@@ -1,0 +1,84 @@
+/* Estilos para el contenedor principal */
+.register-page-container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  /* Estilos para el contenedor de la imagen de fondo */
+  .image-container {
+    flex: 1;
+    background-image: url('../assets/fondo.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+  
+  /* Estilos para el contenedor del formulario */
+  .form-container {
+    flex: 1;
+    background-color: rgba(255, 255, 255, 0);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Estilos para el contenedor del título y el logo */
+  .form-title-container {
+    position: fixed;
+    top: 0;
+    left: 100px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  /* Estilos para el logo */
+  .logo {
+    width: 60px;
+    height: 60px;
+    background-image: url('../assets/logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 10px;
+  }
+.form-title {
+  font-size: 40px;
+}
+
+.form-group {
+    text-align: left;
+  margin-bottom: 10px; 
+}
+
+label {
+  text-align: left;
+  font-size: 16px;
+  font-family: 'Times New Roman', sans-serif;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  font-size: 12px;
+  font-family: 'Times New Roman', sans-serif;
+  padding: 10px; 
+  width: 100%; 
+}
+
+button[type="submit"] {
+  font-size: 18px; 
+  padding: 5px 5px; 
+  background-color: #007bff; 
+  color: white;
+  border: none;
+  cursor: pointer; 
+}
+
+button[type="submit"]:hover {
+  background-color: #0056b3; 
+}
+
+  
