@@ -1,10 +1,8 @@
-/* Estilos para el contenedor principal */
 .register-page-container {
     display: flex;
     height: 100vh;
   }
   
-  /* Estilos para el contenedor de la imagen de fondo */
   .image-container {
     flex: 1;
     background-image: url('../assets/fondo.jpg');
@@ -12,7 +10,6 @@
     background-position: center;
   }
   
-  /* Estilos para el contenedor del formulario */
   .form-container {
     flex: 1;
     background-color: rgba(255, 255, 255, 0);
@@ -22,7 +19,6 @@
     justify-content: center;
   }
   
-  /* Estilos para el contenedor del título y el logo */
   .form-title-container {
     position: fixed;
     top: 0;
@@ -35,7 +31,6 @@
     margin-bottom: 20px;
   }
   
-  /* Estilos para el logo */
   .logo {
     width: 60px;
     height: 60px;
@@ -49,7 +44,7 @@
 }
 
 .form-group {
-    text-align: left;
+  text-align: left;
   margin-bottom: 10px; 
 }
 
