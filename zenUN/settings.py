@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'usuarios' #App usuarios
 ]
 
 MIDDLEWARE = [
@@ -73,10 +74,15 @@ WSGI_APPLICATION = 'zenUN.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+#"String" de conexión a la base de datos
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'brgzb5mff0ockwx9yosx',
+        'USER': 'ujesbcxbjk20hjoe',
+        'PASSWORD': 'VaxdNJNSjMU9uIlrNGYh',
+        'HOST': 'brgzb5mff0ockwx9yosx-mysql.services.clever-cloud.com',
+        'PORT': '3306',
     }
 }
 
