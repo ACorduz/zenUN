@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'MiFuente';
-    src: url('../assets/AveriaSerifLibre-Regular.ttf') format('truetype');
+    src: url('../static/AveriaSerifLibre-Regular.ttf') format('truetype');
 }
 
 body {
@@ -17,7 +17,7 @@ body {
     border-radius: 15px; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 1); 
     overflow: hidden; 
-    background-image: url('../assets/registro.jpg');
+    background-image: url('../static/registro.jpg');
     background-size: cover; 
     background-position: center;
     filter: blur(1px);
@@ -47,7 +47,7 @@ body {
 .logo {
     width: 60px;
     height: 60px;
-    background-image: url('../assets/icono.png');
+    background-image: url('../static/icono.png');
     background-size: contain;
     background-repeat: no-repeat;
     margin-right: 15px;
