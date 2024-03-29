@@ -19,6 +19,7 @@ class usuario(models.Model):
     nombres = models.CharField(max_length=45)
     apellidos = models.CharField(max_length=45)
     correoInstitucional = models.CharField(max_length=50, unique=True) #UNIQUE para que no se pueda repetir el correo.
+    password = models.CharField(max_length=255)
     numeroCelular = models.CharField(max_length=15)
     roles = models.ManyToManyField(rol) #Crea la relación muchos a muchos
     codigoVerificacion = models.IntegerField() #Campo INT para el proceso de verificación de correo
