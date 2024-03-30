@@ -66,3 +66,8 @@ def procesar_registro_estudiante(request):
             mensaje = f"Ocurrió un error: {str(e)}"
 
     return redirect(reverse('registroEstudiante') + f'?mensaje={mensaje}')
+
+#Este método solo se encarga de mostrar la vista de login
+def mostrar_login_usuario(request):
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    return render(request, 'LoginPage.html', {'mensaje': mensaje})

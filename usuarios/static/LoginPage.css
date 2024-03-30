@@ -5,53 +5,54 @@
 
 body {
     font-family: 'MiFuente', sans-serif; 
-    overflow-y: hidden;
-    background-color: rgb(236, 233, 250); 
+    overflow-y: hidden; 
+    background-color: rgb(236, 233, 250)
 }
 
-.register-page-container {
+.login-page-container {
     display: flex;
-    height: 97.6vh; /* Cambiado de 100vh a 100vh */
+    height: 97.5vh;
 }
 
 .image-container {
-    position: absolute;
-    right: 0;
+    position: absolute; 
+    left: 0; 
     top: 0;
-    width: calc(50% - 10px); 
-    height: 100%;
+    width: 50%; 
+    height: 100%; 
     border-radius: 15px; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 1); 
     overflow: hidden; 
-    background-image: url('../assets/registro.jpg');
+    background-image: url('../static/registro.jpg');
     background-size: cover; 
     background-position: center;
     filter: blur(1px);
 }
 
 .form-container {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: calc(50% - 10px); 
-    height: 100%;
-    background-color: rgb(236, 233, 250);
-    padding: 20px;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    position: absolute; 
+    right: 0; 
+    top: 0;
+    width: 46.5%; 
+    max-width: 700px; 
+    height: 100%; 
+    background-color: rgba(200, 243, 198, 0.226);
+    padding: 20px;
 }
 
 .form-title-container {
-    position: fixed;
-    top: 0.1%;
-    left: 140px;
-    right: 0;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    margin-bottom: 20px;
+    justify-content: center; 
+    margin-bottom: 100px;
+}
+
+.form-title {
+    font-size: 40px;
+    border-bottom: 2px solid black;
+    margin-right: 15px; 
 }
 
 .logo {
@@ -61,53 +62,47 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     margin-right: 15px;
-    margin-bottom: 10px; 
     transform: scaleX(-1);
 }
 
-.form-title {
-    font-size: 40px;
-    border-bottom: 2px solid black;
-}
+
 
 .form-group {
     text-align: left;
-    margin-bottom: 3px; 
+    margin-bottom: 10px; 
+    margin-left: 30px;
+    position: relative;
+    padding-right: 20px;
+}
+
+.email-extension {
+    position: absolute;
+    bottom: 10px;
+    right: 90px;
+    color: #000000; 
+    font-size: 20px; 
+}
+
+.changes-container a{
+    color: black;
+    font-size: 19px;
+    margin-left: 55%;
+    margin-top: 2%;
 }
 
 label {
     text-align: left;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"] {
+input[type="password"] {
     font-family: 'MiFuente', sans-serif;
     font-size: 16.5px;
     padding: 10px 0.1px; 
-    width: 93%;
+    width: 89%; 
     border-radius: 10px; 
 }
-.form-group .email-input-container {
-    position: relative;
-}
-
-.form-group input[type="email"] {
-    font-family: 'MiFuente', sans-serif;
-    color: #000000; 
-    font-size: 18px; 
-}
-
-.form-group .email-extension {
-    position: absolute;
-    right: 30px;
-    bottom: 12px;
-    color: #000000; 
-    font-size: 18px; 
-}
-
 
 button[type="submit"] {
     font-family: 'MiFuente', sans-serif; 
@@ -118,8 +113,8 @@ button[type="submit"] {
     border: none;
     cursor: pointer; 
     position: absolute; 
-    bottom: px; 
-    left: 47%; 
+    bottom: 100px; 
+    left: 50%; 
     transform: translateX(-50%); 
     border-radius: 30px;
 }
@@ -131,7 +126,7 @@ button[type="submit"]:hover {
 .location-container {
     display: flex;
     justify-content: space-between;
-    margin-top: 9px;
+    margin-top: 15px;
 }
 
 .location-container .form-group input {
@@ -140,23 +135,34 @@ button[type="submit"]:hover {
     border: 1.6px solid #000000; 
 }
 
-select {
-    font-family: 'MiFuente', sans-serif; 
-    font-size: 16px;
-    padding: 10px;
-    border-radius: 10px; 
-    width: 93%; 
-    background-color: #ffffff; 
-    border: 1.6px solid #000000; 
-}
-
 label {
     margin-bottom: 5px; 
 }
+
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 60px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    border: none; 
+    background-color: transparent;
+    padding: 10px;
+    font-size: 18px;
+}
+
+.toggle-password:hover {
+    color: rgb(130, 34, 255); 
+}
+
 .cuadro {
     position: absolute;
     top: 50%;
-    left: 76%;
+    left: 25%;
     transform: translate(-50%, -50%);
     width: 500px; 
     height: 600px; 
@@ -164,6 +170,7 @@ label {
     z-index: 1000;
     border-radius: 20px;
 }
+
 .cuadro h3 {
     font-size: 30px;
     text-align: center;
@@ -172,7 +179,7 @@ label {
 .cuadro img {
     position: fixed;
     top: 15%;
-    left: 10%;
+    right: 10%;
     width: 80%;
     height: 70%;
 }
@@ -184,9 +191,9 @@ label {
     height: 8%;
     top: 86%;
     font-family: 'MiFuente', sans-serif; 
-    font-size: 20px; 
-    padding: 10px 20px; 
-    background-color: #963aff; 
+    font-size: 18px; 
+    padding: 10px 10px; 
+    background-color: #6b00b3; 
     color: white;
     border: none;
     cursor: pointer; 
@@ -194,27 +201,49 @@ label {
     transform: translateX(-50%); 
     border-radius: 30px;
 }
+
 .cuadro button:hover {
     background-color: #4bd12a;
 }
-.password-container {
-    position: relative;
+
+.reset-password-form button[type="button"] {
+    font-family: 'MiFuente', sans-serif;
+    font-size: 16px;
+    padding: 10px 10px;
+    background-color: #2eeb2e;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 80px;
+    transition: background-color 0.3s ease;
+    display: flex; /* Hace que el contenido sea un flexbox */
+    align-items: center; 
+    position: absolute;
+    left: 420px;
+    top: 466px;
 }
 
-.toggle-password {
-    position: absolute;
-    top: 50%;
-    right: 30px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    border: none; 
-    background-color: transparent;
-    padding: 5px;
+.reset-password-form button[type="button"] span {
+    margin-right: 5px;  
+}
+
+.reset-password-form button[type="button"] i {
     font-size: 15px;
+    
 }
-.toggle-password:hover {
-    color: rgb(130, 34, 255); 
+  
+.reset-password-form input[type="email"]:focus {
+    font-family: 'MiFuente', sans-serif;
+    outline: none; 
+    font-size: 16px;
+    border: 3px solid #000000;
 }
+
+.reset-password-form button[type="button"]:hover {
+    background-color: #6b00b3;
+}
+
+
 
 @media screen and (max-width: 900px) {
     .image-container,
@@ -222,12 +251,12 @@ label {
         display: none; 
     }
 
-    .register-page-container {
+    .login-page-container {
         padding: 20px;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        height: 97.5vh;
         position: relative; 
     }
 
@@ -236,31 +265,20 @@ label {
         max-width: 400px; 
         margin: 0 auto;
         position: relative; 
-        top: 20px;
-        left: 0;
+        top: 50%; 
+        transform: translateY(-50%);
     }
-
+    
     .form-title-container {
-        position: absolute;
-        bottom: 570px;
-        left: 40px;
-        right: 0;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
+        position: relative;
         width: 100%;
         margin-bottom: 20px;
     }
-    
-    .button-container {
-        text-align: center; 
-        margin-top: 20px; 
-        margin-right: 110px;
-    }
 
     button[type="submit"] {
-        position: relative; 
-        border-radius: 30px;
+        position: absolute; 
+        bottom: 20px; 
+        left: 50%; 
+        transform: translateX(-50%); 
     }
 }
-

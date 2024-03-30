@@ -1,17 +1,17 @@
 @font-face {
     font-family: 'MiFuente';
-    src: url('../static/AveriaSerifLibre-Regular.ttf') format('truetype');
+    src: url('../assets/AveriaSerifLibre-Regular.ttf') format('truetype');
 }
 
 body {
-    font-family: 'MiFuente', sans-serif; 
+    font-family: 'MiFuente', sans-serif;
     overflow-y: hidden;
     background-color: rgb(236, 233, 250); 
 }
 
 .register-page-container {
     display: flex;
-    height: 97.6vh; /* Cambiado de 100vh a 100vh */
+    height: 100vh;
 }
 
 .image-container {
@@ -57,7 +57,7 @@ body {
 .logo {
     width: 80px;
     height: 80px;
-    background-image: url('../static/icono.png');
+    background-image: url('../assets/icono.png');
     background-size: contain;
     background-repeat: no-repeat;
     margin-right: 15px;
@@ -82,14 +82,14 @@ label {
 
 input[type="text"],
 input[type="email"],
-input[type="password"],
-input[type="number"] {
+input[type="password"] {
     font-family: 'MiFuente', sans-serif;
     font-size: 16.5px;
     padding: 10px 0.1px; 
     width: 93%;
     border-radius: 10px; 
 }
+
 .form-group .email-input-container {
     position: relative;
 }
@@ -107,7 +107,6 @@ input[type="number"] {
     color: #000000; 
     font-size: 18px; 
 }
-
 
 button[type="submit"] {
     font-family: 'MiFuente', sans-serif; 
@@ -135,7 +134,7 @@ button[type="submit"]:hover {
 }
 
 .location-container .form-group input {
-    width: 81%;
+    width: 88%;
     height: 27%;
     border: 1.6px solid #000000; 
 }
@@ -153,6 +152,7 @@ select {
 label {
     margin-bottom: 5px; 
 }
+
 .cuadro {
     position: absolute;
     top: 50%;
@@ -164,6 +164,7 @@ label {
     z-index: 1000;
     border-radius: 20px;
 }
+
 .cuadro h3 {
     font-size: 30px;
     text-align: center;
@@ -186,7 +187,7 @@ label {
     font-family: 'MiFuente', sans-serif; 
     font-size: 20px; 
     padding: 10px 20px; 
-    background-color: #963aff; 
+    background-color: #6b00b3; 
     color: white;
     border: none;
     cursor: pointer; 
@@ -194,9 +195,11 @@ label {
     transform: translateX(-50%); 
     border-radius: 30px;
 }
+
 .cuadro button:hover {
     background-color: #4bd12a;
 }
+
 .password-container {
     position: relative;
 }
@@ -212,6 +215,7 @@ label {
     padding: 5px;
     font-size: 15px;
 }
+
 .toggle-password:hover {
     color: rgb(130, 34, 255); 
 }
