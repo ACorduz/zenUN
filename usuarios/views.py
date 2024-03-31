@@ -1,9 +1,12 @@
 from django.shortcuts import render
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from usuarios.models import usuario
 from usuarios.models import tipoDocumento
 from django.shortcuts import redirect
 from django.urls import reverse
+
+from django.views.decorators.csrf import csrf_exempt
+
 
 #Funcionalidad de Registro Estudiantes#
 
@@ -66,3 +69,38 @@ def procesar_registro_estudiante(request):
             mensaje = f"Ocurrió un error: {str(e)}"
 
     return redirect(reverse('registroEstudiante') + f'?mensaje={mensaje}')
+
+#Este método solo se encarga de mostrar la vista de login
+def mostrar_login_usuario(request):
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    return render(request, 'LoginPage.html', {'mensaje': mensaje})
+
+
+#Este método se encarga de autenticar las credenciales de usuario 
+@csrf_exempt
+def autenticar_credenciales_usuario(request):
+    try:
+        if request.method == "POST":
+            #Obtener los datos del formulario
+            usuarioInterfaz = request.POST.get('username')
+            contraseña = request.POST.get('password')
+            
+            if  not usuario.objects.filter(correoInstitucional=usuarioInterfaz).exists():
+                mensaje = "El correo no se encuentra registrado"
+                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+    
+            else:
+            #Lógica de validacion de contraseña si la validacion de usuario es exitosa
+                # primero obtener el usuario
+                user = usuario.objects.get(correoInstitucional= usuarioInterfaz)
+
+                # mirar con la funcion chack_password si es la misma
+                if check_password(contraseña, user.password):
+                    mensaje = "El correo es correcto, su validacion es exitosa"
+                    return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+                else:
+                    mensaje = "La contraseña no es correcta"
+                    return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}&username={usuarioInterfaz}')
+    except Exception as e:
+            mensaje = f"Ocurrió un error: {str(e)}"
+            return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')

@@ -33,14 +33,13 @@
         </div>
         <div class="form-content">
           <div class="form-group">
-            <label for="fullName">Nombres</label>
+            <label for="fullName">Nombres:</label>
             <input type="text" id="fullName" name="fullName" required>
           </div>
           <div class="form-group">
               <label for="lastName">Apellidos:</label>
               <input type="text" id="lastName" name="lastName" required>
           </div>
-          <!--Falta hacer la verificación del dominio desde el front-->        
           <div class="form-group">
               <label for="email">Correo:</label>
               <div class="email-input-container">
@@ -53,7 +52,7 @@
               <div class="password-container">
                   <input type="password" id="password" name="password" required>
                   <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password')">
-                      <i id="eye-icon" class="fas fa-eye-slash"></i>
+                      <i id="eye-icon-password" class="fas fa-eye-slash"></i>
                   </button>                
               </div>
           </div>
@@ -66,7 +65,6 @@
                   </button>
               </div>
           </div>
-          <!--Debe tener maximo 15 digitos y debe ser solo numero-->
           <div class="form-group">
             <label for="phone">Numero celular:</label>
             <div class="phone-input-container">
@@ -88,35 +86,82 @@
             <input type="number" id="documentNumber" name="documentNumber" required>
           </div>
       </div>
-          <button type="submit">Registrarse</button>
+      <button type="submit" onclick="validateForm()">Registrar</button>
         </div>
       </div>
       <div class="image-container"></div>
     </div>
   </form>
+  
   <div class="cuadro">
     <h3>Centro de Bienestar UNAL</h3>
     <img src="{% static 'welcome.png' %}" >
-    <button>¿Ya tienes cuenta?</button>
-</div>
-<!--No se deja ver la contraseña en el campo contraseña, muestra el de confirmar contraseña-->
-<script>
-  
-    function togglePasswordVisibility(inputId) {
-    var passwordInput = document.getElementById(inputId);
-    var button = document.querySelector("#" + inputId + "+ .toggle-password");
-    var eyeIcon = document.getElementById("eye-icon");
+    <button onclick="goToLoginPage()">¿Ya tienes cuenta?</button>
 
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        eyeIcon.classList.remove("fa-eye-slash");
-        eyeIcon.classList.add("fa-eye");
-    } else {
-        passwordInput.type = "password";
-        eyeIcon.classList.remove("fa-eye");
-        eyeIcon.classList.add("fa-eye-slash");
-    }
-}
-  </script>
+</div>
+
+<script>
+  // funcion para cambiar la visibildad de la contraseña
+  function togglePasswordVisibility(inputId) {
+      var passwordInput = document.getElementById(inputId);
+      var button = document.querySelector("#" + inputId + " + .toggle-password");
+      var eyeIcon = document.querySelector("#" + inputId + " + .toggle-password i");
+
+      if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          eyeIcon.classList.remove("fa-eye-slash");
+          eyeIcon.classList.add("fa-eye");
+      } else {
+          passwordInput.type = "password";
+          eyeIcon.classList.remove("fa-eye");
+          eyeIcon.classList.add("fa-eye-slash");
+      }
+  }
+
+  function validateForm() {
+      var fullName = document.getElementById('fullName').value;
+      var lastName = document.getElementById('lastName').value;
+      var email = document.getElementById('email').value;
+      var password = document.getElementById('password').value;
+      var confirmPassword = document.getElementById('confirmPassword').value;
+      var documentType = document.getElementById('documentType').value;
+      var documentNumber = document.getElementById('documentNumber').value;
+      var telefono = document.getElementById('phone').value;
+      
+      // Obtener el formulario
+      var formulario = document.getElementById('registroForm');
+
+      //si esta vacio algun campo
+      if (fullName === '' || lastName === '' || email === '' || password === '' || confirmPassword === '' || documentType === '' || documentNumber === '') {
+        alert('Por favor, llene todos los campos.');
+        event.preventDefault();
+      } 
+      // si correo no tiene dominio.unal 
+      else if(!email.endsWith("unal.edu.co")){
+        alert('El correo debe tener dominio.Unal');
+        event.preventDefault(); // Detener el envío del formulario
+      }
+      // Debe tener maximo 15 digitos y debe ser solo numero
+      else if(telefono.toString().length > 15){
+        alert('El numero de telefono debe ser un numero o su longitud no debe ser mayor a 15');
+        event.preventDefault(); // Detener el envío del formulario
+      }
+      // El documento por si solo deja entrar numeros 
+      else if (password != confirmPassword) {
+        alert('Las contraseñas no coinciden.');
+        event.preventDefault(); // Detener el envío del formulario
+      } else {
+        alert('Envio de peticion a la BD');
+      }
+  }
+
+  // metodo vaya a la pagina de login 
+  function goToLoginPage() {
+      var urlLoginPage = "{% url 'loginUsuario' %}";
+      window.location.href = urlLoginPage;
+  }
+</script>
 </body>
 </html>
+
+
