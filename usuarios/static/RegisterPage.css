@@ -11,7 +11,7 @@ body {
 
 .register-page-container {
     display: flex;
-    height: 97.6vh; /* Cambiado de 100vh a 100vh */
+    height: 97.6vh; 
 }
 
 .image-container {
@@ -23,7 +23,7 @@ body {
     border-radius: 15px; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 1); 
     overflow: hidden; 
-    background-image: url('../assets/registro.jpg');
+    background-image: url('../static/registro.jpg');
     background-size: cover; 
     background-position: center;
     filter: blur(1px);

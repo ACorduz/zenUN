@@ -83,13 +83,6 @@ body {
     font-size: 20px; 
 }
 
-.changes-container a{
-    color: black;
-    font-size: 19px;
-    margin-left: 55%;
-    margin-top: 2%;
-}
-
 label {
     text-align: left;
     font-size: 18px;
@@ -206,6 +199,19 @@ label {
     background-color: #4bd12a;
 }
 
+.form-container_resetPassword  .changes-container a{
+    color: black;
+    font-size: 19px;
+    position: relative;
+    left: 1000px;
+    top: 390px;
+}
+
+.reset-password-form {
+    position: relative;
+    top: 400px;
+    left: 750px;
+}
 .reset-password-form button[type="button"] {
     font-family: 'MiFuente', sans-serif;
     font-size: 16px;
@@ -216,11 +222,11 @@ label {
     cursor: pointer;
     border-radius: 80px;
     transition: background-color 0.3s ease;
-    display: flex; /* Hace que el contenido sea un flexbox */
+    display: flex; 
     align-items: center; 
-    position: absolute;
-    left: 420px;
-    top: 466px;
+    position: relative;
+    bottom: 40px;
+    left: 380px;
 }
 
 .reset-password-form button[type="button"] span {
