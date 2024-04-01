@@ -65,7 +65,24 @@ body {
     transform: scaleX(-1);
 }
 
-
+.mensaje-backend h4{
+    position: relative;
+    top: -15px;
+    left: 20px;
+}
+.mensaje-backend {
+    z-index: 9999; 
+    position: relative;
+    top: 150px;
+    left: 850px; 
+    background-color: #f8d7da; 
+    color: #721c24; 
+    border: 1px solid #f5c6cb; 
+    border-radius: 20px;
+    max-height: 30px; 
+    max-width: 300px;
+    margin-bottom: 10px; 
+}
 
 .form-group {
     text-align: left;

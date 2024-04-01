@@ -64,6 +64,24 @@ body {
     margin-bottom: 10px; 
     transform: scaleX(-1);
 }
+.mensaje-exito h4{
+    position: relative;
+    top: -15px;
+    left: 20px;
+}
+.mensaje-exito {
+    z-index: 9999; 
+    position: relative;
+    top: -5px;
+    left: 300px; 
+    background-color: #d4edda; 
+    color: #155724; 
+    border: 1px solid #c3e6cb; 
+    border-radius: 20px;
+    max-height: 30px; 
+    max-width: 300px;
+    margin-bottom: 10px; 
+}
 
 .form-title {
     font-size: 40px;
