@@ -11,7 +11,7 @@ body {
 
 .register-page-container {
     display: flex;
-    height: 97.6vh; /* Cambiado de 100vh a 100vh */
+    height: 97.6vh; 
 }
 
 .image-container {
@@ -23,7 +23,7 @@ body {
     border-radius: 15px; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 1); 
     overflow: hidden; 
-    background-image: url('../assets/registro.jpg');
+    background-image: url('../static/registro.jpg');
     background-size: cover; 
     background-position: center;
     filter: blur(1px);
@@ -63,6 +63,24 @@ body {
     margin-right: 15px;
     margin-bottom: 10px; 
     transform: scaleX(-1);
+}
+.mensaje-exito h4{
+    position: relative;
+    top: -15px;
+    left: 20px;
+}
+.mensaje-exito {
+    z-index: 9999; 
+    position: relative;
+    top: -5px;
+    left: 300px; 
+    background-color: #d4edda; 
+    color: #155724; 
+    border: 1px solid #c3e6cb; 
+    border-radius: 20px;
+    max-height: 30px; 
+    max-width: 300px;
+    margin-bottom: 10px; 
 }
 
 .form-title {
