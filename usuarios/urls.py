@@ -6,5 +6,6 @@ urlpatterns = [
     path('registroEstudiante/', views.mostrar_registro_estudiante, name='registroEstudiante'), #Vista RegistroEstudiante
     path('procesarRegistroEstudiante/', views.procesar_registro_estudiante, name='procesar_registro_estudiante'), #Ruta para el formulario
     path('login/',views.mostrar_login_usuario,name='loginUsuario'), # vista Login
-    path('autenticarCredenciales/',views.autenticar_credenciales_usuario, name='autenticar_credenciales_usuario') # Ruta para el formulario Login
+    path('autenticarCredenciales/',views.autenticar_credenciales_usuario, name='autenticar_credenciales_usuario'), # Ruta para el formulario Login
+    path('paginaPrincipalEstudiante/', views.mostrar_mainPage_estudiante, name='paginaPrincipal_estudiante')
 ]

@@ -86,7 +86,7 @@ def autenticar_credenciales_usuario(request):
             contraseña = request.POST.get('password')
             
             if  not usuario.objects.filter(correoInstitucional=usuarioInterfaz).exists():
-                mensaje = "El correo no se encuentra registrado"
+                mensaje = "correo no registrado"
                 return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
     
             else:
@@ -96,11 +96,27 @@ def autenticar_credenciales_usuario(request):
 
                 # mirar con la funcion chack_password si es la misma
                 if check_password(contraseña, user.password):
-                    mensaje = "El correo es correcto, su validacion es exitosa"
-                    return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+
+                    # revisar si el usuario esta validado
+                    validacionUsuario = user.usuarioVerificado
+                
+                    if(validacionUsuario == True):
+                        mensaje = "Validacion exitosa"
+                        return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
+                    else: 
+                        # sino esta validado el usuario
+                        mensaje = "Revise su correo. Para validar cuenta"
+                        return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}') 
+    
                 else:
-                    mensaje = "La contraseña no es correcta"
+                    # contraseña incorrecta
+                    mensaje = "correo y/o contraseña incorrectos"
                     return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}&username={usuarioInterfaz}')
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}"
             return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+    
+#Este método solo se encarga de mostrar la vista de PaginaPrincipal Estudiante
+def mostrar_mainPage_estudiante(request):
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    return render(request, 'MainPageStudent.html', {'mensaje': mensaje})
