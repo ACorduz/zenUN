@@ -8,6 +8,6 @@ urlpatterns = [
     path('login/',views.mostrar_login_usuario,name='loginUsuario'), # vista Login
     path('autenticarCredenciales/',views.autenticar_credenciales_usuario, name='autenticar_credenciales_usuario'), # Ruta para el formulario Login
     path('paginaPrincipalEstudiante/', views.mostrar_mainPage_estudiante, name='paginaPrincipal_estudiante'),
-    path('recuperarContraseña/',views.mostrar_recuperar_contra, name='enviar_correo') #Ruta para el formulario de recuperar contraseña
-
+    path('login/recuperarContraseña/',views.mostrar_recuperar_contra, name='enviar_correo'), #Ruta para el formulario de recuperar contraseña
+    path('cambiarContraseña/', views.mostrar_ResetPasswordPage, name="cambiar_contraseña")
 ]

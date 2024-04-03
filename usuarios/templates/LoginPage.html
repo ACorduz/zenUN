@@ -45,7 +45,7 @@
     </form>
     <div class="form-container_resetPassword">
       <div class="changes-container">
-        <a href="#" onclick="showResetPasswordForm()">¿Olvidaste tu contraseña?</a>
+        <a href="recuperarContraseña/" >¿Olvidaste tu contraseña?</a>
       </div>
       <div id="resetPasswordForm" class="reset-password-form" style="display: none;">
         <h3>Restablecer contraseña</h3>
@@ -73,11 +73,6 @@
       } else {
         alert('¡Inicio de sesión exitoso!');
       }
-    }
-
-    function showResetPasswordForm() {
-      var resetPasswordForm = document.getElementById('resetPasswordForm');
-      resetPasswordForm.style.display = 'block';
     }
 
     function sendResetPasswordEmail() {
