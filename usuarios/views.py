@@ -5,6 +5,10 @@ from usuarios.models import tipoDocumento
 from django.shortcuts import redirect
 from django.urls import reverse
 
+from django.conf import settings
+from django.core.mail import send_mail
+from usuarios.forms import FormularioContacto
+
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -120,3 +124,45 @@ def autenticar_credenciales_usuario(request):
 def mostrar_mainPage_estudiante(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     return render(request, 'MainPageStudent.html', {'mensaje': mensaje})
+
+    
+
+#Este metodo se encarga de mostrar la vista donde el usuario ingresa que desea recuperar contraseña
+"""def mostrar_recuperar_contra(requets):
+
+    if requets.method == "POST":
+
+        subject = "Correo de prueba"
+
+        message = "Ojala y funcione"
+
+        email_from = settings.EMAIL_HOST_USER
+
+        recipient_list=[requets.POST["mail"],"cbarrerar"]
+
+        print("entra aqui")
+        print(recipient_list)
+
+        send_mail(subject, message, email_from, recipient_list)
+
+        return render(requets, "CorreoEnviado.html",{})
+    
+    return render(requets, "EnviarCorreoRecup.html",{})"""
+
+
+def mostrar_recuperar_contra(request):
+    if request.method=="POST":
+
+        miFormulario=FormularioContacto(request.POST)
+        if miFormulario.is_valid():
+            infForm=miFormulario.cleaned_data
+            print(infForm['asunto'])
+            print(infForm['mensaje'])
+            print(infForm.get('email',''))
+            send_mail(infForm['asunto'], infForm['mensaje'], infForm.get('email',''),['diegolds222@gmail.com'],)
+            print("Valio aqui")
+            return render(request, "CorreoEnviado.html")
+    else:
+        miFormulario=FormularioContacto()
+    
+    return render(request, "EnviarCorreoRecup.html",{"form":miFormulario})
