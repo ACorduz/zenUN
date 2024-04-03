@@ -159,7 +159,7 @@ def mostrar_recuperar_contra(request):
             print(infForm['asunto'])
             print(infForm['mensaje'])
             print(infForm.get('email',''))
-            send_mail(infForm['asunto'], infForm['mensaje'], infForm.get('email',''),['diegolds222@gmail.com'],)
+            send_mail(infForm['asunto'], infForm['mensaje'], settings.EMAIL_HOST_USER,[infForm.get('email','')],)
             print("Valio aqui")
             return render(request, "CorreoEnviado.html")
     else:
