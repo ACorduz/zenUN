@@ -123,15 +123,19 @@ def autenticar_credenciales_usuario(request):
             mensaje = f"Ocurrió un error: {str(e)}"
             return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
     
-#Este método solo se encarga de mostrar la vista de PaginaPrincipal Estudiante
-def mostrar_mainPage_estudiante(request):
+
+def mostrar_enviarCorreo_contrasena(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     return render(request, 'MainPageStudent.html', {'mensaje': mensaje})
 
-    
+#Este método solo se encarga de mostrar la vista de PaginaPrincipal Estudiante
+def mostrar_mainPage_estudiante(request):
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    return render(request, 'SendEmailResetPasswordPage.html', {'mensaje': mensaje})
+   
 #Este metodo se encarga de mostrar la vista donde el usuario ingresa que desea recuperar contraseña
 #Metodo para enviar el correo electronico con el link para el reestablecimiento de la contraseña
-def mostrar_recuperar_contra(request):
+def procesar_enviarCorreo_contrasena(request):
     if request.method=="POST":
 
         #Creamos un formulario que guardara la información del HTML 
@@ -217,14 +221,33 @@ def procesar_cambio_contrasena(request,correoUsuario2, codigoCifrado2):
             nuevaContraseña = request.POST.get('newPassword')
             confirmacion = request.POST.get('confirmPassword')
             
+            # Revisar si el usuario existe
             if  usuario.objects.filter(correoInstitucional= correoUsuario2).exists():
-                mensaje = "El correo esta registrado"
-                if(nuevaContraseña == confirmacion):
-                    mensaje = "Las contraseñas coinciden"
-                    return redirect(reverse('cambiar_contrasena', args=(correoUsuario2, codigoCifrado2)) + f'?mensaje={mensaje}')
+                # Revisar si el codigo es correcto
+                ### Mejorar segun una funcion para decifrar y que pase true
+                if (codigoCifrado2 == 213115614532):
+                    # Revisar si las contraseñas son iguales
+                    if(nuevaContraseña == confirmacion):
+                        mensaje = "Las contraseñas coinciden"
+                        # LUEGO CAMBIAR LA CONTRASEÑA EN LA BD
+                        # primero traer al usuario
+                        user = usuario.objects.get(correoInstitucional= correoUsuario2)
+                        password_hash = make_password(nuevaContraseña)
+                        user.password = password_hash
+                        user.save()
+
+                        mensaje = "EL CAMBIO DE CONTRASEÑA FUE EXITOSO"
+                        return redirect(reverse('cambiar_contrasena', args=("Ya hizo cambio", 0000)) + f'?mensaje={mensaje}')
+                    else:
+                        mensaje = "las contraseñas NO coinciden"
+                        return redirect(reverse('cambiar_contrasena', args=(correoUsuario2, codigoCifrado2)) + f'?mensaje={mensaje}')
                 else:
-                    mensaje = "las contraseñas NO coinciden"
-                    return redirect(reverse('cambiar_contrasena', args=(correoUsuario2, codigoCifrado2)) + f'?mensaje={mensaje}')
+                    mensaje = "Pida un correo de recuperación de contraseña nuevamente"
+                    return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+            else:
+                # usuario no registrado redireccion vista registro estudiante
+                mensaje = "Usuario no registrado"
+                return redirect(reverse('registroEstudiante') + f'?mensaje={mensaje}')
 
     
     except Exception as e:
