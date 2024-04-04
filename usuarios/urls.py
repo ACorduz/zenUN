@@ -10,5 +10,5 @@ urlpatterns = [
     path('paginaPrincipalEstudiante/', views.mostrar_mainPage_estudiante, name='paginaPrincipal_estudiante'),
     path('login/recuperarContraseña/',views.mostrar_recuperar_contra, name='enviar_correo'), #Ruta para el formulario de recuperar contraseña
     path('cambiarContraseña/<str:correoUsuario>/<int:codigoCifrado>/', views.mostrar_ResetPasswordPage, name="cambiar_contrasena"),  # vista Reset Password
-    path('cambiarContraseña/procesarCambioContraseña/', views.procesar_cambio_contrasena, name="procesar_cambio_contrasena")
+    path('cambiarContraseña/<str:correoUsuario2>/<int:codigoCifrado2>/procesarCambioContraseña/', views.procesar_cambio_contrasena, name="procesar_cambio_contrasena")
 ]

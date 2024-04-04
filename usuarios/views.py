@@ -196,27 +196,36 @@ def mostrar_recuperar_contra(request):
 
 #Este método muestra la vista de cambiar contraseña 
 def mostrar_ResetPasswordPage(request, correoUsuario, codigoCifrado):
-        # Pasar los parámetros al contexto
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    # Pasar los parámetros al contexto
     context = {
         'correoUsuario': str(correoUsuario),
-        'codigoCifrado': codigoCifrado
+        'codigoCifrado': codigoCifrado, 
+        'mensaje': mensaje
     }
     return render(request, 'ResetPasswordPage.html', context)
 
 
 
 # Este metodo solo procesar el formulario  y cambio de contraseña en la vista cambio de contraseña
-def procesar_cambio_contrasena(request, correoUsuario, codigoCifrado):
+def procesar_cambio_contrasena(request,correoUsuario2, codigoCifrado2):
     try:
         if request.method == "POST":
+            # Ojo el correo del usuario es correoUsuario2 y  codigoCifrado = codigoCifrado2
+
             #Obtener los datos del formulario
-            nuevaContraseña = request.POST.get('username')
-            confirmacion = request.POST.get('password')
+            nuevaContraseña = request.POST.get('newPassword')
+            confirmacion = request.POST.get('confirmPassword')
             
-            print("FUNCION EL POSTs")
-            if  not usuario.objects.filter(correoInstitucional= "").exists():
-                mensaje = "EL CORREO ESTA REGISTRADO JIJIJIJIJIJIJIJIJIJIJ"
-                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+            if  usuario.objects.filter(correoInstitucional= correoUsuario2).exists():
+                mensaje = "El correo esta registrado"
+                if(nuevaContraseña == confirmacion):
+                    mensaje = "Las contraseñas coinciden"
+                    return redirect(reverse('cambiar_contrasena', args=(correoUsuario2, codigoCifrado2)) + f'?mensaje={mensaje}')
+                else:
+                    mensaje = "las contraseñas NO coinciden"
+                    return redirect(reverse('cambiar_contrasena', args=(correoUsuario2, codigoCifrado2)) + f'?mensaje={mensaje}')
+
     
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}"
