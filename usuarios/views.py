@@ -123,16 +123,19 @@ def autenticar_credenciales_usuario(request):
             mensaje = f"Ocurrió un error: {str(e)}"
             return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
     
-#Este método solo se encarga de mostrar la vista de PaginaPrincipal Estudiante
-def mostrar_mainPage_estudiante(request):
+
+def mostrar_enviarCorreo_contrasena(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     return render(request, 'MainPageStudent.html', {'mensaje': mensaje})
 
-    
-
+#Este método solo se encarga de mostrar la vista de PaginaPrincipal Estudiante
+def mostrar_mainPage_estudiante(request):
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    return render(request, 'SendEmailResetPasswordPage.html', {'mensaje': mensaje})
+   
 #Este metodo se encarga de mostrar la vista donde el usuario ingresa que desea recuperar contraseña
 #Metodo para enviar el correo electronico con el link para el reestablecimiento de la contraseña
-def mostrar_recuperar_contra(request):
+def procesar_enviarCorreo_contrasena(request):
     if request.method=="POST":
 
         #Creamos un formulario que guardara la información del HTML 
@@ -153,15 +156,27 @@ def mostrar_recuperar_contra(request):
 
             recipient_list=[infForm.get('email','')]
 
-            #Verificar si el correo ingresado si pertenece a la abse de datos
+   
+
+            #Verificar si el correo ingresado si pertenece a la base de datos
             if  not usuario.objects.filter(correoInstitucional=infForm.get('email','')).exists():
                 mensaje = "correo no registrado"
                 print(mensaje)
                 return render(request, "SendEmailResetPasswordPage.html",{"form":miFormulario})
             
             else:
-                #generamos un html para que el vorreo que se envia sea más vistoso y no solo texto plano
-                context = {"mail":"http://127.0.0.1:8000/login/"}
+                # variable necesitada en el template sendMessageEmail, (link_resetPassword)
+                user = usuario.objects.get(correoInstitucional= infForm.get('email',''))
+                correo = user.correoInstitucional
+                # ese codigo cifrado es provisional. Hay que crear una funcion que cree un codigo en numeros y despues pueda ser validado comoCorrecto, con otra funcion
+                codigoCifrado = 213115614532
+                link_resetPassword = request.build_absolute_uri(reverse('cambiar_contrasena', args=[correo, codigoCifrado]))
+
+                #generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+                context = {
+                           "link_resetPassword": link_resetPassword,  # Pasamos link_resetPassword al contexto de ese html
+                        }
+                # renderizamos el template html
                 template = get_template("SendMessageEmail.html")
                 content = template.render(context)
 
@@ -176,7 +191,6 @@ def mostrar_recuperar_contra(request):
                 email.send()
 
                 #send_mail(subject ,message, email_from, recipient_list,html_message=template,)
-
                 return render(request, "CorreoEnviado.html")
     else:
         miFormulario=FormularioContacto()
@@ -184,7 +198,58 @@ def mostrar_recuperar_contra(request):
     return render(request, "SendEmailResetPasswordPage.html",{"form":miFormulario})
 
 
-#Este método para mostrar la vista de cambiar contraseña 
-def mostrar_ResetPasswordPage(request):
+#Este método muestra la vista de cambiar contraseña 
+def mostrar_ResetPasswordPage(request, correoUsuario, codigoCifrado):
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    # Pasar los parámetros al contexto
+    context = {
+        'correoUsuario': str(correoUsuario),
+        'codigoCifrado': codigoCifrado, 
+        'mensaje': mensaje
+    }
+    return render(request, 'ResetPasswordPage.html', context)
 
-    return render(request, 'ResetPasswordPage.html', {})
+
+
+# Este metodo solo procesar el formulario  y cambio de contraseña en la vista cambio de contraseña
+def procesar_cambio_contrasena(request,correoUsuario2, codigoCifrado2):
+    try:
+        if request.method == "POST":
+            # Ojo el correo del usuario es correoUsuario2 y  codigoCifrado = codigoCifrado2
+
+            #Obtener los datos del formulario
+            nuevaContraseña = request.POST.get('newPassword')
+            confirmacion = request.POST.get('confirmPassword')
+            
+            # Revisar si el usuario existe
+            if  usuario.objects.filter(correoInstitucional= correoUsuario2).exists():
+                # Revisar si el codigo es correcto
+                ### Mejorar segun una funcion para decifrar y que pase true
+                if (codigoCifrado2 == 213115614532):
+                    # Revisar si las contraseñas son iguales
+                    if(nuevaContraseña == confirmacion):
+                        mensaje = "Las contraseñas coinciden"
+                        # LUEGO CAMBIAR LA CONTRASEÑA EN LA BD
+                        # primero traer al usuario
+                        user = usuario.objects.get(correoInstitucional= correoUsuario2)
+                        password_hash = make_password(nuevaContraseña)
+                        user.password = password_hash
+                        user.save()
+
+                        mensaje = "EL CAMBIO DE CONTRASEÑA FUE EXITOSO"
+                        return redirect(reverse('cambiar_contrasena', args=("Ya hizo cambio", 0000)) + f'?mensaje={mensaje}')
+                    else:
+                        mensaje = "las contraseñas NO coinciden"
+                        return redirect(reverse('cambiar_contrasena', args=(correoUsuario2, codigoCifrado2)) + f'?mensaje={mensaje}')
+                else:
+                    mensaje = "Pida un correo de recuperación de contraseña nuevamente"
+                    return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+            else:
+                # usuario no registrado redireccion vista registro estudiante
+                mensaje = "Usuario no registrado"
+                return redirect(reverse('registroEstudiante') + f'?mensaje={mensaje}')
+
+    
+    except Exception as e:
+            mensaje = f"Ocurrió un error: {str(e)}"
+            return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
