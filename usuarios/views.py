@@ -1,14 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
 from usuarios.models import usuario
 from usuarios.models import tipoDocumento
-from django.shortcuts import redirect
 from django.urls import reverse
+from django.conf import settings
+from django.template.loader import get_template
+from django.core.mail import EmailMultiAlternatives
+from django.core.signing import Signer, BadSignature
+import time
 
-from django.views.decorators.csrf import csrf_exempt
-
-
-#Funcionalidad de Registro Estudiantes#
+#################Funcionalidad de Registro Estudiantes################
 
 #Este método solo se encarga de mostrar la vista de registro
 def mostrar_registro_estudiante(request):
@@ -70,53 +71,174 @@ def procesar_registro_estudiante(request):
 
     return redirect(reverse('registroEstudiante') + f'?mensaje={mensaje}')
 
+########################Funcionalidad de Login Usuarios####################################
+
 #Este método solo se encarga de mostrar la vista de login
 def mostrar_login_usuario(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
-    return render(request, 'LoginPage.html', {'mensaje': mensaje})
-
+    return render(request, 'LoginPage.html', {'mensaje': mensaje})    
 
 #Este método se encarga de autenticar las credenciales de usuario 
-@csrf_exempt
 def autenticar_credenciales_usuario(request):
     try:
         if request.method == "POST":
             #Obtener los datos del formulario
-            usuarioInterfaz = request.POST.get('username')
-            contraseña = request.POST.get('password')
+            correo_usuario = request.POST.get('email')
+            password_usuario = request.POST.get('password')
             
-            if  not usuario.objects.filter(correoInstitucional=usuarioInterfaz).exists():
-                mensaje = "correo no registrado"
+            if  not usuario.objects.filter(correoInstitucional=correo_usuario).exists():
+                mensaje = "Usuario no registrado."
                 return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
     
             else:
             #Lógica de validacion de contraseña si la validacion de usuario es exitosa
                 # primero obtener el usuario
-                user = usuario.objects.get(correoInstitucional= usuarioInterfaz)
+                user = usuario.objects.get(correoInstitucional = correo_usuario)
 
                 # mirar con la funcion chack_password si es la misma
-                if check_password(contraseña, user.password):
+                if check_password(password_usuario, user.password):
 
                     # revisar si el usuario esta validado
                     validacionUsuario = user.usuarioVerificado
                 
                     if(validacionUsuario == True):
-                        mensaje = "Validacion exitosa"
+                        mensaje = "Validacion exitosa."
                         return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
                     else: 
-                        # sino esta validado el usuario
-                        mensaje = "Revise su correo. Para validar cuenta"
+                        # si no está validado el usuario
+                        mensaje = "Revise su correo para válidar cuenta."
                         return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}') 
     
                 else:
                     # contraseña incorrecta
-                    mensaje = "correo y/o contraseña incorrectos"
-                    return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}&username={usuarioInterfaz}')
+                    mensaje = "Correo y/o contraseña incorrectos"
+                    return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}&username={correo_usuario}')
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}"
             return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
-    
-#Este método solo se encarga de mostrar la vista de PaginaPrincipal Estudiante
+
+#Este método se encarga de mostrar la vista de PaginaPrincipal Estudiante
 def mostrar_mainPage_estudiante(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     return render(request, 'MainPageStudent.html', {'mensaje': mensaje})
+
+
+########################Funcionalidad de Recuperar Contraseña####################################
+
+#Este método se encarga de mostrar la vista donde el usuario ingresa que desea recuperar contraseña
+def mostrar_enviarCorreo_contrasena(request):
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    return render(request, 'SendEmailResetPasswordPage.html', {'mensaje': mensaje})
+
+#Metodo para enviar el correo electronico con el link para el reestablecimiento de la contraseña
+def procesar_enviarCorreo_contrasena(request):
+    try: 
+        if request.method=="POST":
+            #Obtener los datos del formulario
+            correoUsuario = request.POST.get('email')
+
+            #Verificar si el correo ingresado si pertenece a la base de datos
+            if  not usuario.objects.filter(correoInstitucional = correoUsuario).exists():
+                mensaje = "Usuario no encontrado."
+                return redirect(reverse('enviarCorreo_contrasena') + f'?mensaje={mensaje}')
+
+            else:
+                #Generar un token único y firmarlo
+                signer = Signer()
+                # Firmar el token con el correo electrónico del usuario y la marca de tiempo actual
+                token = signer.sign(f"{correoUsuario}:{time.time()}")
+
+                #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
+                subject = "Restablecer tu contraseña"
+                message = "No hay problema, puedes restablecer tu contraseña de zenUN\ntras hacer clic en el siguiente enlace:\n\nRestablecer contraseña\n\nSi no solicitaste el restablecimiento de tu contraseña, puedes borrar este email y continuar disfrutando tu aplicación.\nSaludos.\nEl equipo de zenUN Los Capis"
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = [correoUsuario]
+
+                #Generar el enlace con el token incluido
+                reset_url = request.build_absolute_uri(reverse('cambiar_contrasena', args=[token]))
+
+                #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+                context = {
+                            "link_resetPassword": reset_url,  # Pasamos link_resetPassword al contexto de ese html
+                        }
+                #Renderizamos el template html
+                template = get_template("SendMessageEmail.html")
+                content = template.render(context)
+
+                email = EmailMultiAlternatives(
+                        subject,
+                        message,
+                        email_from,
+                        recipient_list
+                    )
+
+                email.attach_alternative(content, "text/html")
+                email.send()
+
+                #send_mail(subject ,message, email_from, recipient_list,html_message=template,)
+                return render(request, "CorreoEnviado.html")
+            
+    except Exception as e:
+        mensaje = f"Ocurrió un error: {str(e)}"
+        return redirect(reverse('enviarCorreo_contrasena') + f'?mensaje={mensaje}')
+
+
+#Este método muestra la vista de cambiar contraseña 
+def mostrar_ResetPasswordPage(request, token):
+    # Configurar la duración máxima del token
+    DURACION_MAXIMA_TOKEN_SEGUNDOS = 30*60 #30 min máximo
+
+    try:
+        signer = Signer()
+        # Desfirmar el token
+        correo_usuario, tiempo_creacion = signer.unsign(token).split(":")
+        
+        # Verificar si el token ha expirado comparando la marca de tiempo actual con la marca de tiempo de creación
+        tiempo_actual = time.time()
+
+        if (tiempo_actual - float(tiempo_creacion) <= DURACION_MAXIMA_TOKEN_SEGUNDOS) and (usuario.objects.filter(correoInstitucional = correo_usuario).exists()):
+            mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+            return render(request, 'ResetPasswordPage.html', {'mensaje':mensaje, 'correo_usuario': correo_usuario, 'token': token})
+        else:
+            mensaje = 'El token ha expirado. Solicite nuevamente un enlace de recuperación de contraseña.'
+            return redirect(reverse('enviarCorreo_contrasena') + f'?mensaje={mensaje}')
+        
+    except BadSignature:
+        mensaje = 'Token inválido.'
+        return render(request, 'SendEmailResetPasswordPage.html', {'mensaje': mensaje})
+    except Exception as e:
+        mensaje = f"Ocurrió un error: {str(e)}"
+        return render(request, 'SendEmailResetPasswordPage.html', {'mensaje': mensaje})
+
+#Este metodo procesar el cambio de la contraseña
+def procesar_cambio_contrasena(request, correo_usuario, token):
+    try:
+        if request.method == "POST":
+            #Obtener los datos del formulario
+            nuevaContraseña = request.POST.get('newPassword')
+            confirmacion = request.POST.get('confirmPassword')
+            
+            # Revisar si el usuario existe
+            if  usuario.objects.filter(correoInstitucional= correo_usuario).exists():
+                # Revisar si las contraseñas son iguales
+                if(nuevaContraseña == confirmacion):
+                    #LUEGO CAMBIAR LA CONTRASEÑA EN LA BD
+                    #primero buscar al usuario por correo
+                        user = usuario.objects.get(correoInstitucional= correo_usuario)
+                        password_hash = make_password(nuevaContraseña)
+                        user.password = password_hash
+                        user.save()
+
+                        mensaje = "EL CAMBIO DE CONTRASEÑA FUE EXITOSO"
+                        return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+                else:
+                    mensaje = 'Las contraseñas no coinciden.'
+                    return redirect(reverse('cambiar_contrasena', args=[token]) + f'?mensaje={mensaje}')
+
+            else:
+                mensaje = "Solicite un correo de recuperación de contraseña nuevamente"
+                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+
+    except Exception as e:
+            mensaje = f"Ocurrió un error: {str(e)}"
+            return redirect(reverse('cambiar_contrasena', args=[token]) + f'?mensaje={mensaje}')

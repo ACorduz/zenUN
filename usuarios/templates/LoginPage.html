@@ -29,7 +29,7 @@
         </div>
         <div class="form-group">
           <label for="username">Usuario:</label>
-          <input type="text" id="username" name="username" required>
+          <input type="email" id="username" name="email" required>
         </div>
         <div class="form-group">
           <label for="password">Contraseña:</label>
@@ -45,7 +45,7 @@
     </form>
     <div class="form-container_resetPassword">
       <div class="changes-container">
-        <a href="#" onclick="showResetPasswordForm()">¿Olvidaste tu contraseña?</a>
+        <a href="{% url 'enviarCorreo_contrasena' %}" >¿Olvidaste tu contraseña?</a>
       </div>
       <div id="resetPasswordForm" class="reset-password-form" style="display: none;">
         <h3>Restablecer contraseña</h3>
@@ -61,7 +61,7 @@
     </div>
   <div class="cuadro">
     <h3>Centro de Bienestar UNAL</h3>
-    <img src="{% static 'welcome.png' %}"">
+    <img src="{% static 'welcome.png' %}">
     <button onclick="goToRegisterPage()"> ¿Aún no tienes cuenta?</button>
   </div>
   <script>
@@ -73,11 +73,6 @@
       } else {
         alert('¡Inicio de sesión exitoso!');
       }
-    }
-
-    function showResetPasswordForm() {
-      var resetPasswordForm = document.getElementById('resetPasswordForm');
-      resetPasswordForm.style.display = 'block';
     }
 
     function sendResetPasswordEmail() {
