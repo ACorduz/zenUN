@@ -32,8 +32,8 @@ urlpatterns = [
             name="procesar_cambio_contrasena"), #Ruta para el formulario reset Password
     path('verificacionCorreo/<str:token>/',
           views.mostrar_otp,
-          name="mostrar_otp"), #Ruta para el formulario de verificación del correo por OTP
-    path('verificacionCorreo/aprobar/<str:token>/',
+          name="mostrar_otp"), #Ruta para mostrar el formulario de verificación del correo por OTP
+    path('verificacionCorreo/aprobar/<str:token>',
          views.aprobar_OTP,
          name="aprobar_OTP"), #Ruta para la vista de aprobación del OTP
 ]

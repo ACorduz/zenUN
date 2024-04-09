@@ -25,18 +25,18 @@ def procesar_registro_estudiante(request):
             #Obtener los datos del formulario
             nombres = request.POST.get('fullName')
             apellidos = request.POST.get('lastName')
-            email = request.POST.get('email')
+            email_usuario = request.POST.get('email')
             password = request.POST.get('password')
             confirm_password = request.POST.get('confirmPassword')
             tipo_documento = int(request.POST.get('documentType'))
             phone = request.POST.get('phone')
             numero_documento = request.POST.get('documentNumber')
             
-            if not email.endswith('@unal.edu.co'):
+            if not email_usuario.endswith('@unal.edu.co'):
                 mensaje = "El correo debe ser de dominio @unal.edu.co"
             elif password != confirm_password:
                 mensaje = "Las contraseñas no coinciden"
-            elif usuario.objects.filter(correoInstitucional=email).exists():
+            elif usuario.objects.filter(correoInstitucional = email_usuario).exists():
                 mensaje = "El correo ya se encuentra registrado"
             elif usuario.objects.filter(numeroDocumento = numero_documento).exists():
                 mensaje = "El número de documento ya se encuentra registrado"
@@ -54,7 +54,7 @@ def procesar_registro_estudiante(request):
                         idTipoDocumento = tipo_doc,
                         nombres = nombres,
                         apellidos = apellidos,
-                        correoInstitucional = email,
+                        correoInstitucional = email_usuario,
                         password = password_hash,
                         numeroCelular = phone,
                         codigoVerificacion = crear_otp(),
@@ -65,14 +65,102 @@ def procesar_registro_estudiante(request):
                 #Asignar el rol de estudiante
                 estudiante.roles.add(estudiante.numeroDocumento, 1)
                 
-                procesar_enviarCorreo_otp(request)
+                ##Envio de correo con el código de verificación
+                #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
+                subject = "Codigo de verificación"
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = [email_usuario]
 
-                mensaje = '¡Registro exitoso!'
+                signer = Signer()
+                # Firmar el un token con el correo electrónico del usuario
+                token = signer.sign(f"{email_usuario}")
 
+                #Generar el enlace para ingresar el código
+                verificacion_url = request.build_absolute_uri(reverse('mostrar_otp', args=[token]))
+
+                #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+                context = {
+                            "codigo_verificacion": str(estudiante.codigoVerificacion),
+                            "link_codigo_verificacion" : verificacion_url,
+                        }
+                #Renderizamos el template html
+                template = get_template("SendMessageEmailOtp.html")
+                content = template.render(context)
+
+                email = EmailMultiAlternatives(
+                        subject,
+                        content,
+                        email_from,
+                        recipient_list
+                        )
+
+                email.attach_alternative(content, "text/html")
+                email.send()
+
+                mensaje = '¡Registro exitoso! Revise su correo para verificar la cuenta y poder acceder.'
+                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+            
+    except Exception as e:
+        mensaje = f"Ocurrió un error: {str(e)}"
+        return redirect(reverse('registroEstudiante') + f'?mensaje={mensaje}')
+    
+    return redirect(reverse('registroEstudiante') + f'?mensaje={mensaje}')
+
+########################Funcionalidad de OTP####################################
+
+#Método para mostrar la vista de la OTP
+def mostrar_otp(request, token):
+    try:
+        signer = Signer()
+        #Desfirmar el token
+        correo_usuario = signer.unsign(token).split(":")[0]  # Obtén el primer elemento de la lista (el correo electrónico)
+        
+        if usuario.objects.filter(correoInstitucional = correo_usuario).exists():
+            return render(request, 'OTP.html', {'token': token})
+        else:
+            # Si el usuario no existe, puedes redirigir a alguna otra página o mostrar un mensaje de error (token invalido)
+            mensaje = "Token inválido."
+            return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+        
+    except Exception as e:
+        mensaje = f"Ocurrió un error: {str(e)}"
+        return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+
+
+#Método que procesa el código para verificar al usuario
+def aprobar_OTP(request, token):
+    try:
+        if request.method == "POST":
+            signer = Signer()
+            #Desfirmar el token
+            correo_usuario = signer.unsign(token).split(":")[0]  # Obtén el primer elemento de la lista (el correo electrónico)
+            user = usuario.objects.get(correoInstitucional = correo_usuario)
+            print(user)
+            if user:
+                #Obtener los datos del formulario
+                OTP = int(request.POST.get('otp_code'))
+
+                if OTP == user.codigoVerificacion:
+                    user.usuarioVerificado = True
+                    user.save()
+                    mensaje = "Validación exitosa. Ya puede iniciar sesión."
+                    return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+                else:
+                    mensaje = "Código de verificación incorrecto."
+                    return render(request,'OTP.html',{'token': token, 'mensaje': mensaje})
+            else:
+                mensaje = 'Correo de verificación inválido, intente acceder nuevamente desde el enlace de su correo.'
+                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+        
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}"
+            return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
 
-    return redirect(reverse('registroEstudiante') + f'?mensaje={mensaje}')
+
+#Metodo para crear la OTP de 6 digitos de longitud
+def crear_otp():
+    otp = random.randint(100001, 999999)
+    return otp
 
 ########################Funcionalidad de Login Usuarios####################################
 
@@ -109,10 +197,8 @@ def autenticar_credenciales_usuario(request):
                         return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
                     else: 
                         # si no está validado el usuario
-                        signer = Signer()
-                        token = signer.sign(f"{correo_usuario}:{time.time()}")
-                        procesar_enviarCorreo_otp(correo_usuario)
-                        return redirect(reverse('mostrar_otp',kwargs={'token':token}))
+                        mensaje = "Revise su correo para válidar la cuenta."
+                        return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}') 
 
                 else:
                     # contraseña incorrecta
@@ -187,85 +273,6 @@ def procesar_enviarCorreo_contrasena(request):
     except Exception as e:
         mensaje = f"Ocurrió un error: {str(e)}"
         return redirect(reverse('enviarCorreo_contrasena') + f'?mensaje={mensaje}')
-
-
-########################Funcionalidad de OTP####################################
-
-#Método para enviar la OTP
-def procesar_enviarCorreo_otp(correo_usuario):
-    try:
-
-        user = usuario.objects.get(correoInstitucional = correo_usuario)
-
-        #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
-        subject = "Codigo de verificación"
-        message = ("Hola y bienvenid@ a zenUN.\n",
-                    "Para verificar tu cuenta, ingresa el siguiente código de verificación: \n",
-                    str(user.codigoVerificacion) + "\n",
-                    "Saludos. \n",
-                    "El equipo de zenUN Los Capis \n")
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = [correo_usuario]
-
-            #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
-        context = {
-                    "Codigo": str(user.codigoVerificacion),  # Pasamos link_resetPassword al contexto de ese html
-                }
-        #Renderizamos el template html
-        template = get_template("SendMessageEmailOtp.html")
-        content = template.render(context)
-
-        email = EmailMultiAlternatives(
-                subject,
-                message,
-                email_from,
-                recipient_list
-                )
-
-        email.attach_alternative(content, "text/html")
-        email.send()
-            
-    except Exception as e:
-        mensaje = f"Ocurrió un error: {str(e)}"
-        return redirect(reverse('enviarCorreo_contrasena') + f'?mensaje={mensaje}')
-    
-#Método para mostrar la vista de la OTP
-def mostrar_otp(request,token):
-    signer = Signer()
-    correo_usuario, tiempo_creacion = signer.unsign(token).split(":")
-    del tiempo_creacion
-
-    print(correo_usuario, token)
-    return render(request, 'OTP.html', {'token': token})
-
-def aprobar_OTP(request,token):
-    try:
-        if request.method == "POST":
-            signer = Signer()
-            correo_usuario, tiempo_creacion = signer.unsign(token).split(":")
-            del tiempo_creacion
-            #Obtener los datos del formulario
-            OTP = request.POST.get('otp_code')
-            user = usuario.objects.get(correoInstitucional = correo_usuario)
-
-            if OTP == user.codigoVerificacion:
-                user.usuarioVerificado = True
-                user.save()
-                mensaje = "Validación exitosa."
-                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
-            else:
-                mensaje = "Código de verificación incorrecto."
-                return render(request,'OTP.html',{'token': token, 'mensaje': mensaje})
-        
-    except Exception as e:
-            mensaje = f"Ocurrió un error: {str(e)}"
-            return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
-
-
-#Metodo para crear la OTP de 6 digitos de longitud
-def crear_otp():
-    otp = random.randint(100001, 999999)
-    return otp
 
 ########################Funcionalidad de cambiar contraseña####################################
 #Este método muestra la vista de cambiar contraseña 
