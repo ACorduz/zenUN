@@ -22,12 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 """ DEPLOY SETTINGS """
 
-
 # Cuando se realize un pull request en el repositiorio de github, recordar que estas lines son variables de entorno necesarias para el despliegue en Render
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG')
 ALLOWED_HOSTS = ["*"]
-
 
 """ LOCAL SETTINGS"""
 
@@ -141,7 +139,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-if not DEBUG:
+if DEBUG:
     DEFAULT_CHARSET = 'utf-8'
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = 'smtp.gmail.com'
