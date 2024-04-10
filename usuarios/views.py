@@ -179,7 +179,7 @@ def autenticar_credenciales_usuario(request):
             
             if  not usuario.objects.filter(correoInstitucional=correo_usuario).exists():
                 mensaje = "Usuario no registrado."
-                return redirect(reverse('loginUsuario') + f'mensaje={mensaje}')
+                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
     
             else:
             #Lógica de validacion de contraseña si la validacion de usuario es exitosa
