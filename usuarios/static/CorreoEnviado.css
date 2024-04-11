@@ -3,7 +3,7 @@
     src: url('../static/AveriaSerifLibre-Regular.ttf') format('truetype');
 }
 
-body {
+body{
     font-family: 'MiFuente', sans-serif;
     margin: 0;
     padding: 0;
@@ -38,7 +38,7 @@ body::after {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 500px;
-    height: 500px;
+    height: 250px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 3);
 }
 
@@ -49,43 +49,7 @@ p {
     text-align: justify;
 }
 
-form {
-    width: 100%;
-}
-
-label {
-    font-weight: bold;
-    position: relative;
-    top: 20px;
-    font-size: 20px;
-}
-.linea {
-    position: relative;
-    top: -80px;
-    color: #000000;
-    width: 225px;
-    border: none; 
-    height: 2px; 
-    background-color: #000000;
-}
-
-input[type="email"], input[type="password"] {
-    font-family: 'MiFuente', sans-serif;
-    font-size: 15px;
-    width: 60%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    background-color: #ccccccf3;
-    border: 1px solid #000000;
-    box-sizing: border-box;
-    position: relative;
-    top: 55px;
-    left: 100px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 2);
-}
-
-input[type="submit"] {
+.container-content button {
     font-family: 'MiFuente', sans-serif;
     font-size: 25px;
     width: 25%;
@@ -99,8 +63,4 @@ input[type="submit"] {
     position: relative;
     top: 55px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 2);
-}
-
-input[type="submit"]:hover {
-    background-color: #6b00b3; 
 }
