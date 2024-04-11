@@ -24,5 +24,22 @@ class usuario(models.Model):
     roles = models.ManyToManyField(rol) #Crea la relación muchos a muchos
     codigoVerificacion = models.IntegerField() #Campo INT para el proceso de verificación de correo
     usuarioVerificado = models.BooleanField(default=False) #Si es TRUE el usuario ha sido verificado
+    
+    USERNAME_FIELD = 'correoInstitucional'
+    REQUIRED_FIELDS = [
+        'numeroDocumento',
+        'idTipoDocumento',
+        'nombres',
+        'apellidos',
+        'numeroCelular',
+        'codigoVerificacion',
+        'usuarioVerificado',
+    ]
 
-
+    @property
+    def is_anonymous(self):
+        return False
+    
+    @property
+    def is_authenticated(self):
+        return True

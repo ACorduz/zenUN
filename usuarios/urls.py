@@ -18,7 +18,10 @@ urlpatterns = [
             name='autenticar_credenciales_usuario'), #Ruta para el formulario Login
     path('paginaPrincipalEstudiante/', 
             login_required(views.mostrar_mainPage_estudiante), 
-            name='paginaPrincipal_estudiante'),  #vista Principal estudiante
+            name='paginaPrincipal_estudiante'), #vista Principal estudiante
+    path('cerrar-sesion/', 
+                views.cerrar_sesion, 
+                name='cerrar_sesion'), #Cerrar Sesión
     path('login/EnvioRecuperacionContraseña', 
             views.mostrar_enviarCorreo_contrasena, 
             name="enviarCorreo_contrasena"), # Vista para el envio del correo de RecuperarContraseña

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import login, logout
 from usuarios.models import usuario
 from usuarios.models import tipoDocumento
 from django.urls import reverse
@@ -193,6 +194,8 @@ def autenticar_credenciales_usuario(request):
                     validacionUsuario = user.usuarioVerificado
                 
                     if(validacionUsuario == True):
+                        #autenticar usuario
+                        login(request, user)
                         mensaje = "Validacion exitosa."
                         return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
                     else: 
@@ -213,6 +216,12 @@ def autenticar_credenciales_usuario(request):
 def mostrar_mainPage_estudiante(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     return render(request, 'MainPageStudent.html', {'mensaje': mensaje})
+
+
+#Cerrar Sesión
+def cerrar_sesion(request):
+    logout(request)
+    return redirect(reverse('loginUsuario'))
 
 
 ########################Funcionalidad de Recuperar Contraseña####################################
