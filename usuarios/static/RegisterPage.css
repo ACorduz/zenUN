@@ -136,7 +136,7 @@ button[type="submit"] {
     border: none;
     cursor: pointer; 
     position: absolute; 
-    bottom: px; 
+    bottom: 10px; 
     left: 47%; 
     transform: translateX(-50%); 
     border-radius: 30px;

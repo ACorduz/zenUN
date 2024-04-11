@@ -9,7 +9,7 @@ urlpatterns = [
     path('procesarRegistroEstudiante/', 
             views.procesar_registro_estudiante, 
             name='procesar_registro_estudiante'), #Ruta para el formulario de RegistroEstudiante
-    path('login/',
+    path('',
             views.mostrar_login_usuario,
             name='loginUsuario'), # Vista Login
     path('autenticarCredenciales/',
