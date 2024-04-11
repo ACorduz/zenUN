@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth.decorators import login_required
 from . import views
 
 #Rutas de la aplicación "Usuarios"
@@ -16,7 +17,7 @@ urlpatterns = [
             views.autenticar_credenciales_usuario, 
             name='autenticar_credenciales_usuario'), #Ruta para el formulario Login
     path('paginaPrincipalEstudiante/', 
-            views.mostrar_mainPage_estudiante, 
+            login_required(views.mostrar_mainPage_estudiante), 
             name='paginaPrincipal_estudiante'),  #vista Principal estudiante
     path('login/EnvioRecuperacionContraseña', 
             views.mostrar_enviarCorreo_contrasena, 
