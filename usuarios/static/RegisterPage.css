@@ -66,6 +66,7 @@ body {
 }
 .mensaje-exito h4{
     position: relative;
+    align-items: center;
     top: -15px;
     left: 20px;
 }
@@ -79,7 +80,7 @@ body {
     border: 1px solid #c3e6cb; 
     border-radius: 20px;
     max-height: 30px; 
-    max-width: 300px;
+    max-width: 320px;
     margin-bottom: 10px; 
 }
 

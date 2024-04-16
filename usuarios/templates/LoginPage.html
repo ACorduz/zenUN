@@ -41,12 +41,10 @@
           </div>
         </div>
         <button type="submit">Iniciar Sesión</button>
+        <a href="{% url 'enviarCorreo_contrasena' %}" >¿Olvidaste tu contraseña?</a>
       </div>
     </form>
     <div class="form-container_resetPassword">
-      <div class="changes-container">
-        <a href="{% url 'enviarCorreo_contrasena' %}" >¿Olvidaste tu contraseña?</a>
-      </div>
       <div id="resetPasswordForm" class="reset-password-form" style="display: none;">
         <h3>Restablecer contraseña</h3>
         <div class="form-group">
