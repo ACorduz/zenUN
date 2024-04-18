@@ -75,3 +75,9 @@ input[type="text"] {
     box-sizing: border-box;
     width: 50%;
 }
+.mensajeBackend {
+    position: absolute;
+    top: 220px;
+    left: 550px;
+    z-index: 9999;
+}
