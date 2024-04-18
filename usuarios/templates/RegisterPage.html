@@ -158,6 +158,21 @@
       var urlLoginPage = "{% url 'loginUsuario' %}";
       window.location.href = urlLoginPage;
   }
+  // método para esconder el dominio al hacer click 
+  var input = document.getElementById('email');
+  var text = document.querySelector('.email-extension');
+
+  input.addEventListener('click', function() {
+    input.value = '';
+    text.style.display = 'none';
+  });
+  // método para limitar el número del telefono 
+  var phoneInput = document.getElementById('phone');
+  phoneInput.addEventListener('input', function() {
+      if (phoneInput.value.length > 10) {
+          phoneInput.value = phoneInput.value.slice(0, 10);
+      }
+  });
 </script>
 </body>
 </html>
