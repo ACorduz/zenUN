@@ -17,10 +17,21 @@
     
   </style>
 <body>
-    <!--Falta que se muestre correctamente el error-->
-    {% if mensaje %}
+  <!-- Traer Libreria SweetAlertTwo-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Mensaje del backend-->
+  {% if mensaje %}
     <div class="mensaje-exito">
-      <h4>{{ mensaje }}</h4>
+      <script>     
+        Swal.fire({
+          position: "top-end",
+          title: "Aviso Zenun",
+          text: '{{mensaje}}',
+          icon: 'warning',
+          confirmButtonText: 'Aceptar'
+        });
+      </script>
+      <!-- <h4>{{ mensaje }}</h4> -->
     </div>
   {% endif %}
   <form action="{% url 'procesar_registro_estudiante' %}" method="POST">
@@ -118,6 +129,33 @@
       }
   }
 
+  // funcion para validar los criterios de una contraseña segura
+  function cumpleCriteriosPassword(contraseña) {
+    // Verificar si la contraseña cumple con los criterios de seguridad
+    if(!/[a-z]/.test(contraseña)){
+      mostrarAlertaAviso("aviso Contraseña", "debe contener almenos una letra minuscula.");
+      return(false);
+    }
+    else if(!/[A-Z]/.test(contraseña)){
+      mostrarAlertaAviso("aviso Contraseña", "debe contener almenos una letra MAYUSCULA.");
+      return(false);
+    }
+    else if(!/\d/.test(contraseña)){
+      mostrarAlertaAviso("aviso Contraseña", "debe contener almenos un numero.");
+      return(false);
+    }
+    else if(!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(contraseña)){
+      mostrarAlertaAviso("aviso Contraseña", "debe contener almenos un simbolo especial.");
+      return(false);
+    }
+    else if (contraseña.length < 8){
+      mostrarAlertaAviso("aviso Contraseña", "longitud de contraseña mayor o igual a 8.");
+      return(false); 
+    } 
+
+    return(true);
+  }
+  // funcion para validar los campos del formulario 
   function validateForm() {
       var fullName = document.getElementById('fullName').value;
       var lastName = document.getElementById('lastName').value;
@@ -133,32 +171,63 @@
 
       //si esta vacio algun campo
       if (fullName === '' || lastName === '' || email === '' || password === '' || confirmPassword === '' || documentType === '' || documentNumber === '') {
-        alert('Por favor, llene todos los campos.');
-        event.preventDefault();
+        mostrarAlertaError("Error:","Porfavor, rellene todos los campos.");
+        event.preventDefault(); // Detener el envío del formulario
       } 
       // si correo no tiene dominio.unal 
       else if(!email.endsWith("unal.edu.co")){
-        alert('El correo debe tener dominio.Unal');
+        mostrarAlertaError("Error Correo:","El correo debe tener dominio .Unal .");
         event.preventDefault(); // Detener el envío del formulario
       }
-      // Debe tener maximo 15 digitos y debe ser solo numero
-      else if(telefono.toString().length > 15){
-        alert('El numero de telefono debe ser un numero o su longitud no debe ser mayor a 15');
+      // si se pone un . o  , telefono
+      else if(/[,.]/.test(telefono)){
+        mostrarAlertaError("Error Numero celular:","quitar la (,) o (.) del campo.");
         event.preventDefault(); // Detener el envío del formulario
       }
-      // El documento por si solo deja entrar numeros 
+      // si se pone un . o , en el numero documento
+      else if(/[,.]/.test(documentNumber)){
+        mostrarAlertaError("Error N. de documento:","quitar la (,) o (.) del campo.");
+        event.preventDefault(); // Detener el envío del formulario
+      }
+      // verificar contraseña mas segura
+      else if(!cumpleCriteriosPassword(password)){
+        event.preventDefault();
+      }
+      // si se pone la contraseña incorrecta
       else if (password != confirmPassword) {
-        alert('Las contraseñas no coinciden.');
+        mostrarAlertaError("Error Confirmacion Contraseñas",'Las contraseñas no coinciden.');
         event.preventDefault(); // Detener el envío del formulario
       }
   }
 
-  // metodo vaya a la pagina de login 
+  // funcion para ir  a la pagina de login 
   function goToLoginPage() {
       var urlLoginPage = "{% url 'loginUsuario' %}";
       window.location.href = urlLoginPage;
   }
-  // método para esconder el dominio al hacer click 
+
+  // fucnion para crear una alerta con la libreria SweetAlert2
+  function mostrarAlertaError(titulo="",texto) {
+    // Mostrar alerta personalizada con SweetAlert2
+    Swal.fire({
+      title: titulo,
+      text: texto,
+      icon: 'error',
+      confirmButtonText: 'Aceptar'
+    });
+  }
+
+  function mostrarAlertaAviso(titulo="",texto) {
+    // Mostrar alerta personalizada con SweetAlert2
+    Swal.fire({
+      title: titulo,
+      text: texto,
+      icon: 'warning',
+      confirmButtonText: 'Aceptar'
+    });
+  }
+
+  // funcion para esconder el dominio al hacer click 
   var input = document.getElementById('email');
   var text = document.querySelector('.email-extension');
 
@@ -166,13 +235,17 @@
     input.value = '';
     text.style.display = 'none';
   });
-  // método para limitar el número del telefono 
+
+  // funcion para limitar el número del telefono 
   var phoneInput = document.getElementById('phone');
   phoneInput.addEventListener('input', function() {
       if (phoneInput.value.length > 10) {
           phoneInput.value = phoneInput.value.slice(0, 10);
+          mostrarAlertaError("Error Numero celular",'El numero de telefono no debe tener mas de 10 digitos');
       }
   });
+
+
 </script>
 </body>
 </html>
