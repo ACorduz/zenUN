@@ -20,20 +20,19 @@ AUTH_USER_MODEL = 'usuarios.usuario'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
 """ DEPLOY SETTINGS """
 
 # Cuando se realize un pull request en el repositiorio de github, recordar que estas lines son variables de entorno necesarias para el despliegue en Render
-SECRET_KEY = os.environ.get('SECRET_KEY')
+"""SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG')
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*"]"""
 
 """ LOCAL SETTINGS"""
 
 #Cuando se trabaje de manera local se deben usar las siguientes varaibles de entorno 
-"""DEBUG = True
+DEBUG = True
 SECRET_KEY = 'django-insecure-+x&k4xqe2en_l2+l@6ekv_-9slmm64nk@#gs2xpqyuqms7s8s0'
-ALLOWED_HOSTS = []"""
+ALLOWED_HOSTS = []
 
 RENDER_EXTERNAL_HOST = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOST:
@@ -53,7 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
