@@ -10,11 +10,20 @@
   
 </head>
 <body>
+    <!-- Traer Libreria SweetAlertTwo-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Mensaje del backend-->
     {% if mensaje %}
-    <div class="mensajeBackend">
-        <h4>{{mensaje}}</h4>
-      </div>
-      {% endif %} 
+      <script>     
+        Swal.fire({
+          position: "top",
+          title: "Aviso Zenun",
+          text: '{{mensaje}}',
+          icon: 'warning',
+          confirmButtonText: 'Aceptar'
+        });
+      </script>
+    {% endif %}
     <form action="{% url 'aprobar_OTP' token=token %}" method='POST'>
         {% csrf_token %}
 
