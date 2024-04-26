@@ -13,10 +13,19 @@
         }
     </style>
     <body>
-        {% if mensaje %}
-        <div class="mensaje-backend">
-          <h4>{{ mensaje }}</h4>
-        </div>
+      <!-- Traer Libreria SweetAlertTwo-->
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <!-- Mensaje del backend-->
+      {% if mensaje %}
+        <script>     
+          Swal.fire({
+            position: "top",
+            title: "Aviso Zenun",
+            text: '{{mensaje}}',
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+          });
+        </script>
       {% endif %}
         <h1> Pagina principal Estudiante </h1>
 

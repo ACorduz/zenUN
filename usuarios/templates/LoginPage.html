@@ -10,11 +10,19 @@
   
 </head>
 <body>
-  <!--Falta que se muestre correctamente el error-->
+  <!-- Traer Libreria SweetAlertTwo-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Mensaje del backend-->
   {% if mensaje %}
-    <div class="mensaje-backend">
-      <h4>{{ mensaje }}</h4>
-    </div>
+    <script>     
+      Swal.fire({
+        position: "top",
+        title: "Aviso Zenun",
+        text: '{{mensaje}}',
+        icon: 'warning',
+        confirmButtonText: 'Aceptar'
+      });
+    </script>
   {% endif %}
 
   <div class="login-page-container">
@@ -40,49 +48,36 @@
             </button>      
           </div>
         </div>
-        <button type="submit">Iniciar Sesión</button>
+        <button type="submit" onclick="validateFormLoginPage()">Iniciar Sesión</button>
         <a href="{% url 'enviarCorreo_contrasena' %}" >¿Olvidaste tu contraseña?</a>
       </div>
     </form>
-    <div class="form-container_resetPassword">
-      <div id="resetPasswordForm" class="reset-password-form" style="display: none;">
-        <h3>Restablecer contraseña</h3>
-        <div class="form-group">
-          <label for="emailReset">Correo electrónico:</label>
-          <input type="email" id="emailReset" name="emailReset" required>
-        </div>
-        <button type="button" onclick="sendResetPasswordEmail()">
-          <i class="fas fa-arrow-right"></i> 
-      </button>
-      </div>
-    </div>
-    </div>
+
   <div class="cuadro">
     <h3>Centro de Bienestar UNAL</h3>
     <img src="{% static 'welcome.png' %}">
     <button onclick="goToRegisterPage()"> ¿Aún no tienes cuenta?</button>
   </div>
   <script>
-    function login() {
+    function validateFormLoginPage() {
       var username = document.getElementById('username').value;
       var password = document.getElementById('password').value;
       if (username === '' || password === ''){
-        alert('Por favor, llene todos los campos.');
-      } else {
-        alert('¡Inicio de sesión exitoso!');
-      }
+        mostrarAlertaError("Error", 'Por favor, llene todos los campos.')
+        event.preventDefault(); // Detener el envío del formulario
+      } 
     }
 
-    function sendResetPasswordEmail() {
-    var email = document.getElementById('emailReset').value;
-    if (email === '') {
-        alert('Agregue su correo electrónico');
-    } else {
-        alert('Se ha enviado un correo de restablecimiento de contraseña a: ' + email);
+    function mostrarAlertaError(titulo="",texto) {
+      // Mostrar alerta personalizada con SweetAlert2
+      Swal.fire({
+        title: titulo,
+        text: texto,
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
     }
-}
-
-
+      
     function togglePasswordVisibility(inputId) {
       var passwordInput = document.getElementById(inputId);
       var button = document.querySelector("#" + inputId + " + .toggle-password");
