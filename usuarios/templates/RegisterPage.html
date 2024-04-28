@@ -97,6 +97,10 @@
             <input type="number" id="documentNumber" name="documentNumber" required>
           </div>
       </div>
+      <div class="checkbox-container">
+        <input type="checkbox" id="aceptarTerminos">
+        <label for="aceptarTerminos">Acepto <a href="#" id="linkTerminos">términos y condiciones.</a></label>
+      </div>
       <button type="submit" onclick="validateForm()">Registrar</button>
         </div>
       </div>
@@ -165,7 +169,8 @@
       var documentType = document.getElementById('documentType').value;
       var documentNumber = document.getElementById('documentNumber').value;
       var telefono = document.getElementById('phone').value;
-      
+      var checkbox = document.getElementById("aceptarTerminos");
+
       // Obtener el formulario
       var formulario = document.getElementById('registroForm');
 
@@ -196,6 +201,11 @@
       // si se pone la contraseña incorrecta
       else if (password != confirmPassword) {
         mostrarAlertaError("Error Confirmacion Contraseñas",'Las contraseñas no coinciden.');
+        event.preventDefault(); // Detener el envío del formulario
+      }
+      //Verificar que el boton de terminos y condiciones este chuleado
+      else if(checkbox.checked == false){
+        mostrarAlertaError("Terminos y condiciones",'Debe aceptar los terminos y condiciones para poder utilizar el aplicativo');
         event.preventDefault(); // Detener el envío del formulario
       }
   }
@@ -245,6 +255,33 @@
       }
   });
 
+  //Función para mostrar los terminos y condiciones
+  function mostrarTerminos(){
+    Swal.fire({
+      title: 'Términos y Condiciones de Uso',
+      html: '<p>Bienvenido a nuestra aplicación zenUN. Al acceder y utilizar esta aplicación, usted acepta los siguientes términos y condiciones. Es importante que lea este documento detenidamente antes de continuar.</p>' +
+            '<p><strong>Datos Recopilados:</strong> Para brindarle nuestros servicios, recopilamos información personal, incluidos su nombre completo, correo institucional, número de cédula y número de teléfono. Estos datos se utilizarán exclusivamente para facilitar préstamos y demás transacciones que sean hechas a su nombre dentro de la aplicación.</p>' +
+            '<p><strong>Uso de los Datos:</strong> Sus datos personales serán tratados con la máxima confidencialidad y se utilizarán únicamente con el propósito mencionado anteriormente. No compartiremos su información con terceros sin su consentimiento previo.</p>' +
+            '<p><strong>Confidencialidad y Seguridad:</strong> Implementamos medidas de seguridad adecuadas para proteger su información contra accesos no autorizados, pérdidas o alteraciones. Sin embargo, no podemos garantizar la seguridad absoluta de sus datos.</p>' +
+            '<p><strong>Consentimiento del Usuario:</strong> Al aceptar estos términos y condiciones, usted nos otorga su consentimiento explícito para el uso de sus datos personales de acuerdo con lo establecido en este documento.</p>' +
+            '<p><strong>Acceso y Modificación de Datos:</strong> Usted tiene derecho a acceder, corregir o eliminar sus datos personales en cualquier momento. Para ejercer este derecho, por favor contáctenos a través de los medios proporcionados en esta aplicación.</p>' +
+            '<p><strong>Responsabilidad del Usuario:</strong> Usted es responsable de proporcionar información precisa y actualizada, así como de mantener segura su información de inicio de sesión y contraseña.</p>' +
+            '<p><strong>Limitación de Responsabilidad:</strong> No nos hacemos responsables de cualquier pérdida o daño que pueda surgir del uso indebido de sus datos por parte de terceros, a pesar de las medidas de seguridad implementadas.</p>' +
+            '<p><strong>Modificaciones a los Términos y Condiciones:</strong> Nos reservamos el derecho de actualizar o modificar estos términos y condiciones en cualquier momento. Le notificaremos sobre estos cambios de manera adecuada.</p>' +
+            '<p><strong>Contacto:</strong> Si tiene alguna pregunta o inquietud sobre estos términos y condiciones o el manejo de sus datos personales, no dude en contactarnos a través de los medios proporcionados en esta aplicación.</p>' +
+            '<p>Al utilizar nuestra aplicación, usted reconoce y acepta estos términos y condiciones en su totalidad. Si no está de acuerdo con alguno de estos términos, le recomendamos que cese el uso de nuestra aplicación de inmediato.</p>',
+      confirmButtonText: 'Aceptar',
+      customClass: {
+        container: 'custom-swal-container'
+      }
+    });
+
+  }
+  // Event listener para el enlace de términos y condiciones
+  document.getElementById("linkTerminos").addEventListener("click", function(event) {
+    event.preventDefault(); // Evitar que el enlace recargue la página
+      mostrarTerminos(); // Llamar a la función mostrarTerminos
+  });
 
 </script>
 </body>
