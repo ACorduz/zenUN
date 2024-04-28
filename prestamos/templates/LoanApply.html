@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar préstamo</title>
+    <link rel="stylesheet" href="../static/LoanApply.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <button class="button-wrapper" onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
+            <img src="../static/icono.png" alt="Botón 1">
+            <span>zenUN</span>
+        </button>
+        <div class="header-title">Solicitar Préstamo</div>
+        <img src="../static/perfil.png" alt="Botón 2">
+    </div>
+    <div class="container-content">
+        <h1>Resumen préstamo</h1>
+        <hr class="linea">
+        <div id="informacionUsuario">
+            <div id="contenedorDatos">
+                <p>Implemento prestado: <span id="implemento">{{ implemento }}</span></p>
+                <p>Edificio donde se prestó: <span id="edificio">{{ edificio }}</span></p>
+                <p>Nombre del estudiante: <span id="nombreEstudiante">{{ nombre_estudiante }}</span></p>
+                <p>Correo del estudiante: <span id="correoEstudiante">{{ correo_estudiante }}</span></p>
+                <p>Hora de inicio de la reserva: <span id="inicioReserva">{{ inicio_reserva }}</span></p>
+                <p>Hora de finalización de la reserva: <span id="finReserva">{{ fin_reserva }}</span></p>
+                <p>Hora de la devolución del implemento: <span id="devolucionImplemento">{{ devolucion_implemento }}</span></p>
+            </div>
+        </div>
+        <div id="contenedorReserva">
+            <p>¡Listo! Tu implemento quedó reservado, no olvides que solo tienes 15 minutos 
+                para ir a la facultad en la que reservaste el objeto y reclamarlo.</p>
+        </div>
+        <form>
+            <input type="button" value="Realizar reserva" onclick="mostrarReserva()">
+        </form>
+        <script>
+        function mostrarReserva() {
+            var contenedorReserva = document.getElementById("contenedorReserva");
+            contenedorReserva.style.display = "block";
+        }
+        </script>
+    </div>
+</body>
+</html>
