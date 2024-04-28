@@ -20,5 +20,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     #path para urls de la aplicación "usuarios"
-    path('', include('usuarios.urls'))#Se importan las URLS de la aplicación usuarios
+    path('', include('usuarios.urls')),#Se importan las URLS de la aplicación usuarios
+    #path para urls de la aplicación "prestamos"
+    path('', include('prestamos.urls'))#Se importan las URLS de la aplicación prestamos
 ]
