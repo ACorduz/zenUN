@@ -343,6 +343,3 @@ def procesar_cambio_contrasena(request, correo_usuario, token):
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}"
             return redirect(reverse('cambiar_contrasena', args=[token]) + f'?mensaje={mensaje}')
-
-
-#Solicitar Prestamo Back
