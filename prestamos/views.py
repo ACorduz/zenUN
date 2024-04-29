@@ -25,3 +25,10 @@ def mostrar_solicitarPrestamo(request):
     }
     
     return render(request, 'LoanApply.html', context)
+
+
+
+################# Funcionalidad Devolucion Prestamo AdministradorBienestar ################
+def mostrar_devolucionImplementos_administradorBienestar(request):
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    return render(request, 'DevolucionImplementos.html', {'mensaje': mensaje})
