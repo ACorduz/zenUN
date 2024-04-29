@@ -8,6 +8,18 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     </head>
     <body>
+        <!-- mensaje del backend si hay  -->
+        {% if mensaje %}
+            <script>     
+            Swal.fire({
+                position: "top",
+                title: "Aviso Zenun",
+                text: '{{mensaje}}',
+                icon: 'warning',
+                confirmButtonText: 'Aceptar'
+            });
+            </script>
+        {% endif %}
         <div class="header">
             <button class="button-wrapper" onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
                 <img src="../static/icono.png" alt="Botón 1">
@@ -24,37 +36,73 @@
                 <img src="../static/iconoJuego.png">
             </div>
             <p> Nº identifiacion estudiante</p>
-            <!-- Contenerdor de la identifiacion -->
-            <form>
+            <!-- Formulario para mostrarDatosEstudiante -->
+            <form action="{% url 'devolucionImplementos_mostrarInformacionPrestamo' %}" method="POST">
+                <!-- token de validacion -->
+                {% csrf_token %}  
                 <div id="contenedorIdentificacionEst"> 
                     <input type="number" id="documentNumber" name="documentNumber" required>
-                    <button type="submit"> </button>
+                    <button type="submit">
+                        <span>FLECHA</span>
+                    </button>
                 </div>
             </form>
-        
-            <button type="submit" id="devolver"> devolver </button>
+            <!-- Formulario pra devolver el prestamo -->
+            <form>
+                <input type="text" id="comentario" name="comentario" required>
+                <button type="submit" id="devolver">
+                    <span>zenUN</span>
+                </button>
+            </form>
             <!-- Contenerdor de la devolucion -->
             <div id="contenedorDevolucion">
                 <div class="contenedorDevolucion_elementos">  
                     <p>implemento prestado: </p>
+                    {% if implemento_prestado %}
+                    <span class="mensajeBack">
+                        {{implemento_prestado}}
+                    </span>
+                    {% endif %}
                 </div>
                 <div class="contenedorDevolucion_elementos">  
                     <p>Facultad donde se presto: </p>
+                    {% if facultad_implemento %}
+                    <span class="mensajeBack"> 
+                        {{facultad_implemento}}
+                    </span>
+                    {% endif %}
                 </div>
                 <div class="contenedorDevolucion_elementos">  
                     <p>Nombre del estudiante:  </p>
+                    {% if nombre_estudiante %}
+                    <span class="mensajeBack"> 
+                        {{nombre_estudiante}}
+                    </span>
+                    {% endif %}
                 </div>
                 <div class="contenedorDevolucion_elementos">  
                     <p>Correo estudiante:  </p>
+                    {% if correo_estudiante %}
+                    <span class="mensajeBack"> 
+                        {{correo_estudiante}}
+                    </span>
+                    {% endif %}
                 </div>
                 <div class="contenedorDevolucion_elementos">  
-                    <p>Hora inicio reserva:  </p>
+                    <p>Hora fin prestamo:  </p>
+                    {% if inicio_prestamo %}
+                    <span class="mensajeBack"> 
+                        {{inicio_prestamo}}
+                    </span>
+                    {% endif %}
                 </div>
                 <div class="contenedorDevolucion_elementos">  
-                    <p>Hora inicio reserva:  </p>
-                </div>
-                <div class="contenedorDevolucion_elementos">  
-                    <p>Comentarios:  </p>
+                    <p>Hora fin prestamo:  </p>
+                    {% if fin_prestamo %}
+                    <span class="mensajeBack"> 
+                        {{fin_prestamo}}
+                    </span>
+                    {% endif %}
                 </div>
             </div>
 

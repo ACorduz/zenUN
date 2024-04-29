@@ -104,3 +104,21 @@ body {
     margin-top: 5%;  
 }
 
+form button:hover {
+    background-color: #4CAF50; /* Color de fondo */
+    border: none; /* Elimina el borde */
+    color: white; /* Color del texto */
+    padding: 10px 20px; /* Espaciado interno */
+    text-align: center; /* Alineación del texto */
+    text-decoration: none; /* Elimina el subrayado */
+    display: inline-block;
+    font-size: 16px; /* Tamaño del texto */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    border-radius: 5px; /* Borde redondeado */
+  }
+  
+form button:hover {
+    background-color: #45a049; /* Cambia el color de fondo al pasar el cursor */
+  }
+ 
+
