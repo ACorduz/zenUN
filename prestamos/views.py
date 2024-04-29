@@ -39,7 +39,7 @@ def mostrar_devolucionImplementos_administradorBienestar(request):
     correo_estudiante  = request.GET.get('correo_estudiante', '')  # Obtener el correo_estudiante de la URL, si está presente
     inicio_prestamo = request.GET.get('inicio_prestamo', '')  # Obtener el inicio_prestamo de la URL, si está presente
     fin_prestamo = request.GET.get('fin_prestamo', '')  # Obtener el fin_prestamo de la URL, si está presente
-    revision_datos = request.GET.get('revision_datos', '0')  # Obtener el fin_prestamo de la URL, si está presente
+    revision_datos = request.GET.get('revision_datos', '0')  # Obtener un parametro que nos dice si la persona reviso los datos , si está presente
 
     # pasarle el contexto de lo que haya
     contexto = {
@@ -55,7 +55,7 @@ def mostrar_devolucionImplementos_administradorBienestar(request):
     # retornar la URL
     return render(request, 'DevolucionImplementos.html', contexto)
 
-def procesar_devolucionImplementos_mostrarInformacionPrestamo_administradorBienestar(request):
+def mostrar_informacionPrestamo_devolucionImplementos_administradorBienestar(request):
     try:
         if request.method == "POST":
 
@@ -79,9 +79,23 @@ def procesar_devolucionImplementos_mostrarInformacionPrestamo_administradorBiene
             
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}" # solo se le pasaria el mensaje en la URL 
-            return redirect(reverse('cambiar_contrasena') + f'?mensaje={mensaje}')
+            return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
 
 
-def procesar_devolucionImplementos_administradorBienestar(request):
-    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
-    return render(request, 'DevolucionImplementos.html', {'mensaje': mensaje})
+def procesar_devolucion_devolucionImplementos_administradorBienestar(request):
+    try:
+        if request.method == "POST":
+
+            #Obtener los datos del formulario
+            comentario = request.POST.get('comentario')
+
+
+            ## meter el comentario en la BD y cambiar el estado del implemento
+
+    
+            mensaje = 'Devolucion del implemento exitoso'# solo se le pasaria el mensaje en la URL 
+            return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
+        
+    except Exception as e:
+        mensaje = f"Ocurrió un error: {str(e)}" # solo se le pasaria el mensaje en la URL 
+        return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')

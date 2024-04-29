@@ -8,16 +8,28 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     </head>
     <body>
-        <!-- mensaje del backend si hay  -->
+        <!-- Traer Libreria SweetAlertTwo-->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- Mensaje del backend-->
         {% if mensaje %}
-            <script>     
-            Swal.fire({
-                position: "top",
-                title: "Aviso Zenun",
-                text: '{{mensaje}}',
-                icon: 'warning',
-                confirmButtonText: 'Aceptar'
-            });
+            <script> 
+            if('{{mensaje}}' == 'Devolucion del implemento exitoso'){
+                Swal.fire({
+                    title: "Sin ningun Problema!",
+                    text: "{{mensaje}}",
+                    icon: "success"
+                });
+            } 
+            else{
+                Swal.fire({
+                    position: "top",
+                    title: "Aviso Zenun",
+                    text: '{{mensaje}}',
+                    icon: 'warning',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+            
             </script>
         {% endif %}
         <div class="header">
@@ -40,19 +52,26 @@
             <form action="{% url 'devolucionImplementos_mostrarInformacionPrestamo' %}" method="POST">
                 <!-- token de validacion -->
                 {% csrf_token %}  
-                <div id="contenedorIdentificacionEst"> 
+                <div id="contenedorIdentificacionEstudiante"> 
                     <input type="number" id="documentNumber" name="documentNumber" required>
-                    <button type="submit">
+                    <button type="submit" onclick="validateFormMostrarDatosEstudiante()">
                         <span>FLECHA</span>
                     </button>
                 </div>
             </form>
             <!-- Formulario pra devolver el prestamo -->
-            <form>
-                <input type="text" id="comentario" name="comentario" required>
-                <button type="submit" id="devolver">
-                    <span>zenUN</span>
-                </button>
+            <form action="{% url 'devolucionImplementos_procesarDevolucion' %}" method="POST">
+                <!-- token de validacion -->
+                {% csrf_token %}
+                <div id="contenedorDevolverPrestamo"> 
+                    <p> comentario</p>
+                    <input type="text" id="comentario" name="comentario" >
+                    {% if revision_datos %}
+                    <button type="submit" id="devolver"  onclick="validateFormDevolverPrestamo('{{ revision_datos }}')">
+                        <span>Devolver</span>
+                    </button>
+                    {% endif %}
+                </div>
             </form>
             <!-- Contenerdor de la devolucion -->
             <div id="contenedorDevolucion">
@@ -107,5 +126,46 @@
             </div>
 
         </div>
+        <script>
+            // funcion para validar el formularion de mostrar datos de prestamo
+            function validateFormMostrarDatosEstudiante() {
+                var NumeroDocumento = document.getElementById('documentNumber').value;
+
+                if (NumeroDocumento === ''){
+                    mostrarAlertaError("Error", 'Por favor, llene el campo de numero de documento para buscar datos')
+                    event.preventDefault(); // Detener el envío del formulario
+                }
+                else if(/[,.]/.test(NumeroDocumento)){
+                    mostrarAlertaError("Error N. de documento:","quitar la (,) o (.) del campo.");
+                    event.preventDefault(); // Detener el envío del formulario
+                }
+            }
+
+            // funcion para validar el formulario de Devolver Prestamo
+            function validateFormDevolverPrestamo(revision_datos="0") {
+                var comentario = document.getElementById('comentario').value;
+
+                if (comentario === ''){
+                    mostrarAlertaError("Error", 'Por favor, llene el campo de comentario, con almenos un ok')
+                    event.preventDefault(); // Detener el envío del formulario
+                }
+                else if(revision_datos == "0"){
+                    mostrarAlertaError("Error", 'Por favor, Revise primero los datos del estudiante')
+                    event.preventDefault();
+                } 
+            }
+            
+            // funcion para mostrar los errores 
+            function mostrarAlertaError(titulo="",texto) {
+                // Mostrar alerta personalizada con SweetAlert2
+                Swal.fire({
+                    title: titulo,
+                    text: texto,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+
+        </script>
     </body>
 </html>
