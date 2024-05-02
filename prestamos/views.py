@@ -1,5 +1,8 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
+from models import prestamo, implemento, edificio, comentarioImplemento
+from usuarios.models import usuario
+
 
 
 
@@ -59,24 +62,41 @@ def mostrar_informacionPrestamo_devolucionImplementos_administradorBienestar(req
     try:
         if request.method == "POST":
 
-            #Obtener los datos del formulario
-            nombres = request.POST.get('documentNumber')
+            # Obtener los datos del formulario
+            NumeroDocumento = request.POST.get('documentNumber')
+            try:
+                # ver si existe el prestamo
+                if prestamo.objects.filter(estudianteNumeroDocumento=NumeroDocumento, estadoPrestamo="ACTIVO"):
 
-            # Datos traidos de la BD
-            mensaje = "DatoBD"
-            implemento_prestado = "DatoBD"
-            facultad_implemento = "DatoBD"
-            nombre_estudiante = "DatoBD"
-            correo_estudiante = "DatoBD"
-            inicio_prestamo = "DatoBD"
-            fin_prestamo = "DatoBD"
-            revision_datos="1" # para saber si el adm. Bienestar reviso los datos de la persona 
+                    ## Traer los objetos de la BD
+                    objetoPrestamo = prestamo.objects.get(estudianteNumeroDocumento=NumeroDocumento, estadoPrestamo="ACTIVO")
+                    objetoImplemento =  implemento.objects.get(idImplemento = objetoPrestamo.idImplemento)
+                    objetoEdificio = edificio.objects.get(idEdificio = objetoImplemento.edificioId)
+                    objetoEstudiante = usuario.objects.get(numeroDocumento= objetoPrestamo.estudianteNumeroDocumento)
 
-            # Pasar los datos a la cadena para que puedan ser pasados a la url 
-            cadenaURLParametros = f'?mensaje={mensaje}&implemento_prestado={implemento_prestado}&facultad_implemento={facultad_implemento}&nombre_estudiante={nombre_estudiante}&correo_estudiante={correo_estudiante}&inicio_prestamo={inicio_prestamo}&fin_prestamo={fin_prestamo}&revision_datos={revision_datos}'''
-        
-        return redirect(reverse("devolucionImplementos") + cadenaURLParametros)
-            
+
+                    ## poner los datos de la BD en variables para el front
+                    mensaje = "Obtencion de datos exitosa"
+                    implemento_prestado =  objetoImplemento.nombreImplemento
+                    facultad_implemento = objetoEdificio.nombreEdificio
+                    nombre_estudiante = f"´{objetoEstudiante.nombres} {objetoEstudiante.apellidos}"
+                    correo_estudiante = objetoEstudiante.correoInstitucional
+                    inicio_prestamo = objetoPrestamo.fechaHoraInicioPrestamo
+                    fin_prestamo = objetoPrestamo.fechaHoraFinPrestamo
+                    revision_datos="1" # para saber si el adm. Bienestar reviso los datos de la persona 
+
+                    # Pasar los datos a una cadena para que puedan ser pasados a la url
+                    cadenaURLParametros = f'?mensaje={mensaje}&implemento_prestado={implemento_prestado}&facultad_implemento={facultad_implemento}&nombre_estudiante={nombre_estudiante}&correo_estudiante={correo_estudiante}&inicio_prestamo={inicio_prestamo}&fin_prestamo={fin_prestamo}&revision_datos={revision_datos}'
+                    # mandar los datos a la vista devolucion de implementos
+                    return redirect(reverse("devolucionImplementos") + cadenaURLParametros)   
+                
+                else: #si no hay ningun objetoPrestamo con ese numero de documento
+                    mensaje = f"El estudiante con ese numero de documento no tiene ningun prestamo activo" # solo se le pasaria el mensaje en la URL 
+                    return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
+
+            except Exception as e:
+                mensaje = f"Ocurrió un error con la BD: {str(e)}" # solo se le pasaria el mensaje en la URL 
+                return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}" # solo se le pasaria el mensaje en la URL 
             return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
@@ -88,7 +108,6 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request):
 
             #Obtener los datos del formulario
             comentario = request.POST.get('comentario')
-
 
             ## meter el comentario en la BD y cambiar el estado del implemento
 
