@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
-from models import prestamo, implemento, edificio, comentarioImplemento
+from prestamos.models import prestamo, implemento, edificio, comentarioImplemento
 from usuarios.models import usuario
 
 
