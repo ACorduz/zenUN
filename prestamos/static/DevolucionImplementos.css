@@ -107,7 +107,7 @@ body {
     top: 10px;
 }
 .container-header .container-title h1 {
-    font-size:28px;
+    font-size:48px;
     line-height: 1.8;
     margin: 0;
 }
@@ -119,11 +119,12 @@ body {
 
 #contenedorIdentificacionEstudiante{
     display: flex;
-    flex-direction: column;
     gap:15px;
     justify-content: center;
+    position:relative;
+    left:59px;
 }
-#contenedorIdentificacionEstudiante p {
+.textp {
     font-size:25px;
     line-height: 1.8;
 }
@@ -135,13 +136,14 @@ body {
     display: flex;
     flex-direction: column;
     gap:15px;
+    align-items: center;
 }
 
 .container-forms {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 50px;
+    gap: 175px;
 }
 
 #documentNumber {
@@ -183,14 +185,10 @@ body {
     width: 250px;
     transition: filter 1s; 
 }
-
-
 .flechita {
     background: none;
     border: none;
     position: relative;
-    top: -185px;
-    left: -39px;
 }
 .flechita img{
   width:89px;
@@ -208,7 +206,7 @@ body {
     font-size:25px;
     padding: 5px 5px;
     border-radius: 16px;
-    
+    gap:15px;
 }
 .contenedorDevolucion_elementos {
     display: table-row;
@@ -264,14 +262,24 @@ body {
     .container-forms{
         display:block;
     }
+    .container-contenedorDevolucion {
+        top:45px;
+    }
     .flechita {
         background: none;
         border: none;
         position: relative;
-        top:-504px;
-        left:525px
+        top:3px;
+        left:-7px
     }
     .flechita img{
       width:72px;
     }
+    #contenedorIdentificacionEstudiante{
+        left:52px;
+    }
+    .container-header .container-title h1 {
+        font-size:32px;
+    }
+    
 }

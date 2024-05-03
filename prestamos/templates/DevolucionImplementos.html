@@ -58,12 +58,17 @@
         <div class="container-forms">
             <!-- Formulario para mostrarDatosEstudiante -->
             <div class="container-form">
-                <form action="{% url 'devolucionImplementos_mostrarInformacionPrestamo' %}" method="POST">
+                <div class="textp">
+                <p> Nº identificacion estudiante</p>
+                </div>
+                <form action="{% url 'devolucionImplementos_mostrarInformacionPrestamo' %}" method="POST" class="form-flechita">
                     <!-- token de validacion -->
                     {% csrf_token %}
                     <div id="contenedorIdentificacionEstudiante">
-                        <p> Nº identificacion estudiante</p>
                         <input type="number" id="documentNumber" name="documentNumber" required>
+                        <button type="submit" onclick="validateFormMostrarDatosEstudiante()" class="flechita">
+                            <img src="{% static 'flecha.png' %}" alt="Flecha">
+                        </button>
                     </div>
                 </form>
                 <!-- Formulario pra devolver el prestamo -->
@@ -76,15 +81,12 @@
                         {% if revision_datos %}
                         <button type="submit" class="button-devolver" id="devolver"
                             onclick="validateFormDevolverPrestamo('{{ revision_datos }}')">
-                            <img src="../static/devolver.png" alt="Devolver">
+                            <img src="{% static 'devolver.png' %}" alt="Devolver">
                         </button>
                         {% endif %}
                     </div>
                 </form>
             </div>
-            <button type="submit" onclick="validateFormMostrarDatosEstudiante()" class="flechita">
-                <img src="../static/flecha.png" alt="Flecha">
-            </button>
             <!-- Contenerdor de la devolucion -->
             <div class="container-contenedorDevolucion">
                 <div class="Cuadro1">
@@ -93,7 +95,7 @@
                 </div>
                 <div id="contenedorDevolucion">
                     <div class="contenedorDevolucion_elementos">
-                        <p2>Implemento prestado: </p2>
+                        <p>Implemento prestado: </p>
                         {% if implemento_prestado %}
                         <span class="mensajeBack">
                             {{implemento_prestado}}
@@ -101,7 +103,7 @@
                         {% endif %}
                     </div>
                     <div class="contenedorDevolucion_elementos">
-                        <p3>Edificio donde se presto: </p3>
+                        <p>Edificio donde se presto: </p>
                         {% if facultad_implemento %}
                         <span class="mensajeBack">
                             {{facultad_implemento}}
@@ -109,7 +111,7 @@
                         {% endif %}
                     </div>
                     <div class="contenedorDevolucion_elementos">
-                        <p4>Nombre del estudiante: </p4>
+                        <p>Nombre del estudiante: </p>
                         {% if nombre_estudiante %}
                         <span class="mensajeBack">
                             {{nombre_estudiante}}
@@ -117,7 +119,7 @@
                         {% endif %}
                     </div>
                     <div class="contenedorDevolucion_elementos">
-                        <p5>Correo estudiante: </p5>
+                        <p>Correo estudiante: </p>
                         {% if correo_estudiante %}
                         <span class="mensajeBack">
                             {{correo_estudiante}}
@@ -125,7 +127,7 @@
                         {% endif %}
                     </div>
                     <div class="contenedorDevolucion_elementos">
-                        <p6>Hora fin prestamo: </p6>
+                        <p>Hora fin prestamo: </p>
                         {% if inicio_prestamo %}
                         <span class="mensajeBack">
                             {{inicio_prestamo}}
@@ -133,7 +135,7 @@
                         {% endif %}
                     </div>
                     <div class="contenedorDevolucion_elementos">
-                        <p7>Hora fin prestamo: </p7>
+                        <p>Hora fin prestamo: </p>
                         {% if fin_prestamo %}
                         <span class="mensajeBack">
                             {{fin_prestamo}}
