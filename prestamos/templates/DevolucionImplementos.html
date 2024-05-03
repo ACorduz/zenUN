@@ -67,7 +67,7 @@
                     </div>
                 </form>
                 <!-- Formulario pra devolver el prestamo -->
-                <form action="{% url 'devolucionImplementos_procesarDevolucion' %}" method="POST">
+                <form action="{% url 'devolucionImplementos_procesarDevolucion' numeroDocumento=numeroDocumento %}" method="POST">
                     <!-- token de validacion -->
                     {% csrf_token %}
                     <div id="contenedorDevolverPrestamo">
