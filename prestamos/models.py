@@ -6,11 +6,17 @@ class edificio(models.Model):
     idEdificio = models.AutoField(primary_key=True)
     nombreEdificio = models.CharField(max_length=45)
 
+class estadoImplemento(models.Model):
+    idEstadoImplemento = models.AutoField(primary_key=True)
+    nombreEstadoImplemento =  models.CharField(max_length=45)
+    descripcionEstadoImplemento = models.CharField(max_length=45)
+
 class implemento(models.Model):
     idImplemento = models.AutoField(primary_key=True)
     nombreImplemento = models.CharField(max_length=45)
-    estadoImplemento = models.CharField(max_length=45)
     edificioId = models.ForeignKey(edificio, on_delete=models.CASCADE)
+    estadoImplementoId = models.ForeignKey(estadoImplemento, on_delete=models.CASCADE)
+
 
 class estadoPrestamo(models.Model):
     idEstadoPrestamo = models.AutoField(primary_key=True)
