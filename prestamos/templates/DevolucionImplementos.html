@@ -1,172 +1,202 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Solicitar préstamo</title>
-        <link rel="stylesheet" href="{% static 'DevolucionImplementos.css' %}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    </head>
-    <body>
-        <!-- Traer Libreria SweetAlertTwo-->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <!-- Mensaje del backend-->
-        {% if mensaje %}
-            <script> 
-            if('{{mensaje}}' == 'Devolucion del implemento exitoso'){
-                Swal.fire({
-                    title: "Sin ningun Problema!",
-                    text: "{{mensaje}}",
-                    icon: "success"
-                });
-            } 
-            else{
-                Swal.fire({
-                    position: "top",
-                    title: "Aviso Zenun",
-                    text: '{{mensaje}}',
-                    icon: 'warning',
-                    confirmButtonText: 'Aceptar'
-                });
-            }
-            
-            </script>
-        {% endif %}
-        <div class="header">
-            <button class="button-wrapper" onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
-                <img src=   "{% static 'icono.png' %}" alt="Botón 1">
-                <span>zenUN</span>
-            </button>
-            <div class="header-title"> </div> 
-            <img src="{% static 'perfil.png' %}" alt="Botón 2">
-        </div>
-        <div class="container-content">
-            <h1>Devolucion implementos</h1>
-            <hr class="linea">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar préstamo</title>
+    <link rel="stylesheet" href="../static/DevolucionImplementos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <!-- Traer Libreria SweetAlertTwo-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Mensaje del backend-->
+    {% if mensaje %}
+    <script>
+        if ('{{mensaje}}' == 'Devolucion del implemento exitoso') {
+            Swal.fire({
+                title: "Sin ningun Problema!",
+                text: "{{mensaje}}",
+                icon: "success"
+            });
+        }
+        else {
+            Swal.fire({
+                position: "top",
+                title: "Aviso Zenun",
+                text: '{{mensaje}}',
+                icon: 'warning',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+    </script>
+    {% endif %}
+    <div class="header">
+        <button class="button-wrapper"
+            onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
+            <img src="../static/icono.png" alt="Botón 1">
+            <span>zenUN</span>
+        </button>
+        <div class="header-title"> </div>
+        <img src="../static/perfil.png" alt="Botón 2">
+    </div>
+    <div class="container-content">
+        <div class="container-header">
             <!-- iconoJuego -->
-            <div id="iconGame">
-                <img src="{% static 'iconoJuego.png' %}">
+            <div class="iconGame">
+                <img src="../static/iconoJuego.png">
             </div>
-            <p> Nº identifiacion estudiante</p>
-            <!-- Formulario para mostrarDatosEstudiante -->
-            <form action="{% url 'devolucionImplementos_mostrarInformacionPrestamo' %}" method="POST">
-                <!-- token de validacion -->
-                {% csrf_token %}  
-                <div id="contenedorIdentificacionEstudiante"> 
-                    <input type="number" id="documentNumber" name="documentNumber" required>
-                    <button type="submit" onclick="validateFormMostrarDatosEstudiante()">
-                        <span>FLECHA</span>
-                    </button>
-                </div>
-            </form>
-            <!-- Formulario pra devolver el prestamo -->
-            <form action="{% url 'devolucionImplementos_procesarDevolucion' numeroDocumento=numeroDocumento %}" method="POST">
-                <!-- token de validacion -->
-                {% csrf_token %}
-                <div id="contenedorDevolverPrestamo"> 
-                    <p> comentario</p>
-                    <input type="text" id="comentario" name="comentario" >
-                    {% if revision_datos %}
-                    <button type="submit" id="devolver"  onclick="validateFormDevolverPrestamo('{{ revision_datos }}')">
-                        <span>Devolver</span>
-                    </button>
-                    {% endif %}
-                </div>
-            </form>
-            <!-- Contenerdor de la devolucion -->
-            <div id="contenedorDevolucion">
-                <div class="contenedorDevolucion_elementos">  
-                    <p>implemento prestado: </p>
-                    {% if implemento_prestado %}
-                    <span class="mensajeBack">
-                        {{implemento_prestado}}
-                    </span>
-                    {% endif %}
-                </div>
-                <div class="contenedorDevolucion_elementos">  
-                    <p>Facultad donde se presto: </p>
-                    {% if facultad_implemento %}
-                    <span class="mensajeBack"> 
-                        {{facultad_implemento}}
-                    </span>
-                    {% endif %}
-                </div>
-                <div class="contenedorDevolucion_elementos">  
-                    <p>Nombre del estudiante:  </p>
-                    {% if nombre_estudiante %}
-                    <span class="mensajeBack"> 
-                        {{nombre_estudiante}}
-                    </span>
-                    {% endif %}
-                </div>
-                <div class="contenedorDevolucion_elementos">  
-                    <p>Correo estudiante:  </p>
-                    {% if correo_estudiante %}
-                    <span class="mensajeBack"> 
-                        {{correo_estudiante}}
-                    </span>
-                    {% endif %}
-                </div>
-                <div class="contenedorDevolucion_elementos">  
-                    <p>Hora fin prestamo:  </p>
-                    {% if inicio_prestamo %}
-                    <span class="mensajeBack"> 
-                        {{inicio_prestamo}}
-                    </span>
-                    {% endif %}
-                </div>
-                <div class="contenedorDevolucion_elementos">  
-                    <p>Hora fin prestamo:  </p>
-                    {% if fin_prestamo %}
-                    <span class="mensajeBack"> 
-                        {{fin_prestamo}}
-                    </span>
-                    {% endif %}
-                </div>
+            <div class="container-title">
+                <h1>Devolucion implementos</h1>
+                <hr class="linea">
             </div>
-
         </div>
-        <script>
-            // funcion para validar el formularion de mostrar datos de prestamo
-            function validateFormMostrarDatosEstudiante() {
-                var NumeroDocumento = document.getElementById('documentNumber').value;
+        <div class="container-forms">
+            <!-- Formulario para mostrarDatosEstudiante -->
+            <div class="container-form">
+                <form action="{% url 'devolucionImplementos_mostrarInformacionPrestamo' %}" method="POST">
+                    <!-- token de validacion -->
+                    {% csrf_token %}
+                    <div id="contenedorIdentificacionEstudiante">
+                        <p> Nº identificacion estudiante</p>
+                        <input type="number" id="documentNumber" name="documentNumber" required>
+                    </div>
+                </form>
+                <!-- Formulario pra devolver el prestamo -->
+                <form action="{% url 'devolucionImplementos_procesarDevolucion' %}" method="POST">
+                    <!-- token de validacion -->
+                    {% csrf_token %}
+                    <div id="contenedorDevolverPrestamo">
+                        <p>Comentarios</p>
+                        <textarea name="textarea" rows="10" id="comentario" cols="50"></textarea>
+                        {% if revision_datos %}
+                        <button type="submit" class="button-devolver" id="devolver"
+                            onclick="validateFormDevolverPrestamo('{{ revision_datos }}')">
+                            <img src="../static/devolver.png" alt="Devolver">
+                        </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+            <button type="submit" onclick="validateFormMostrarDatosEstudiante()" class="flechita">
+                <img src="../static/flecha.png" alt="Flecha">
+            </button>
+            <!-- Contenerdor de la devolucion -->
+            <div class="container-contenedorDevolucion">
+                <div class="Cuadro1">
+                </div>
+                <div class="Cuadro2">
+                </div>
+                <div id="contenedorDevolucion">
+                    <div class="contenedorDevolucion_elementos">
+                        <p2>Implemento prestado: </p2>
+                        {% if implemento_prestado %}
+                        <span class="mensajeBack">
+                            {{implemento_prestado}}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="contenedorDevolucion_elementos">
+                        <p3>Edificio donde se presto: </p3>
+                        {% if facultad_implemento %}
+                        <span class="mensajeBack">
+                            {{facultad_implemento}}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="contenedorDevolucion_elementos">
+                        <p4>Nombre del estudiante: </p4>
+                        {% if nombre_estudiante %}
+                        <span class="mensajeBack">
+                            {{nombre_estudiante}}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="contenedorDevolucion_elementos">
+                        <p5>Correo estudiante: </p5>
+                        {% if correo_estudiante %}
+                        <span class="mensajeBack">
+                            {{correo_estudiante}}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="contenedorDevolucion_elementos">
+                        <p6>Hora fin prestamo: </p6>
+                        {% if inicio_prestamo %}
+                        <span class="mensajeBack">
+                            {{inicio_prestamo}}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="contenedorDevolucion_elementos">
+                        <p7>Hora fin prestamo: </p7>
+                        {% if fin_prestamo %}
+                        <span class="mensajeBack">
+                            {{fin_prestamo}}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                if (NumeroDocumento === ''){
-                    mostrarAlertaError("Error", 'Por favor, llene el campo de numero de documento para buscar datos')
-                    event.preventDefault(); // Detener el envío del formulario
-                }
-                else if(/[,.]/.test(NumeroDocumento)){
-                    mostrarAlertaError("Error N. de documento:","quitar la (,) o (.) del campo.");
-                    event.preventDefault(); // Detener el envío del formulario
-                }
+    </div>
+    <script>
+        // funcion para validar el formularion de mostrar datos de prestamo
+        function validateFormMostrarDatosEstudiante() {
+            var NumeroDocumento = document.getElementById('documentNumber').value;
+
+            if (NumeroDocumento === '') {
+                mostrarAlertaError("Error", 'Por favor, llene el campo de numero de documento para buscar datos')
+                event.preventDefault(); // Detener el envío del formulario
             }
-
-            // funcion para validar el formulario de Devolver Prestamo
-            function validateFormDevolverPrestamo(revision_datos="0") {
-                var comentario = document.getElementById('comentario').value;
-
-                if (comentario === ''){
-                    mostrarAlertaError("Error", 'Por favor, llene el campo de comentario, con almenos un ok')
-                    event.preventDefault(); // Detener el envío del formulario
-                }
-                else if(revision_datos == "0"){
-                    mostrarAlertaError("Error", 'Por favor, Revise primero los datos del estudiante')
-                    event.preventDefault();
-                } 
+            else if (/[,.]/.test(NumeroDocumento)) {
+                mostrarAlertaError("Error N. de documento:", "quitar la (,) o (.) del campo.");
+                event.preventDefault(); // Detener el envío del formulario
+            } else {
+                this.mostrarAlertaSuccess("Success","Xd")
             }
-            
-            // funcion para mostrar los errores 
-            function mostrarAlertaError(titulo="",texto) {
-                // Mostrar alerta personalizada con SweetAlert2
-                Swal.fire({
-                    title: titulo,
-                    text: texto,
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar'
-                });
-            }
+        }
 
-        </script>
-    </body>
+        // funcion para validar el formulario de Devolver Prestamo
+        function validateFormDevolverPrestamo(revision_datos = "0") {
+            var comentario = document.getElementById('comentario').value;
+
+            if (comentario === '') {
+                mostrarAlertaError("Error", 'Por favor, agregue un comentario')
+                event.preventDefault(); // Detener el envío del formulario
+            }
+            else if (revision_datos == "0") {
+                mostrarAlertaError("Error", 'Por favor, revise los datos del estudiante')
+                event.preventDefault();
+            }
+        }
+
+        // funcion para mostrar los errores 
+        function mostrarAlertaError(titulo = "", texto) {
+            // Mostrar alerta personalizada con SweetAlert2
+            Swal.fire({
+                title: titulo,
+                text: texto,
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+        function mostrarAlertaSuccess(titulo = "", texto) {
+            // Mostrar alerta personalizada con SweetAlert2
+            Swal.fire({
+                title: titulo,
+                text: texto,
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+    </script>
+</body>
+
 </html>
