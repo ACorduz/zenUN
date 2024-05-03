@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Solicitar préstamo</title>
-        <link rel="stylesheet" href="../static/DevolucionImplementos.css">
+        <link rel="stylesheet" href="{% static 'DevolucionImplementos.css' %}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     </head>
     <body>
@@ -34,18 +35,18 @@
         {% endif %}
         <div class="header">
             <button class="button-wrapper" onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
-                <img src="../static/icono.png" alt="Botón 1">
+                <img src=   "{% static 'icono.png' %}" alt="Botón 1">
                 <span>zenUN</span>
             </button>
             <div class="header-title"> </div> 
-            <img src="../static/perfil.png" alt="Botón 2">
+            <img src="{% static 'perfil.png' %}" alt="Botón 2">
         </div>
         <div class="container-content">
             <h1>Devolucion implementos</h1>
             <hr class="linea">
             <!-- iconoJuego -->
             <div id="iconGame">
-                <img src="../static/iconoJuego.png">
+                <img src="{% static 'iconoJuego.png' %}">
             </div>
             <p> Nº identifiacion estudiante</p>
             <!-- Formulario para mostrarDatosEstudiante -->
@@ -60,7 +61,7 @@
                 </div>
             </form>
             <!-- Formulario pra devolver el prestamo -->
-            <form action="{% url 'devolucionImplementos_procesarDevolucion' %}" method="POST">
+            <form action="{% url 'devolucionImplementos_procesarDevolucion' numeroDocumento=numeroDocumento %}" method="POST">
                 <!-- token de validacion -->
                 {% csrf_token %}
                 <div id="contenedorDevolverPrestamo"> 
