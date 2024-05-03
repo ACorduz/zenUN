@@ -77,7 +77,7 @@
                     {% csrf_token %}
                     <div id="contenedorDevolverPrestamo">
                         <p>Comentarios</p>
-                        <textarea name="textarea" rows="10" id="comentario" cols="50"></textarea>
+                        <textarea name="comentario" rows="10" id="comentario" cols="50"></textarea>
                         {% if revision_datos %}
                         <button type="submit" class="button-devolver" id="devolver"
                             onclick="validateFormDevolverPrestamo('{{ revision_datos }}')">
