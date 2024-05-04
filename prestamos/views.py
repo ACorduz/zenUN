@@ -118,3 +118,8 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request):
     except Exception as e:
         mensaje = f"Ocurrió un error: {str(e)}" # solo se le pasaria el mensaje en la URL 
         return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
+
+
+################# Funcionalidad Aprobar Prestamo AdministradorBienestar ################
+def mostrar_aprobarPrestamo(request):
+    return render(request,"principalAdminBienestar.html")

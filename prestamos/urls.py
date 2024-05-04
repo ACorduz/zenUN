@@ -18,5 +18,9 @@ urlpatterns = [
         path("devolucionImplementos/procesarDevolucion",
             views.procesar_devolucion_devolucionImplementos_administradorBienestar,
             name="devolucionImplementos_procesarDevolucion"
-        ) #En la vista  devolucionImplementos procesar devolucion implemento
+        ), #En la vista  devolucionImplementos procesar devolucion implemento
+        path("principalAdminBienestar",
+            views.mostrar_aprobarPrestamo,
+            name = "principalAdminBienestar"
+        )
 ]
