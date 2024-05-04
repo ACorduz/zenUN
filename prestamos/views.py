@@ -2,6 +2,10 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from prestamos.models import prestamo, implemento, edificio, comentarioImplemento, estadoImplemento,estadoPrestamo
 from usuarios.models import usuario
+from django.conf import settings
+from django.template.loader import get_template
+from django.core.mail import EmailMultiAlternatives
+
 
 
 
@@ -48,7 +52,7 @@ def mostrar_devolucionImplementos_administradorBienestar(request):
     # retornar la URL
     return render(request, 'DevolucionImplementos.html', contexto)
 
-
+# Metodo para procesar la información del prestamo pasando los datos a la URL 
 def mostrar_informacionPrestamo_devolucionImplementos_administradorBienestar(request):
     try:
         if request.method == "POST":
@@ -94,6 +98,7 @@ def mostrar_informacionPrestamo_devolucionImplementos_administradorBienestar(req
             mensaje = f"Ocurrió un error: {str(e)}" # solo se le pasaria el mensaje en la URL 
             return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
 
+# Metodo para mostrar la vista devolucionImplementos.html pero cogiendo los datos de la URL 
 def mostrar_devolucionImplementosConParametroNumeroDocumento_administradorBienestar(request, numeroDocumento): 
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     implemento_prestado = request.GET.get('implemento_prestado', '')  # Obtener el implementoPrestado de la URL, si está presente
@@ -120,6 +125,7 @@ def mostrar_devolucionImplementosConParametroNumeroDocumento_administradorBienes
     # retornar la URL
     return render(request,'DevolucionImplementos.html', contexto)
 
+# Metodo para procesar la devolucion de un implemento 
 def procesar_devolucion_devolucionImplementos_administradorBienestar(request, numeroDocumento):
     try:
         if request.method == "POST":
@@ -159,10 +165,66 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request, nu
             objetoPrestamo.save()
             objetoImplemento.save()
 
-    
-            mensaje = 'Devolucion del implemento exitoso'# solo se le pasaria el mensaje en la URL 
-            return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
+            # link  para el login
+            link_login = request.build_absolute_uri(reverse('loginUsuario'))
+
+            # llamar a un metodo para enviar el correo de devolucion
+            seEnvioCorreo, mensajeCorreo = Proceso_enviarCorreo_devolucionImplementos(
+                numeroDocumento, 
+                objetoImplemento.nombreImplemento, 
+                objetoPrestamo.fechaHoraFinPrestamo,
+                "Encargado de bienestar nombre de la cookie",
+                link_login
+            )
+
+            if seEnvioCorreo:
+                mensaje = f'Devolucion del implemento exitoso, {mensajeCorreo} '# solo se le pasaria el mensaje en la URL 
+                return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
+            else:
+                mensaje = f'Devolucion del implemento exitoso, {mensajeCorreo} '# solo se le pasaria el mensaje en la URL 
+                return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
         
     except Exception as e:
         mensaje = f"Ocurrió un error: {str(e)}" # solo se le pasaria el mensaje en la URL 
         return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
+
+
+# Metodo para enviar el correo electronico 
+def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento, fechaDevolucion, nombreEncargadoBienestar, link_login):
+    try: 
+        # obtener el correo del usuario
+        usuarioObject = usuario.objects.get(numeroDocumento = numeroDocumento)
+        correoUsuario = usuarioObject.correoInstitucional
+        # no se verifica si el correo ingresado existe pues para llamar a este metodo ya deberia haberse verificado esto    
+
+        #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
+        subject = "Resumen devolucion implemento ZenUN"
+        message = ""
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [correoUsuario]
+
+        #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+        context = {
+                    "nombreImplemento": nombreImplemento,
+                    "fechaDevolucion": fechaDevolucion,
+                    "nombreEncargadoBienestar":nombreEncargadoBienestar,
+                    "link_login": link_login
+                }
+        #Renderizamos el template html
+        template = get_template("SendMessageEmailDevolucionImplementoExitosa.html")
+        content = template.render(context)
+
+        email = EmailMultiAlternatives(
+                subject,
+                message,
+                email_from,
+                recipient_list
+            )
+
+        email.attach_alternative(content, "text/html")
+        email.send()
+        
+        return(True, "envio correo devolucion exitoso")
+
+    except Exception as e:
+        return(False , f"no se pudo enviar correo deovolucion: {e}")
