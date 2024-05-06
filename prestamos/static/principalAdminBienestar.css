@@ -9,7 +9,7 @@
     align-items: center;
     padding: 2px;
     background-color: #c0febf;
-    position: fixed;
+    position: relative;
     top: 0;
     left: 0;
     right: 0;
@@ -21,8 +21,7 @@
 .header-title {
     font-family: 'MiFuente', sans-serif;
     font-size: 30px;
-    text-align: center;
-    /*margin-right: 100px;*/
+    text-align: center;    
 }
 
 .button-wrapper {
@@ -56,12 +55,11 @@
 body {
     font-family: 'MiFuente', sans-serif;
     margin: 0;
-    padding: 0;
-    display: flex;
-    /*justify-content: center;*/
+    padding: 0;    
+    justify-content: space-between;
     align-items: center;
     min-height: 100vh;
-    background-image: url('../static/registro.jpg');
+    background-image: url('../static/registro.jpg');    
     background-size: cover;
     background-position: center;
 }
@@ -80,38 +78,51 @@ body::after {
 
 .grid-container{
     display: grid;    
-    margin: 5%;
-    grid-template-rows: 50% 50%;
-    grid-template-columns: 50% 50%;    
-    padding: 2px;
+    width: 80%;
+    margin:auto;
+    margin-top: 10vh;
+    margin-bottom: 12vh;
+    height:60vh;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;    
+    padding: 0px;    
+    gap: 10px;
 }
-.grid-container button{
-    background:white;
+/* Estilo para cada cuadricula de la matriz */
+.grid-container a{
+    text-decoration:none;    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
     cursor: pointer;
     padding: 0;
-    margin: 0;
-    border: none;
+    margin: 0;    
+    border: none;         
 }
-#crearEventoButton{
-    grid-column: 2/3;
-    margin-top: 5px;      
+.texto{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    background-color: gray;
+    color: white;
+    width: 100%;    
+    padding-bottom: 10px;
+    padding-top: 10px;
+    font-size: 20px;    
 }
-#aprobarPrestamoButton{
-    
-    margin-right: 15px;
+
+#aprobarPrestamoButton{        
     grid-row: span 2;
-    /*image-resolution: auto;*/
+    background: url('../static/imgButtonAprobarPrestamo.jpg') no-repeat center center/cover;   
     
 }
 #devolverPrestamoButton{
-    margin-bottom: 5px;
+    background: url('../static/imgButtonDevolverPrestamo.png') no-repeat center center/cover;    
 }
-#imgAprobarPrestamo{
-    position:relative;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 90%;
+#crearEventoButton{
+    grid-column: 2/3;
+    background: url('../static/imgButtonCrearEvento.png') no-repeat center center/cover;    
 }
 .footer{    
     font-size: small;
@@ -119,7 +130,7 @@ body::after {
     align-items: right;
     padding: 2px;
     background-color: #c0febf;
-    position: fixed;
+    position: relative;    
     bottom: 0;
     left: 0;
     right: 0;
