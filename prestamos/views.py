@@ -121,5 +121,5 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request):
 
 
 ################# Funcionalidad Aprobar Prestamo AdministradorBienestar ################
-def mostrar_aprobarPrestamo(request):
+def mostrar_principalAdminBienestar(request):
     return render(request,"principalAdminBienestar.html")

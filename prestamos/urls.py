@@ -20,7 +20,7 @@ urlpatterns = [
             name="devolucionImplementos_procesarDevolucion"
         ), #En la vista  devolucionImplementos procesar devolucion implemento
         path("principalAdminBienestar",
-            views.mostrar_aprobarPrestamo,
+            views.mostrar_principalAdminBienestar,
             name = "principalAdminBienestar"
         )
 ]
