@@ -40,4 +40,16 @@ urlpatterns = [
     path('verificacionCorreo/aprobar/<str:token>',
          views.aprobar_OTP,
          name="aprobar_OTP"), #Ruta para la vista de aprobación del OTP
+    path('verificacionCorreoAdminBienestar/',
+         views.mostrar_vistaVerificarCorreoAdminBienestar,
+         name="verificacionCorreoAdminBienestar"),
+    path('verificacionCorreoAdminBienestar/procesar',
+         views.procesar_verificar_correo_Admin_Bienestar,
+         name='procesarVerificacionCorreoAdminBienestar'),
+    path('registroAdministradorBienestar/',
+         views.mostrar_registro_administrativo,
+         name='registroAdministradorBienestar'),
+    path('registroAdministradorBienestar/procesar',
+         views.procesar_registro_administrador_bienestar,
+         name="procesarRegistroAdministradorBienestar")
 ]

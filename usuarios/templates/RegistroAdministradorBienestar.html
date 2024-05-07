@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro</title>
+  <title>Registro Administrador Bienestar</title>
   <link rel="stylesheet" href="{% static 'RegisterPage.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
@@ -34,13 +34,13 @@
       <!-- <h4>{{ mensaje }}</h4> -->
     </div>
   {% endif %}
-  <form action="{% url 'procesar_registro_estudiante' %}" method="POST">
+  <form action="{% url 'procesarRegistroAdministradorBienestar' %}" method="POST">
     {% csrf_token %}
     <div class="register-page-container">
       <div class="form-container">
         <div class="form-title-container">
           <div class="logo"></div>
-          <h2 class="form-title">Crea tu cuenta</h2>
+          <h2 class="form-title" style="font-size: 24px;">Crear cuenta Administrador de Bienestar</h2>
         </div>
         <div class="form-content">
           <div class="form-group">

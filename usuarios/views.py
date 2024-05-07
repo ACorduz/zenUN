@@ -343,3 +343,140 @@ def procesar_cambio_contrasena(request, correo_usuario, token):
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}"
             return redirect(reverse('cambiar_contrasena', args=[token]) + f'?mensaje={mensaje}')
+    
+
+########################Funcionalidad Registro Administrativo###################################
+
+#Método para mostrar la vista en donde se puede verificar si un posible usuario administrador ya está
+#registrado como estudiante o como admin de bienestar
+def mostrar_vistaVerificarCorreoAdminBienestar(request):
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    return render(request, 'VerificacionCorreoRegistroAdministrativo.html', {'mensaje': mensaje})
+
+#Funcionalidad para verificar si un usuario ya está registrado como estudiante
+def procesar_verificar_correo_Admin_Bienestar(request):
+    try:
+        if request.method == "POST":
+            correoUsuario = request.POST.get('email')
+            
+        
+            #Verificación del dominio del correo que ingresa
+            if not correoUsuario.endswith('@unal.edu.co'):
+                mensaje = "El correo debe ser de dominio @unal.edu.co"
+                return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
+            
+            # Revisar si el usuario existe
+            if not usuario.objects.filter(correoInstitucional=correoUsuario).exists():
+                mensaje = "Por favor registre los siguientes datos del nuevo administrador de bienestar."
+                return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}')
+            else:
+                user = usuario.objects.get(correoInstitucional= correoUsuario)
+                
+                #Verificar si el usuario tiene el rol de ESTUDIANTE y no tiene el de ADMINISTRADOR DE BIENESTAR
+                if user.roles.filter(idRol="1").exists() and not (user.roles.filter(idRol="2").exists()):
+                    mensaje = "El usuario ya se encuentra registrado como estudiante, por favor asigne el rol de Administrador de Bienestar."
+                    return redirect(reverse('asignarRolAdminBienestar') + f'?mensaje={mensaje}')
+                
+                elif user.roles.filter(idRol="2").exists():
+                    mensaje = "El usuario ya se encuentra registrado como Administrador de Bienestar."
+                    return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
+    
+    except Exception as e:
+        mensaje = f"Ocurrió un error: {str(e)}"
+        return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
+    
+
+#Método para mostrar la vista de registro admnistrador bienestar
+def mostrar_registro_administrativo(request):
+    tipos_documentos = tipoDocumento.objects.all()
+    mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    return render(request, 'RegistroAdministradorBienestar.html', {'tipos_documentos':tipos_documentos, 'mensaje': mensaje})
+
+#Este método se encarga de procesar el formulario de registro cuando se envía
+def procesar_registro_administrador_bienestar(request):
+    try:
+        if request.method == "POST":
+            #Obtener los datos del formulario
+            nombres = request.POST.get('fullName')
+            apellidos = request.POST.get('lastName')
+            email_usuario = request.POST.get('email')
+            email_usuario.lower()
+            password = request.POST.get('password')
+            confirm_password = request.POST.get('confirmPassword')
+            tipo_documento = int(request.POST.get('documentType'))
+            phone = request.POST.get('phone')
+            numero_documento = request.POST.get('documentNumber')
+            
+            if not email_usuario.endswith('@unal.edu.co'):
+                mensaje = "El correo debe ser de dominio @unal.edu.co"
+            elif password != confirm_password:
+                mensaje = "Las contraseñas no coinciden"
+            elif usuario.objects.filter(correoInstitucional = email_usuario).exists():
+                mensaje = "El correo ya se encuentra registrado"
+            elif usuario.objects.filter(numeroDocumento = numero_documento).exists():
+                mensaje = "El número de documento ya se encuentra registrado"
+            else:
+            #Lógica de creación de usuario si todas las validaciones son exitosas
+                #Tipo de documento
+                tipo_doc = tipoDocumento.objects.get(pk=tipo_documento)
+
+                #Primero, generar el hash de la contraseña
+                password_hash = make_password(password)
+
+                #Luego, crear el objeto usuario utilizando el hash de la contraseña
+                administradorBienestar = usuario.objects.create(
+                        numeroDocumento = numero_documento,
+                        idTipoDocumento = tipo_doc,
+                        nombres = nombres,
+                        apellidos = apellidos,
+                        correoInstitucional = email_usuario,
+                        password = password_hash,
+                        numeroCelular = phone,
+                        codigoVerificacion = crear_otp(),
+                        usuarioVerificado = False
+                )
+                administradorBienestar.save()
+
+                #Asignar el rol de administrador de Bienestar
+                administradorBienestar.roles.add(administradorBienestar.numeroDocumento, 2)
+                
+                ##Envio de correo con el código de verificación
+                #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
+                subject = "Codigo de verificación"
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = [email_usuario]
+
+                signer = Signer()
+                # Firmar el un token con el correo electrónico del usuario
+                token = signer.sign(f"{email_usuario}")
+
+                #Generar el enlace para ingresar el código
+                verificacion_url = request.build_absolute_uri(reverse('mostrar_otp', args=[token]))
+
+                #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+                context = {
+                            "codigo_verificacion": str(administradorBienestar.codigoVerificacion),
+                            "link_codigo_verificacion" : verificacion_url,
+                        }
+                #Renderizamos el template html
+                template = get_template("SendMessageEmailOtp.html")
+                content = template.render(context)
+
+                email = EmailMultiAlternatives(
+                        subject,
+                        content,
+                        email_from,
+                        recipient_list
+                        )
+
+                email.attach_alternative(content, "text/html")
+                email.send()
+
+                mensaje = '¡Registro exitoso! Revise su correo para verificar la cuenta y poder acceder.'
+                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+            
+    except Exception as e:
+        mensaje = f"Ocurrió un error: {str(e)}"
+        return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}')
+    
+    return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}')
