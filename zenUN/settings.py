@@ -36,7 +36,7 @@ ALLOWED_HOSTS = []
 
 RENDER_EXTERNAL_HOST = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOST:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOST)
+ ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOST)
 
 # Application definition
 
@@ -53,7 +53,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
