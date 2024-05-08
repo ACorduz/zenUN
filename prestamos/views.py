@@ -188,7 +188,6 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request, nu
         mensaje = f"Ocurrió un error: {str(e)}" # solo se le pasaria el mensaje en la URL 
         return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
 
-
 # Metodo para enviar el correo electronico 
 def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento, fechaDevolucion, nombreEncargadoBienestar, link_login):
     try: 
@@ -228,3 +227,7 @@ def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento
 
     except Exception as e:
         return(False , f"no se pudo enviar correo deovolucion: {e}")
+
+################# Funcionalidad Aprobar Prestamo AdministradorBienestar ################
+def mostrar_principalAdminBienestar(request):
+    return render(request,"principalAdminBienestar.html")
