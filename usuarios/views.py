@@ -351,7 +351,7 @@ def procesar_cambio_contrasena(request, correo_usuario, token):
 #registrado como estudiante o como admin de bienestar
 def mostrar_vistaVerificarCorreoAdminBienestar(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
-    return render(request, 'VerificacionCorreoRegistroAdministrativo.html', {'mensaje': mensaje})
+    return render(request, 'VerificacionCorreoRegistroAdministradorBienestar.html', {'mensaje': mensaje})
 
 #Funcionalidad para verificar si un usuario ya está registrado como estudiante
 def procesar_verificar_correo_Admin_Bienestar(request):
@@ -373,14 +373,21 @@ def procesar_verificar_correo_Admin_Bienestar(request):
                 user = usuario.objects.get(correoInstitucional= correoUsuario)
                 
                 #Verificar si el usuario tiene el rol de ESTUDIANTE y no tiene el de ADMINISTRADOR DE BIENESTAR
-                if user.roles.filter(idRol="1").exists() and not (user.roles.filter(idRol="2").exists()):
+                if user.usuarioVerificado==True and user.roles.filter(idRol="1").exists() and not (user.roles.filter(idRol="2").exists()):
                     mensaje = "El usuario ya se encuentra registrado como estudiante, por favor asigne el rol de Administrador de Bienestar."
-                    return redirect(reverse('asignarRolAdminBienestar') + f'?mensaje={mensaje}')
+                    numeroDocumento = user.numeroDocumento
+                    nombres = user.nombres
+                    apellidos = user.apellidos
+                    return render(request, 'AsignacionRolAdministradorBienestar.html', {'mensaje': mensaje, 'correo': correoUsuario, 'numeroDocumento': numeroDocumento, 'nombres':nombres, 'apellidos':apellidos})
                 
                 elif user.roles.filter(idRol="2").exists():
                     mensaje = "El usuario ya se encuentra registrado como Administrador de Bienestar."
                     return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
-    
+                
+                else:
+                    mensaje = "El usuario" + " " + correoUsuario + " " + "se encuentra registrado como estudiante pero no ha verificado su cuenta, por favor verifique su cuenta antes de continuar."
+                    return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
+                
     except Exception as e:
         mensaje = f"Ocurrió un error: {str(e)}"
         return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
@@ -480,3 +487,24 @@ def procesar_registro_administrador_bienestar(request):
         return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}')
     
     return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}')
+
+#Este método se encarga de asignar el rol de administrador de bienestar al usuario que ya está registrado como estudiante
+def procesar_asignacion_rol_administrador_bienestar(request):
+    try:
+        if request.method == "POST":
+            correoUsuario = request.POST.get('email')
+            correoUsuario.lower()
+
+            if not correoUsuario.endswith('@unal.edu.co'):
+                mensaje = "El correo debe ser de dominio @unal.edu.co"
+                return render(request, 'AsignacionRolAdministradorBienestar.html', {'mensaje': mensaje, 'correo': correoUsuario})
+            else:
+                #Asignacion de rol de administrador de Bienestar
+                user = usuario.objects.get(correoInstitucional= correoUsuario)
+
+                user.roles.add(user.numeroDocumento, 2)
+                mensaje = "Asignación de rol Administrador de Bienestar exitosa!"
+                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+    except Exception as e:
+        mensaje = f"Ocurrió un error: {str(e)}"
+        return render(request, 'AsignacionRolAdministradorBienestar.html', {'mensaje': mensaje, 'correo': correoUsuario})
