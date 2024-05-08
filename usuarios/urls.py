@@ -20,8 +20,8 @@ urlpatterns = [
             login_required(views.mostrar_mainPage_estudiante), 
             name='paginaPrincipal_estudiante'), #vista Principal estudiante
     path('cerrar-sesion/', 
-                views.cerrar_sesion, 
-                name='cerrar_sesion'), #Cerrar Sesión
+            views.cerrar_sesion, 
+            name='cerrar_sesion'), #Cerrar Sesión
     path('login/EnvioRecuperacionContraseña', 
             views.mostrar_enviarCorreo_contrasena, 
             name="enviarCorreo_contrasena"), # Vista para el envio del correo de RecuperarContraseña
@@ -40,4 +40,19 @@ urlpatterns = [
     path('verificacionCorreo/aprobar/<str:token>',
          views.aprobar_OTP,
          name="aprobar_OTP"), #Ruta para la vista de aprobación del OTP
+    path('verificacionCorreoAdminBienestar/',
+         views.mostrar_vistaVerificarCorreoAdminBienestar,
+         name="verificacionCorreoAdminBienestar"),
+    path('verificacionCorreoAdminBienestar/procesar',
+         views.procesar_verificar_correo_Admin_Bienestar,
+         name='procesarVerificacionCorreoAdminBienestar'),
+    path('registroAdministradorBienestar/',
+         views.mostrar_registro_administrativo,
+         name='registroAdministradorBienestar'),
+    path('registroAdministradorBienestar/procesar',
+         views.procesar_registro_administrador_bienestar,
+         name="procesarRegistroAdministradorBienestar"),
+    path('procesarAsignacionRol',
+         views.procesar_asignacion_rol_administrador_bienestar,
+         name="procesarAsignacionRolAdminBienestar")
 ]

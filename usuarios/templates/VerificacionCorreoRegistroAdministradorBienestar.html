@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'VerificacionCorreoRA.css' %}">
+    <title>Verificacion Correo Administrador Bienestar</title>
+</head>
+<body>
+    <!-- Traer Libreria SweetAlertTwo-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Mensaje del backend-->
+  {% if mensaje %}
+    <script>     
+      Swal.fire({
+        position: "top",
+        title: "Aviso Zenun",
+        text: '{{mensaje}}',
+        icon: 'warning',
+        confirmButtonText: 'Aceptar'
+      });
+    </script>
+  {% endif %}
+
+    <div class="formulario">
+        <div class="titulo">
+            <p>Registrar Administrador de Bienestar</p >
+        </div>
+        <div class="info">
+            <p>Ingresa el correo institucional del usuario a vincular como administrador de bienestar.</p>
+        </div>
+        <form action="{% url 'procesarVerificacionCorreoAdminBienestar' %}" method="POST">
+            {% csrf_token %}
+            <div>
+                <label for="email"><u>Correo electrónico</u></label>
+                <div class="email-input-container">
+                    <input type="email" name="email" id="email"  oninput="this.value = this.value.toLowerCase()" required>
+                    <span class="email-extension">@unal.edu.co</span>
+                </div>
+            </div>
+            <div class="boton-container">
+                <button type="submit">Enviar</button>
+            </div>
+                
+        </form>
+    </div>
+</body>
+<script>
+    // funcion para esconder el dominio al hacer click 
+  var input = document.getElementById('email');
+  var text = document.querySelector('.email-extension');
+
+    input.addEventListener('click', function() {
+    input.value = '';
+    text.style.display = 'none';
+  });
+</script>
+</html>
+
