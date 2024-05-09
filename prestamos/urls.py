@@ -26,5 +26,8 @@ urlpatterns = [
         path("principalAdminBienestar",
             views.mostrar_principalAdminBienestar,
             name = "principalAdminBienestar"
-        )
+        ), ##vista Disponibilidad Implementos
+
+        path('tabla_implementos/', views.tabla_reservas, name='tabla_reservas')
+
 ]

@@ -28,8 +28,9 @@ class prestamo(models.Model):
     estudianteNumeroDocumento = models.ForeignKey(usuario, on_delete=models.CASCADE, related_name='estudianteNumeroDocumento')
     administradorBienestarNumeroDocumento = models.ForeignKey(usuario, null=True, on_delete=models.CASCADE, related_name='administradorBienestarNumeroDocumento')
     fechaHoraCreacion = models.DateTimeField(default=datetime.now)
-    fechaHoraInicioPrestamo = models.DateTimeField()
-    fechaHoraFinPrestamo = models.DateTimeField()
+    ##dejar que sea nulo
+    fechaHoraInicioPrestamo = models.DateTimeField(null=True)
+    fechaHoraFinPrestamo = models.DateTimeField(null=True)
     idImplemento = models.ForeignKey(implemento, on_delete=models.CASCADE)
     estadoPrestamo = models.ForeignKey(estadoPrestamo, on_delete=models.CASCADE)
     comentario = models.TextField(null=True)
