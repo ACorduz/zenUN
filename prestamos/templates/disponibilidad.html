@@ -23,7 +23,7 @@
 
 <!-- Formulario de búsqueda y filtro -->
 <div class="search-container">
-    <form id="filtro-form" method="GET" action="{% url 'buscar_y_filtrar_implemento' %}">
+    <form id="filtro-form" method="GET">  <!-- agregar logica filtro -->
         <input type="text" placeholder="Buscar por nombre..." name="implemento">
         <label for="edificio">Filtrar por edificio:</label>
         <select name="edificio" id="edificio">
@@ -55,10 +55,15 @@
         <td>{{ implemento.edificioId.nombreEdificio }}</td>
         <td>{{ implemento.estadoImplementoId.nombreEstadoImplemento }}</td>
         {% if implemento.prestamos %}
-            {% for prestamo in implemento.prestamos %}
-                <td>{{ prestamo.fechaHoraInicioPrestamo|default:"" }}</td>
-                <td>{{ prestamo.fechaHoraFinPrestamo|default:"" }}</td>
-            {% endfor %}
+            {% with ultimo_prestamo=implemento.prestamos.last %}
+                {% if implemento.estadoImplementoId.nombreEstadoImplemento == 'DISPONIBLE' or implemento.estadoImplementoId.nombreEstadoImplemento == 'NO DISPONIBLE' %}
+                    <td></td>
+                    <td></td>
+                {% else %}
+                    <td>{{ ultimo_prestamo.fechaHoraInicioPrestamo|default_if_none:"" }}</td>
+                    <td>{{ ultimo_prestamo.fechaHoraFinPrestamo|default_if_none:"" }}</td>
+                {% endif %}
+            {% endwith %}
         {% else %}
             <td></td>
             <td></td>
@@ -72,6 +77,8 @@
     {% endfor %}
 </table>
 
+<!--Servia para la parte del filtro
+    
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
@@ -101,7 +108,9 @@ $(document).ready(function() {
     });
 });
 </script>
+-->
 
 </body>
 </html>
+
 

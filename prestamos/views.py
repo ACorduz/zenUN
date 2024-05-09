@@ -258,7 +258,6 @@ def tabla_reservas(request):
             
             # Verificar si el préstamo está en proceso y tiene una fecha de finalización
             if prestamo_obj.estadoPrestamo.nombreEstado == 'PROCESO' and prestamo_obj.fechaHoraFinPrestamo:
-                print("entro al primer if")
                 print("Hora actual en Bogotá:", hora_actual_bogota.time())
                 print("Hora máxima de reserva:", prestamo_obj.fechaHoraFinPrestamo.time())
                 if hora_actual_bogota.time() > prestamo_obj.fechaHoraFinPrestamo.time():
