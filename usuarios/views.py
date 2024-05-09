@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from functools import wraps
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login, logout
 from usuarios.models import usuario
@@ -10,6 +11,25 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.signing import Signer, BadSignature
 import time
 import random
+
+
+########################################Funcionalidad acceso según el ROL#########################
+def role_required(role_name):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            # Verificar si el usuario tiene el rol necesario
+            if request.user.is_authenticated and request.user.roles.filter(nombreRol=role_name).exists():
+                return view_func(request, *args, **kwargs)
+            else:
+                # Si el usuario no tiene el rol necesario, redirigir a una página de acceso denegado
+                return redirect(reverse('accesoDenegado'))  # Puedes definir una URL para una página de acceso denegado
+        return _wrapped_view
+    return decorator
+
+def access_denied(request):
+    return render(request, 'accesoDenegado.html')
+
 
 #################Funcionalidad de Registro Estudiantes################
 
@@ -196,8 +216,23 @@ def autenticar_credenciales_usuario(request):
                     if(validacionUsuario == True):
                         #autenticar usuario
                         login(request, user)
-                        mensaje = "Validacion exitosa."
-                        return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
+
+                        # Verifica cuántos roles tiene el usuario
+                        roles_count = user.roles.count()
+                        roles = user.roles.all()
+                        for rol in roles:
+                            nombre_rol = rol.nombreRol
+                            print(nombre_rol)
+                        if roles_count > 1:
+                            return redirect(reverse('SeleccionarRol'))
+                        else:
+                        # Redirige a donde quieras si el usuario tiene un solo rol
+                            if request.user.roles.filter(nombreRol='Estudiante').exists():
+                                return redirect(reverse('paginaPrincipal_estudiante'))
+                            elif request.user.roles.filter(nombreRol='Administrador Bienestar').exists():
+                                return redirect(reverse('paginaPrincipalAdministradorBienestar'))
+                            elif request.user.roles.filter(nombreRol='Administrador Master').exists():
+                                return redirect(reverse('paginaPrincipalAdministradorMaster'))
                     else: 
                         # si no está validado el usuario
                         mensaje = "Revise su correo para válidar la cuenta."
@@ -205,17 +240,39 @@ def autenticar_credenciales_usuario(request):
 
                 else:
                     # contraseña incorrecta
-                    mensaje = "Correo y/o contraseña incorrectos"
+                    mensaje = "Correo o contraseña incorrectos"
                     return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}&username={correo_usuario}')
                 
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}"
             return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
 
+#Método se encarga de mostrar los roles que tiene el usuario que se loguea    
+def seleccionar_rol(request):
+    # Aquí obtienes todos los roles disponibles para el usuario
+    roles = request.user.roles.all()
+    return render(request, 'SeleccionRolUsuario.html', {'roles': roles})
+
+#Método que se encarga de procesar la selección del rol
+def procesar_seleccionar_rol(request):
+    if request.method == "POST":
+        rol = request.POST.get('selected_role')
+        if rol == '1':
+            return redirect(reverse('paginaPrincipal_estudiante'))
+        elif rol == '2':
+            return redirect(reverse('paginaPrincipalAdministradorBienestar'))
+        else:
+            return redirect(reverse('paginaPrincipalAdministradorMaster'))
+
+@role_required('Estudiante')
 #Este método se encarga de mostrar la vista de PaginaPrincipal Estudiante
 def mostrar_mainPage_estudiante(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     return render(request, 'MainPageStudent.html', {'mensaje': mensaje})
+
+@role_required('Administrador Bienestar')
+def mostrar_principalAdminBienestar(request):
+    return render(request,"PrincipalAdminBienestar.html")
 
 
 #Cerrar Sesión
@@ -508,3 +565,4 @@ def procesar_asignacion_rol_administrador_bienestar(request):
     except Exception as e:
         mensaje = f"Ocurrió un error: {str(e)}"
         return render(request, 'AsignacionRolAdministradorBienestar.html', {'mensaje': mensaje, 'correo': correoUsuario})
+    

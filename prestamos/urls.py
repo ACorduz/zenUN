@@ -23,8 +23,5 @@ urlpatterns = [
             views.procesar_devolucion_devolucionImplementos_administradorBienestar,
             name="devolucionImplementos_procesarDevolucion"
         ), #En la vista  devolucionImplementos( con paramentro CORREO en la URL)  procesar devolucion implemento
-        path("principalAdminBienestar",
-            views.mostrar_principalAdminBienestar,
-            name = "principalAdminBienestar"
-        )
+
 ]

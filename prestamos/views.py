@@ -229,5 +229,4 @@ def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento
         return(False , f"no se pudo enviar correo deovolucion: {e}")
 
 ################# Funcionalidad Aprobar Prestamo AdministradorBienestar ################
-def mostrar_principalAdminBienestar(request):
-    return render(request,"principalAdminBienestar.html")
+
