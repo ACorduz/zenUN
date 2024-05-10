@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'VerificacionCorreoRA.css' %}">
+    <title>Selección de Rol</title>
+</head>
+<body>
+    <!-- Traer Libreria SweetAlertTwo-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Mensaje del backend-->
+  {% if mensaje %}
+    <script>     
+      Swal.fire({
+        position: "top",
+        title: "Aviso Zenun",
+        text: '{{mensaje}}',
+        icon: 'warning',
+        confirmButtonText: 'Aceptar'
+      });
+    </script>
+  {% endif %}
+
+    <div class="formulario">
+        <div class="titulo">
+            <p>Seleccione el rol con el que desea ingresar</p >
+        </div>
+        <div class="info">
+        </div>
+        <form action="{% url 'ProcesarSeleccionRol' %}" method="POST">
+            {% csrf_token %}
+            <div>
+              <select name="selected_role">
+                {% for rol in roles %}
+                    <option value="{{ rol.idRol }}">{{ rol.nombreRol }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="boton-container">
+                <button type="submit">Seleccionar</button>
+            </div>
+                
+        </form>
+    </div>
+</body>
+</html>
+
