@@ -230,8 +230,7 @@ def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento
         return(False , f"no se pudo enviar correo deovolucion: {e}")
 
 ################# Funcionalidad Aprobar Prestamo AdministradorBienestar ################
-def mostrar_principalAdminBienestar(request):
-    return render(request,"principalAdminBienestar.html")
+
 
 ################# Funcionalidad Habilitar/Deshabilitar boton################
 def tabla_reservas(request):
@@ -278,3 +277,4 @@ def solicitar_prestamo(request, implemento_id):
     implemento_obj = implemento.objects.get(pk=implemento_id)
     # Pasar el implemento a la plantilla de solicitud de préstamo, ejemplo:
     return render(request, 'principalAdminBienestar.html', {'implemento': implemento_obj})
+

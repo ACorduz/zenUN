@@ -54,5 +54,17 @@ urlpatterns = [
          name="procesarRegistroAdministradorBienestar"),
     path('procesarAsignacionRol',
          views.procesar_asignacion_rol_administrador_bienestar,
-         name="procesarAsignacionRolAdminBienestar")
+         name="procesarAsignacionRolAdminBienestar"),
+    path('accesoDenegado',
+         views.access_denied,
+         name='accesoDenegado'),
+    path('seleccionRol/',
+         login_required(views.seleccionar_rol),
+         name='SeleccionarRol'),
+    path("principalAdminBienestar/",
+        views.mostrar_principalAdminBienestar,
+        name = "paginaPrincipalAdministradorBienestar"),
+    path("procesarSeleccionRol/",
+         views.procesar_seleccionar_rol,
+         name='ProcesarSeleccionRol')
 ]
