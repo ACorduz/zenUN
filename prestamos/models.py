@@ -1,6 +1,7 @@
 from django.db import models
 from usuarios.models import usuario
 from datetime import datetime
+from simple_history.models import HistoricalRecords
 
 class edificio(models.Model):
     idEdificio = models.AutoField(primary_key=True)
@@ -16,6 +17,7 @@ class implemento(models.Model):
     nombreImplemento = models.CharField(max_length=45)
     edificioId = models.ForeignKey(edificio, on_delete=models.CASCADE)
     estadoImplementoId = models.ForeignKey(estadoImplemento, on_delete=models.CASCADE)
+    history = HistoricalRecords()
 
 
 class estadoPrestamo(models.Model):
@@ -33,6 +35,7 @@ class prestamo(models.Model):
     idImplemento = models.ForeignKey(implemento, on_delete=models.CASCADE)
     estadoPrestamo = models.ForeignKey(estadoPrestamo, on_delete=models.CASCADE)
     comentario = models.TextField(null=True)
+    history = HistoricalRecords()
 
 class comentarioImplemento(models.Model):
     idComentarioImplemento = models.AutoField(primary_key=True)

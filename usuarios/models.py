@@ -1,4 +1,5 @@
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 #Modelo para la entidad Tipo de documento
 class tipoDocumento(models.Model):
@@ -24,6 +25,7 @@ class usuario(models.Model):
     roles = models.ManyToManyField(rol) #Crea la relación muchos a muchos
     codigoVerificacion = models.IntegerField() #Campo INT para el proceso de verificación de correo
     usuarioVerificado = models.BooleanField(default=False) #Si es TRUE el usuario ha sido verificado
+    history = HistoricalRecords()
     
     USERNAME_FIELD = 'correoInstitucional'
     REQUIRED_FIELDS = [
