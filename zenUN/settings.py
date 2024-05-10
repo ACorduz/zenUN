@@ -150,4 +150,3 @@ if DEBUG:
     EMAIL_HOST_PASSWORD="dpuw cgvi rmyp jpnm"
 
     STATICFILE_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  
-

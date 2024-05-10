@@ -1,0 +1,106 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+}
+
+/* Estilos para el banner */
+.banner {
+    background-color: hwb(122 58% 16%); /* Verde */
+    color: white;
+    text-align: center;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between; /* Espacio igual entre los elementos */
+    align-items: center; /* Centrar verticalmente */
+}
+
+.left-content {
+    display: flex;
+    align-items: center; /* Centrar verticalmente */
+}
+
+.logo {
+    width: 80px; /* Ajusta el tamaño de la imagen según sea necesario */
+    margin-right: 5px; /* Espacio entre la imagen y el texto */
+}
+
+.right-content {
+    display: flex;
+    align-items: center; /* Centrar verticalmente */
+}
+
+.right-content p {
+    margin-left: 10px; /* Espacio entre el texto y la imagen */
+    color: black; /* Cambia el color del texto a negro */
+}
+
+.right-content img {
+    width: 50px; /* Ajusta el tamaño de la imagen según sea necesario */
+    margin-left: 10px; /* Espacio entre la imagen y el texto */
+}
+.banner h2 {
+    color: black; /* Cambia el color del texto a negro */
+}
+/* Estilos para el formulario de búsqueda */
+.search-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Estilos para los filtros */
+input[type="text"],
+select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+/* Estilos para los botones */
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease; /* Agregar una transición suave al cambio de color de fondo */
+}
+
+button:enabled {
+    background-color: #4CAF50; /* Verde */
+    color: white;
+}
+
+button:disabled {
+    background-color: rgb(211, 203, 203); /* Rojo */
+    color: hsl(0, 0%, 8%); /* Texto gris para indicar deshabilitado */
+    cursor: default; /* Cambiar el cursor a predeterminado */
+}
+
+/* Estilos para la tabla de implementos */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/* Estilos para filas alternas de la tabla */
+tr:nth-child(even) {
+    background-color: #f9f9f9; /* Color de fondo para filas pares */
+}
+
+tr:nth-child(odd) {
+    background-color: #e6e6e6; /* Color de fondo para filas impares */
+}
