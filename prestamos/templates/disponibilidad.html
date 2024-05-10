@@ -1,0 +1,121 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disponibilidad Implementos</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'estilos.css' %}">
+</head>
+<body>
+
+<!-- Banner con el título -->
+<div class="banner">
+    <div class="left-content">
+        <img src="{% static 'icono.png' %}" alt="ZenUN" class="logo">
+        <h2>zenUN</h2>
+    </div>
+    <div class="right-content">
+        <p>ejemplo@unal.edu.co</p>
+        <img src="{% static 'usuario.png' %}" alt="user">
+    </div>
+</div>
+
+<!-- Formulario de búsqueda y filtro -->
+<div class="search-container">
+    <form id="filtro-form" method="GET">  <!-- agregar logica filtro -->
+        <input type="text" placeholder="Buscar por nombre..." name="implemento">
+        <label for="edificio">Filtrar por edificio:</label>
+        <select name="edificio" id="edificio">
+            <option value="">Todos los edificios</option>
+            <option value="Julio Garavito">Julio Garavito</option>
+            <option value="Polideportivo">Polideportivo</option>
+            <option value="Concha Acústica">Concha Acústica</option>
+        </select>
+        <button type="submit">Buscar/Filtrar</button>
+    </form>
+</div>
+
+<!-- Tabla de implementos -->
+<table id="tabla-implementos">
+    <tr>
+        <th>Nombre</th>
+        <th>Código</th>
+        <th>Edificio</th>
+        <th>Disponibilidad</th>
+        <th>Hora de Reserva</th>
+        <th>Hora de Devolución</th>
+        <th>Reservar</th>
+    </tr>
+    <!-- Iterar sobre los implementos y mostrarlos en la tabla -->
+    {% for implemento in implementos %}
+    <tr>
+        <td>{{ implemento.nombreImplemento }}</td>
+        <td>{{ implemento.idImplemento }}</td>
+        <td>{{ implemento.edificioId.nombreEdificio }}</td>
+        <td>{{ implemento.estadoImplementoId.nombreEstadoImplemento }}</td>
+        {% if implemento.prestamos %}
+            {% with ultimo_prestamo=implemento.prestamos.last %}
+                {% if implemento.estadoImplementoId.nombreEstadoImplemento == 'DISPONIBLE' or implemento.estadoImplementoId.nombreEstadoImplemento == 'NO DISPONIBLE' %}
+                    <td></td>
+                    <td></td>
+                {% else %}
+                    <td>{{ ultimo_prestamo.fechaHoraInicioPrestamo|default_if_none:"" }}</td>
+                    <td>{{ ultimo_prestamo.fechaHoraFinPrestamo|default_if_none:"" }}</td>
+                {% endif %}
+            {% endwith %}
+        {% else %}
+            <td></td>
+            <td></td>
+        {% endif %}
+        {% if implemento.estadoImplementoId.nombreEstadoImplemento != 'DISPONIBLE' %}
+            <td><button disabled>Reservar</button></td>
+        {% else %}
+            <td>
+                 <!-- Esta parte se puede editar para enviar el id a la vista de prestamo -->
+                <form action="{% url 'solicitar_prestamo' implemento.idImplemento %}" method="get">
+                    <button type="submit">Reservar</button>
+                </form>
+            </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+
+<!--Servia para la parte del filtro
+    
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#filtro-form').on('submit', function(event) {
+        event.preventDefault(); // Evita el comportamiento predeterminado de enviar el formulario
+
+        // Obtiene la URL del formulario
+        var url = $(this).attr('action');
+
+        // Obtiene los datos del formulario
+        var formData = $(this).serialize();
+
+        // Realiza la solicitud AJAX
+        $.ajax({
+            type: 'GET',
+            url: url,
+            data: formData,
+            success: function(response) {
+                // Actualiza la tabla con los resultados recibidos
+                $('#tabla-implementos').html(response.tabla_html);
+            },
+            error: function(xhr, status, error) {
+                // Maneja los errores si ocurren
+                console.error(xhr.responseText);
+            }
+        });
+    });
+});
+</script>
+-->
+
+</body>
+</html>
+
+

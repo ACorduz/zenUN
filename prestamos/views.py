@@ -5,7 +5,8 @@ from usuarios.models import usuario
 from django.conf import settings
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
-
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 
@@ -229,5 +230,51 @@ def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento
         return(False , f"no se pudo enviar correo deovolucion: {e}")
 
 ################# Funcionalidad Aprobar Prestamo AdministradorBienestar ################
-def mostrar_principalAdminBienestar(request):
-    return render(request,"principalAdminBienestar.html")
+
+
+################# Funcionalidad Habilitar/Deshabilitar boton################
+def tabla_reservas(request):
+    print("Entrando a la función tabla reservas")
+    # Obtener todos los implementos
+    implementos = implemento.objects.all()
+
+    # Obtener la hora actual en UTC
+    hora_actual_utc = timezone.now()
+    print("Hora actual (UTC):", hora_actual_utc)
+
+    # Ajustar la hora actual a la zona horaria de Bogotá (UTC-5)
+    diferencia_horaria = timedelta(hours=-5)
+    hora_actual_bogota = hora_actual_utc + diferencia_horaria
+    print("Hora actual (Bogotá):", hora_actual_bogota.time())
+
+    # Verificar y actualizar los préstamos en reserva
+    for implemento_obj in implementos:
+        implemento_obj.prestamos = prestamo.objects.filter(idImplemento=implemento_obj)
+        for prestamo_obj in implemento_obj.prestamos:
+            #print("Prestamo:", prestamo_obj)
+            #print("Estado del préstamo:", prestamo_obj.estadoPrestamo.nombreEstado)
+            #print("Fecha y hora de finalización del préstamo:", prestamo_obj.fechaHoraFinPrestamo)
+            
+            # Verificar si el préstamo está en proceso y tiene una fecha de finalización
+            if prestamo_obj.estadoPrestamo.nombreEstado == 'PROCESO' and prestamo_obj.fechaHoraFinPrestamo:
+                #print("Hora actual en Bogotá:", hora_actual_bogota.time())
+                #print("Hora máxima de reserva:", prestamo_obj.fechaHoraFinPrestamo.time())
+                if hora_actual_bogota.time() > prestamo_obj.fechaHoraFinPrestamo.time():
+                    print("La hora actual es mayor que la hora máxima de reserva.")
+                    prestamo_obj.estadoPrestamo = estadoPrestamo.objects.get(nombreEstado='FINALIZADO')
+                    prestamo_obj.fechaHoraInicioPrestamo = None
+                    prestamo_obj.fechaHoraFinPrestamo = None
+                    prestamo_obj.save()
+
+                    # Actualizar el estado del implemento a DISPONIBLE
+                    implemento_obj.estadoImplementoId = estadoImplemento.objects.get(nombreEstadoImplemento='DISPONIBLE')
+                    implemento_obj.save()
+
+    return render(request, 'disponibilidad.html', {'implementos': implementos})
+
+def solicitar_prestamo(request, implemento_id):
+    # Obtener el implemento usando su ID
+    implemento_obj = implemento.objects.get(pk=implemento_id)
+    # Pasar el implemento a la plantilla de solicitud de préstamo, ejemplo:
+    return render(request, 'principalAdminBienestar.html', {'implemento': implemento_obj})
+
