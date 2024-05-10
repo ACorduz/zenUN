@@ -27,7 +27,8 @@ urlpatterns = [
             views.mostrar_principalAdminBienestar,
             name = "principalAdminBienestar"
         ), ##vista Disponibilidad Implementos
-
-        path('tabla_implementos/', views.tabla_reservas, name='tabla_reservas')
+        path('tabla_implementos/', views.tabla_reservas, name='tabla_reservas'),
+        ## Ejemplo Pasar los parametros a la vista solicitar Prestamo
+        path('solicitarPrestamo/<int:implemento_id>/', views.solicitar_prestamo, name='solicitar_prestamo'),
 
 ]

@@ -252,14 +252,14 @@ def tabla_reservas(request):
     for implemento_obj in implementos:
         implemento_obj.prestamos = prestamo.objects.filter(idImplemento=implemento_obj)
         for prestamo_obj in implemento_obj.prestamos:
-            print("Prestamo:", prestamo_obj)
-            print("Estado del préstamo:", prestamo_obj.estadoPrestamo.nombreEstado)
-            print("Fecha y hora de finalización del préstamo:", prestamo_obj.fechaHoraFinPrestamo)
+            #print("Prestamo:", prestamo_obj)
+            #print("Estado del préstamo:", prestamo_obj.estadoPrestamo.nombreEstado)
+            #print("Fecha y hora de finalización del préstamo:", prestamo_obj.fechaHoraFinPrestamo)
             
             # Verificar si el préstamo está en proceso y tiene una fecha de finalización
             if prestamo_obj.estadoPrestamo.nombreEstado == 'PROCESO' and prestamo_obj.fechaHoraFinPrestamo:
-                print("Hora actual en Bogotá:", hora_actual_bogota.time())
-                print("Hora máxima de reserva:", prestamo_obj.fechaHoraFinPrestamo.time())
+                #print("Hora actual en Bogotá:", hora_actual_bogota.time())
+                #print("Hora máxima de reserva:", prestamo_obj.fechaHoraFinPrestamo.time())
                 if hora_actual_bogota.time() > prestamo_obj.fechaHoraFinPrestamo.time():
                     print("La hora actual es mayor que la hora máxima de reserva.")
                     prestamo_obj.estadoPrestamo = estadoPrestamo.objects.get(nombreEstado='FINALIZADO')
@@ -272,3 +272,9 @@ def tabla_reservas(request):
                     implemento_obj.save()
 
     return render(request, 'disponibilidad.html', {'implementos': implementos})
+
+def solicitar_prestamo(request, implemento_id):
+    # Obtener el implemento usando su ID
+    implemento_obj = implemento.objects.get(pk=implemento_id)
+    # Pasar el implemento a la plantilla de solicitud de préstamo, ejemplo:
+    return render(request, 'principalAdminBienestar.html', {'implemento': implemento_obj})

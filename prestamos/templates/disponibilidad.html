@@ -71,7 +71,12 @@
         {% if implemento.estadoImplementoId.nombreEstadoImplemento != 'DISPONIBLE' %}
             <td><button disabled>Reservar</button></td>
         {% else %}
-            <td><button>Reservar</button></td>
+            <td>
+                 <!-- Esta parte se puede editar para enviar el id a la vista de prestamo -->
+                <form action="{% url 'solicitar_prestamo' implemento.idImplemento %}" method="get">
+                    <button type="submit">Reservar</button>
+                </form>
+            </td>
         {% endif %}
     </tr>
     {% endfor %}
