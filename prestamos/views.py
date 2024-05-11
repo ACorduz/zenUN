@@ -38,9 +38,9 @@ def mostrar_solicitarPrestamo(request,implemento_id):
         'edificio': edificioPrestamo,
         'nombre_estudiante': nombre_estudiante,
         'correo_estudiante': correo_estudiante,
-        'hora_inicio_reserva': hora_inicio_reserva,
-        'hora_fin_reserva': hora_fin_reserva,
-        'hora_devolucion_implemento': hora_devolucion_implemento
+        'inicio_reserva': hora_inicio_reserva,
+        'fin_reserva': hora_fin_reserva,
+        'devolucion_implemento': hora_devolucion_implemento
     }
     
     #Función para guardar la información del prestamo en la BD 
