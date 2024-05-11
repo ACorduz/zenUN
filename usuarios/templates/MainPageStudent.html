@@ -1,38 +1,86 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagina Principal Estudiante </title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    </head>
-    <style>
-        .form-group label, 
-        .form-group input {
-        display: block;
-        }
-    </style>
-    <body>
-      <!-- Traer Libreria SweetAlertTwo-->
-      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-      <!-- Mensaje del backend-->
-      {% if mensaje %}
-        <script>     
-          Swal.fire({
-            position: "top",
-            title: "Aviso Zenun",
-            text: '{{mensaje}}',
-            icon: 'warning',
-            confirmButtonText: 'Aceptar'
-          });
-        </script>
-      {% endif %}
-        <h1> Pagina principal Estudiante </h1>
+<html lang="es">
 
-        <h1>¿Estás seguro de que deseas cerrar sesión?</h1>
-        <form action="{% url 'cerrar_sesion' %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Cerrar Sesión</button>
-        </form>
-    </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagina Principal Estudiante </title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'MainPageStudent.css' %}">
+</head>
+
+<body>
+  <!-- Traer Libreria SweetAlertTwo-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Mensaje del backend-->
+  {% if mensaje %}
+  <script>
+    Swal.fire({
+      position: "top",
+      title: "Aviso Zenun",
+      text: '{{mensaje}}',
+      icon: 'warning',
+      confirmButtonText: 'Aceptar'
+    });
+  </script>
+  {% endif %}
+
+  <div class="header">
+
+    <button class="button-wrapper" onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
+      <img src="{% static 'icono.png' %}" alt="Botón 1">
+      <span>zenUN</span>
+    </button>
+    <div class="header-title">
+      <h1>Pagina Principal Estudiantes</h1>
+    </div>
+    <img src="{% static 'perfil.png' %}" alt="Botón 2">
+
+  </div>
+
+  <div class="container-content">
+    <div class="container-forms">
+
+      <div class="container-form1">
+
+        <button class="disponibilidad">
+          <img src="{% static 'implementos.png' %}" alt="disp">
+        </button>
+        <div class="fondogris1">
+          <p>Disponibilidad de Implementos</p>
+        </div>
+
+      </div>
+
+      <div class="container-form2">
+
+        <button class="eventos">
+          <img src="{% static 'eventos.png' %}" alt="eventos">
+        </button>
+        <div class="fondogris2">
+          <p>Eventos</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <footer class="footer">
+    <div class="textfooter">
+      <p>© Copyright 2024</p>
+      <p>Algunos derechos reservados.</p>
+      <p>Contáctenos</p>
+      <p>Acerca de este sitio web</p>
+      <p>Actualización: 09/05/2024</p>
+    </div>
+    <div class="lineafooter">
+    </div>
+  </footer>
+  <!-- <h1>¿Estás seguro de que deseas cerrar sesión?</h1>
+  <form action="{% url 'cerrar_sesion' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Cerrar Sesión</button>
+  </form> -->
+</body>
+
 </html>
