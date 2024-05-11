@@ -175,8 +175,10 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request, nu
             seEnvioCorreo, mensajeCorreo = Proceso_enviarCorreo_devolucionImplementos(
                 numeroDocumento, 
                 objetoImplemento.nombreImplemento, 
+                objetoPrestamo.fechaHoraInicioPrestamo,
                 objetoPrestamo.fechaHoraFinPrestamo,
-                "Encargado de bienestar nombre de la cookie",
+                f"{request.user.nombres.strip()} {request.user.apellidos.strip()}", #datos de la cookie nombre adm. bienestar
+                f"{request.user.correoInstitucional}", #datos de la cookie correo adm bienestar 
                 link_login
             )
 
@@ -192,7 +194,7 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request, nu
         return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
 
 # Metodo para enviar el correo electronico 
-def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento, fechaDevolucion, nombreEncargadoBienestar, link_login):
+def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento, fechaDevolucionInicial, fechaDevolucionFinal , nombreEncargadoBienestar,correoEncargadoBienestar,link_login):
     try: 
         # obtener el correo del usuario
         usuarioObject = usuario.objects.get(numeroDocumento = numeroDocumento)
@@ -208,8 +210,12 @@ def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento
         #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
         context = {
                     "nombreImplemento": nombreImplemento,
-                    "fechaDevolucion": fechaDevolucion,
+                    "nombreEstudiante": f"{usuarioObject.nombres.strip()} {usuarioObject.apellidos.strip()}",
+                    "numeroDocumentoEstudiante":numeroDocumento,
+                    "fechaDevolucionInicial": fechaDevolucionInicial,
+                    "fechaDevolucionFinal": fechaDevolucionFinal,
                     "nombreEncargadoBienestar":nombreEncargadoBienestar,
+                    "correoEncargadoBienestar": correoEncargadoBienestar,
                     "link_login": link_login
                 }
         #Renderizamos el template html

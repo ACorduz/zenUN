@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 
@@ -19,7 +20,7 @@
 <body>
     <div class = "grid-container">        
         <a id = "aprobarPrestamoButton" href=""><span class="texto">Aprobar Préstamo</span></a>
-        <a id = "devolverPrestamoButton" href=""><span class="texto">Devolver Préstamo</span></a>
+        <a id = "devolverPrestamoButton" href="{% url 'devolucionImplementos' %}"><span class="texto">Devolver Préstamo</span></a>
         <a id = "crearEventoButton" href=""><span class="texto">Crear Evento</span></a>
     </div>
     <div class = "footer">
