@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login, logout
 from usuarios.models import usuario
 from usuarios.models import tipoDocumento
+from usuarios.models import razonCambio
 from django.urls import reverse
 from django.conf import settings
 from django.template.loader import get_template
@@ -79,8 +80,13 @@ def procesar_registro_estudiante(request):
                         password = password_hash,
                         numeroCelular = phone,
                         codigoVerificacion = crear_otp(),
-                        usuarioVerificado = False
+                        usuarioVerificado = False                        
                 )
+                #Se asigna el tipo de cambio que se hace para trazabilidad
+                #El cambio 1 es cuando se registra el usuario en la bd faltando todavía verificar el correo
+                idRazonCambio = razonCambio.objects.get(pk=1)
+                estudiante._change_reason = idRazonCambio
+                
                 estudiante.save()
 
                 #Asignar el rol de estudiante

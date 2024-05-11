@@ -14,7 +14,7 @@ class rol(models.Model):
     descripcionRol = models.CharField(max_length=255)
 
 
-class razonCambio(models.model):
+class razonCambio(models.Model):
     idCambio = models.AutoField(primary_key=True)
     razonCambio = models.CharField(max_length=255)
 
@@ -30,7 +30,7 @@ class usuario(models.Model):
     roles = models.ManyToManyField(rol) #Crea la relación muchos a muchos
     codigoVerificacion = models.IntegerField() #Campo INT para el proceso de verificación de correo
     usuarioVerificado = models.BooleanField(default=False) #Si es TRUE el usuario ha sido verificado
-    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, on_delete=models.CASCADE))
+    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE))
     
     USERNAME_FIELD = 'correoInstitucional'
     REQUIRED_FIELDS = [
