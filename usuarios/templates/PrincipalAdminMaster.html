@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principal Administrador Informes</title>
+    <link rel="stylesheet" href="../static/principalAdminBienestar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">    
+</head>
+    <div class="header">
+        <a href="{% url 'principalAdminMaster' %}" style="text-decoration: none;">
+        <button class="button-wrapper">
+            
+            <img src="../static/icono.png" alt="Botón 1">
+            <span>zenUN</span>
+        </button></a>
+        <div class="header-title">Página Principal Administradores de Informes</div>
+        <img src="../static/perfil.png" alt="Botón 2">
+    </div>
+<body>
+    <div class = "grid-container">        
+        <a id = "aprobarPrestamoButton" href=""><span class="texto">Informes</span></a>
+        <a id = "devolverPrestamoButton" href="{% url 'verificacionCorreoAdminBienestar' %}"><span class="texto">Registrar Administrador Bienestar</span></a>
+        <a id = "crearEventoButton" href=""><span class="texto"></span></a>
+    </div>
+    <div class = "footer">
+        <div class="derechos">@Copyright 2024<br>  
+              Algunos derechos reservados.<br>
+              Contáctenos<br>
+              Acerca de este sitio web<br>
+              Actualización: 04/05/2024
+        </div>        
+    </div>
+</body>
+
+</html>

@@ -66,5 +66,8 @@ urlpatterns = [
         name = "paginaPrincipalAdministradorBienestar"),
     path("procesarSeleccionRol/",
          views.procesar_seleccionar_rol,
-         name='ProcesarSeleccionRol')
+         name='ProcesarSeleccionRol'),
+    path('principalAdminInformes/',
+         views.mostrar_principalAdminMaster,
+         name='principalAdminMaster')
 ]
