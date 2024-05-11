@@ -70,7 +70,7 @@ def procesar_registro_estudiante(request):
                 password_hash = make_password(password)
 
                 #Luego, crear el objeto usuario utilizando el hash de la contraseña
-                estudiante = usuario.objects.create(
+                estudiante = usuario(
                         numeroDocumento = numero_documento,
                         idTipoDocumento = tipo_doc,
                         nombres = nombres,

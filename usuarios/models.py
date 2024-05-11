@@ -13,6 +13,11 @@ class rol(models.Model):
     nombreRol = models.CharField(max_length=45)
     descripcionRol = models.CharField(max_length=255)
 
+
+class razonCambio(models.model):
+    idCambio = models.AutoField(primary_key=True)
+    razonCambio = models.CharField(max_length=255)
+
 #Modelo para la entidad usuario
 class usuario(models.Model):
     numeroDocumento = models.IntegerField(primary_key=True)
@@ -25,7 +30,7 @@ class usuario(models.Model):
     roles = models.ManyToManyField(rol) #Crea la relación muchos a muchos
     codigoVerificacion = models.IntegerField() #Campo INT para el proceso de verificación de correo
     usuarioVerificado = models.BooleanField(default=False) #Si es TRUE el usuario ha sido verificado
-    history = HistoricalRecords()
+    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, on_delete=models.CASCADE))
     
     USERNAME_FIELD = 'correoInstitucional'
     REQUIRED_FIELDS = [
@@ -37,7 +42,6 @@ class usuario(models.Model):
         'codigoVerificacion',
         'usuarioVerificado',
     ]
-
     @property
     def is_anonymous(self):
         return False
@@ -45,3 +49,4 @@ class usuario(models.Model):
     @property
     def is_authenticated(self):
         return True
+    
