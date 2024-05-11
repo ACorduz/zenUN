@@ -7,6 +7,8 @@ from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.db.models import Max
+from usuarios.views import role_required
 
 
 
@@ -224,53 +226,57 @@ def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento
         email.attach_alternative(content, "text/html")
         email.send()
         
-        return(True, "envio correo devolucion exitoso")
+        return(True, "envio correo devolución exitoso")
 
     except Exception as e:
-        return(False , f"no se pudo enviar correo deovolucion: {e}")
-
-################# Funcionalidad Aprobar Prestamo AdministradorBienestar ################
+        return(False , f"no se pudo enviar correo devolución: {e}")
 
 
 ################# Funcionalidad Habilitar/Deshabilitar boton################
-def tabla_reservas(request):
-    print("Entrando a la función tabla reservas")
+@role_required('Estudiante')
+def mostrar_tabla_disponibilidad_implementos(request):
     # Obtener todos los implementos
-    implementos = implemento.objects.all()
+    implementos_con_ultimos_prestamos = implemento.objects.annotate(
+        ultima_fecha_inicio_prestamo=Max('prestamo__fechaHoraInicioPrestamo'),
+        ultima_fecha_fin_prestamo=Max('prestamo__fechaHoraFinPrestamo')
+    )
+    edificios = edificio.objects.all()
 
-    # Obtener la hora actual en UTC
-    hora_actual_utc = timezone.now()
-    print("Hora actual (UTC):", hora_actual_utc)
+    correo_usuario = request.user.correoInstitucional
+    return render(request, 'disponibilidad.html', {'implementos': implementos_con_ultimos_prestamos, 'edificios':edificios, 'correo': correo_usuario})
+    
 
-    # Ajustar la hora actual a la zona horaria de Bogotá (UTC-5)
-    diferencia_horaria = timedelta(hours=-5)
-    hora_actual_bogota = hora_actual_utc + diferencia_horaria
-    print("Hora actual (Bogotá):", hora_actual_bogota.time())
+    # # Obtener la hora actual en UTC
+    # hora_actual_utc = timezone.now()
 
-    # Verificar y actualizar los préstamos en reserva
-    for implemento_obj in implementos:
-        implemento_obj.prestamos = prestamo.objects.filter(idImplemento=implemento_obj)
-        for prestamo_obj in implemento_obj.prestamos:
-            #print("Prestamo:", prestamo_obj)
-            #print("Estado del préstamo:", prestamo_obj.estadoPrestamo.nombreEstado)
-            #print("Fecha y hora de finalización del préstamo:", prestamo_obj.fechaHoraFinPrestamo)
+    # # Ajustar la hora actual a la zona horaria de Bogotá (UTC-5)
+    # diferencia_horaria = timedelta(hours=-5)
+    # hora_actual_bogota = hora_actual_utc + diferencia_horaria
+
+    # # Verificar y actualizar los préstamos en reserva
+    # for implemento_obj in implementos:
+    #     implemento_obj.prestamos = prestamo.objects.filter(idImplemento=implemento_obj)
+    #     for prestamo_obj in implemento_obj.prestamos:
+    #         #print("Prestamo:", prestamo_obj)
+    #         #print("Estado del préstamo:", prestamo_obj.estadoPrestamo.nombreEstado)
+    #         #print("Fecha y hora de finalización del préstamo:", prestamo_obj.fechaHoraFinPrestamo)
             
-            # Verificar si el préstamo está en proceso y tiene una fecha de finalización
-            if prestamo_obj.estadoPrestamo.nombreEstado == 'PROCESO' and prestamo_obj.fechaHoraFinPrestamo:
-                #print("Hora actual en Bogotá:", hora_actual_bogota.time())
-                #print("Hora máxima de reserva:", prestamo_obj.fechaHoraFinPrestamo.time())
-                if hora_actual_bogota.time() > prestamo_obj.fechaHoraFinPrestamo.time():
-                    print("La hora actual es mayor que la hora máxima de reserva.")
-                    prestamo_obj.estadoPrestamo = estadoPrestamo.objects.get(nombreEstado='FINALIZADO')
-                    prestamo_obj.fechaHoraInicioPrestamo = None
-                    prestamo_obj.fechaHoraFinPrestamo = None
-                    prestamo_obj.save()
+    #         # Verificar si el préstamo está en proceso y tiene una fecha de finalización
+    #         if prestamo_obj.estadoPrestamo.nombreEstado == 'PROCESO' and prestamo_obj.fechaHoraFinPrestamo:
+    #             print("Hora actual en Bogotá:", hora_actual_bogota.time())
+    #             #print("Hora máxima de reserva:", prestamo_obj.fechaHoraFinPrestamo.time())
+    #             if hora_actual_bogota.time() > prestamo_obj.fechaHoraFinPrestamo.time():
+    #                 print("La hora actual es mayor que la hora máxima de reserva.")
+    #                 prestamo_obj.estadoPrestamo = estadoPrestamo.objects.get(nombreEstado='FINALIZADO')
+    #                 prestamo_obj.fechaHoraInicioPrestamo = None
+    #                 prestamo_obj.fechaHoraFinPrestamo = None
+    #                 prestamo_obj.save()
 
-                    # Actualizar el estado del implemento a DISPONIBLE
-                    implemento_obj.estadoImplementoId = estadoImplemento.objects.get(nombreEstadoImplemento='DISPONIBLE')
-                    implemento_obj.save()
-
-    return render(request, 'disponibilidad.html', {'implementos': implementos})
+    #                 # Actualizar el estado del implemento a DISPONIBLE
+    #                 implemento_obj.estadoImplementoId = estadoImplemento.objects.get(nombreEstadoImplemento='DISPONIBLE')
+    #                 implemento_obj.save()
+    
+    
 
 def solicitar_prestamo(request, implemento_id):
     # Obtener el implemento usando su ID
