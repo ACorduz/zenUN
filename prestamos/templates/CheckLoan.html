@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar préstamo</title>
+    <link rel="stylesheet" href="{% static 'LoanApply.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <button class="button-wrapper" onclick="window.location.href = '/paginaPrincipalEstudiante/';">
+            <img src="{% static 'icono.png' %}" alt="Botón 1">
+            <span>zenUN</span>
+        </button>
+        <div class="header-title">Solicitar Préstamo</div>
+        <img src="{% static 'perfil.png' %}" alt="Botón 2">
+    </div>
+    <div class="container-content">
+        <script>
+        function mostrarReserva() {
+            var contenedorReserva = document.getElementById("contenedorReserva");
+            contenedorReserva.style.display = "block";
+        }
+        </script>
+    </div>
+</body>
+</html>
+
