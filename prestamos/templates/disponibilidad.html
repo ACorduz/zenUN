@@ -63,7 +63,7 @@
         {% else %}
             <td>
                  <!-- Esta parte se puede editar para enviar el id a la vista de prestamo -->
-                <form action="{% url 'solicitar_prestamo' implemento.idImplemento %}" method="get">
+                <form action="{% url 'solicitarPrestamo' implemento.idImplemento %}" method="get">
                     <button type="submit">Reservar</button>
                 </form>
             </td>

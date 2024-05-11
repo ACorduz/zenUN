@@ -16,28 +16,65 @@ from usuarios.views import role_required
 ################# Funcionalidad Solicitar Prestamo Estudiante ################
 
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
-def mostrar_solicitarPrestamo(request):
-    # Aqui se utiliza la base de datos para traer los datos que necesitamos
-    implemento = "Implemento X"
-    edificio = "Edificio Y"
-    nombre_estudiante = "Juan"
-    correo_estudiante = "juan@example.com"
-    inicio_reserva = "10:00 AM"
-    fin_reserva = "11:00 AM"
-    devolucion_implemento = "11:30 AM"
+def mostrar_solicitarPrestamo(request,implemento_id):
+    # A partir del id del implemento pasado por URL se instancian los objetos de implemento y edificio para mostrarlos en pantalla
+    implemento_obj = implemento.objects.get(pk=implemento_id)
+    edificio_obj = edificio.objects.get(pk = implemento_obj.edificioId.idEdificio)
+    implementoPrestamo = implemento_obj.nombreImplemento
+    edificioPrestamo = edificio_obj.nombreEdificio
 
-    # Pasas los datos al contexto para que puedan ser renderizados en el template
+    #Como hay una sesión iniciada recuperamos los datos de la cooki del usuario logeado
+    nombre_estudiante = f"{request.user.nombres.strip()} {request.user.apellidos.strip()}"
+    correo_estudiante = request.user.correoInstitucional
+
+    #Tomamos el tiempo actual y calculamos el tiempo de la reserva y el tiempo para devolver el implemento
+    hora_inicio_reserva = timezone.now()
+    hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
+    hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
+
+    # Pasar los datos al contexto para que puedan ser renderizados y mostrados en el html
     context = {
-        'implemento': implemento,
-        'edificio': edificio,
+        'implemento': implementoPrestamo,
+        'edificio': edificioPrestamo,
         'nombre_estudiante': nombre_estudiante,
         'correo_estudiante': correo_estudiante,
-        'inicio_reserva': inicio_reserva,
-        'fin_reserva': fin_reserva,
-        'devolucion_implemento': devolucion_implemento
+        'hora_inicio_reserva': hora_inicio_reserva,
+        'hora_fin_reserva': hora_fin_reserva,
+        'hora_devolucion_implemento': hora_devolucion_implemento
     }
     
+    #Función para guardar la información del prestamo en la BD 
+    #guardar_informacionPrestamo(request,hora_inicio_reserva, hora_fin_reserva,hora_devolucion_implemento,implemento_id)
+
     return render(request, 'LoanApply.html', context)
+
+#Función para guardar la información del prestamo en la base de datos
+def guardar_informacionPrestamo(request,hora_inicio_reserva,hora_fin_reserva,hora_devolucion_implemento,implemento_id):#,hora_inicio_reserva,hora_fin_reserva,hora_devolucion_implemento):
+    
+    # Instaciar el objeto usuario para guardarlo en el prestamo
+    estudiante = usuario.objects.get(numeroDocumento=request.user.numeroDocumento)  
+    
+    #Hay que cambiar el estado del implemento a 1 "RESERVA"
+    Implemento = implemento.objects.get(idImplemento = implemento_id)
+    Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 1)
+    Implemento.estadoImplementoId = Estado_Implemento
+    Implemento.save()
+
+    #Instanciar el estado del prestamo 1 "PROCESO" para guardarlo en la información del prestamo
+    Estado_Prestamo = estadoPrestamo.objects.get(idEstadoPrestamo = 1)
+
+    # Crear una nueva instancia de Prestamo y asignar valores a sus campos
+    Prestamo = prestamo.objects.create(
+        estudianteNumeroDocumento=estudiante,
+        fechaHoraCreacion=hora_inicio_reserva,
+        fechaHoraInicioPrestamo=hora_fin_reserva,
+        fechaHoraFinPrestamo=hora_devolucion_implemento,
+        estadoPrestamo=Estado_Prestamo,
+        idImplemento = Implemento,
+        comentario=""
+    )
+    
+    Prestamo.save()
 
 
 ################# Funcionalidad Devolucion Prestamo AdministradorBienestar ################
@@ -278,9 +315,9 @@ def mostrar_tabla_disponibilidad_implementos(request):
     
     
 
-def solicitar_prestamo(request, implemento_id):
+"""def solicitar_prestamo(request, implemento_id):
     # Obtener el implemento usando su ID
     implemento_obj = implemento.objects.get(pk=implemento_id)
     # Pasar el implemento a la plantilla de solicitud de préstamo, ejemplo:
-    return render(request, 'principalAdminBienestar.html', {'implemento': implemento_obj})
+    return render(request, 'principalAdminBienestar.html', {'implemento': implemento_obj})"""
 
