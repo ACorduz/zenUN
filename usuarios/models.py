@@ -29,9 +29,9 @@ class usuario(models.Model):
     numeroCelular = models.CharField(max_length=15)
     roles = models.ManyToManyField(rol) #Crea la relación muchos a muchos
     codigoVerificacion = models.IntegerField() #Campo INT para el proceso de verificación de correo
-    usuarioVerificado = models.BooleanField(default=False) #Si es TRUE el usuario ha sido verificado
-    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE))
-    
+    usuarioVerificado = models.BooleanField(default=False) #Si es TRUE el usuario ha sido verificado    
+    lastLogin = models.DateTimeField(null = True) #Mantiene registro de la última vez que inició sesión un usuario
+    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE))    
     USERNAME_FIELD = 'correoInstitucional'
     REQUIRED_FIELDS = [
         'numeroDocumento',

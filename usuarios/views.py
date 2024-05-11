@@ -10,6 +10,7 @@ from django.conf import settings
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from django.core.signing import Signer, BadSignature
+from datetime import datetime
 import time
 import random
 
@@ -169,6 +170,8 @@ def aprobar_OTP(request, token):
 
                 if OTP == user.codigoVerificacion:
                     user.usuarioVerificado = True
+                    idRazonCambio = razonCambio.objects.get(pk=2) #Cambio 2 es cuando se verfica el correo
+                    user._change_reason = idRazonCambio
                     user.save()
                     mensaje = "Validación exitosa. Ya puede iniciar sesión."
                     return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
@@ -222,7 +225,10 @@ def autenticar_credenciales_usuario(request):
                     if(validacionUsuario == True):
                         #autenticar usuario
                         login(request, user)
-
+                        user.lastLogin = datetime.now()
+                        idRazonCambio = razonCambio.objects.get(pk=3)
+                        user._change_reason = idRazonCambio
+                        user.save() #Guarda el último inicio de sesión
                         # Verifica cuántos roles tiene el usuario
                         roles_count = user.roles.count()
                         roles = user.roles.all()
