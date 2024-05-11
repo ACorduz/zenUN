@@ -16,24 +16,21 @@
         <h2>zenUN</h2>
     </div>
     <div class="right-content">
-        <p>ejemplo@unal.edu.co</p>
+        <p>{{ correo }}</p>
         <img src="{% static 'usuario.png' %}" alt="user">
     </div>
 </div>
 
 <!-- Formulario de búsqueda y filtro -->
 <div class="search-container">
-    <form id="filtro-form" method="GET">  <!-- agregar logica filtro -->
-        <input type="text" placeholder="Buscar por nombre..." name="implemento">
-        <label for="edificio">Filtrar por edificio:</label>
-        <select name="edificio" id="edificio">
-            <option value="">Todos los edificios</option>
-            <option value="Julio Garavito">Julio Garavito</option>
-            <option value="Polideportivo">Polideportivo</option>
-            <option value="Concha Acústica">Concha Acústica</option>
-        </select>
-        <button type="submit">Buscar/Filtrar</button>
-    </form>
+    <input type="text" id="searchInput" placeholder="Buscar por nombre...">
+    <label for="edificio">Filtrar por edificio:</label>
+    <select id="edificio">
+        <option value="">Todos los edificios</option>
+        {% for edificio in edificios %}
+        <option value="{{ edificio.nombreEdificio }}">{{ edificio.nombreEdificio }}</option>
+        {% endfor %}
+    </select>
 </div>
 
 <!-- Tabla de implementos -->
@@ -54,19 +51,12 @@
         <td>{{ implemento.idImplemento }}</td>
         <td>{{ implemento.edificioId.nombreEdificio }}</td>
         <td>{{ implemento.estadoImplementoId.nombreEstadoImplemento }}</td>
-        {% if implemento.prestamos %}
-            {% with ultimo_prestamo=implemento.prestamos.last %}
-                {% if implemento.estadoImplementoId.nombreEstadoImplemento == 'DISPONIBLE' or implemento.estadoImplementoId.nombreEstadoImplemento == 'NO DISPONIBLE' %}
-                    <td></td>
-                    <td></td>
-                {% else %}
-                    <td>{{ ultimo_prestamo.fechaHoraInicioPrestamo|default_if_none:"" }}</td>
-                    <td>{{ ultimo_prestamo.fechaHoraFinPrestamo|default_if_none:"" }}</td>
-                {% endif %}
-            {% endwith %}
+        {% if implemento.estadoImplementoId.nombreEstadoImplemento == 'DISPONIBLE' or implemento_obj.estadoImplementoId.nombreEstadoImplemento == 'NO DISPONIBLE' %}
+            <td></td>
+            <td></td>
         {% else %}
-            <td></td>
-            <td></td>
+            <td>{{ implemento.ultima_fecha_inicio_prestamo|default_if_none:"" }}</td>
+            <td>{{ implemento.ultima_fecha_fin_prestamo|default_if_none:"" }}</td>    
         {% endif %}
         {% if implemento.estadoImplementoId.nombreEstadoImplemento != 'DISPONIBLE' %}
             <td><button disabled>Reservar</button></td>
@@ -81,41 +71,42 @@
     </tr>
     {% endfor %}
 </table>
-
-<!--Servia para la parte del filtro
-    
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--<footer class="footer">
+    <div class="textfooter">
+      <p>© Copyright 2024</p>
+      <p>Algunos derechos reservados.</p>
+      <p>Contáctenos</p>
+      <p>Acerca de este sitio web</p>
+      <p>Actualización: 09/05/2024</p>
+    </div>
+    <div class="lineafooter">
+    </div>
+  </footer>-->
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-$(document).ready(function() {
-    $('#filtro-form').on('submit', function(event) {
-        event.preventDefault(); // Evita el comportamiento predeterminado de enviar el formulario
-
-        // Obtiene la URL del formulario
-        var url = $(this).attr('action');
-
-        // Obtiene los datos del formulario
-        var formData = $(this).serialize();
-
-        // Realiza la solicitud AJAX
-        $.ajax({
-            type: 'GET',
-            url: url,
-            data: formData,
-            success: function(response) {
-                // Actualiza la tabla con los resultados recibidos
-                $('#tabla-implementos').html(response.tabla_html);
-            },
-            error: function(xhr, status, error) {
-                // Maneja los errores si ocurren
-                console.error(xhr.responseText);
-            }
+    $(document).ready(function() {
+        $('#searchInput, #edificio').on('keyup change', function() {
+            var searchText = $('#searchInput').val().toLowerCase();
+            var edificio = $('#edificio').val();
+            
+            // Mostrar todas las filas, excluyendo el encabezado
+            $('#tabla-implementos tbody tr').not(':first').show();
+            
+            // Filtrar las filas de la tabla y ocultar las que no coinciden
+            $('#tabla-implementos tbody tr').not(':first').each(function() {
+                var nombre = $(this).find('td:first').text().toLowerCase();
+                var edificioTd = $(this).find('td:nth-child(3)').text();
+                
+                // Ocultar las filas que no coinciden con los criterios de búsqueda
+                if ((nombre.indexOf(searchText) === -1 && searchText !== '') ||
+                    (edificio !== '' && edificio !== edificioTd)) {
+                    $(this).hide();
+                }
+            });
         });
     });
-});
-</script>
--->
-
-</body>
+    </script>
 </html>
 
 

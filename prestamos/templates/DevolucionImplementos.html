@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitar préstamo</title>
+    <title>Devolucion de Implementos</title>
     <link rel="stylesheet" href="{% static 'DevolucionImplementos.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
@@ -26,7 +26,7 @@
         else {
             Swal.fire({
                 position: "top",
-                title: "Aviso Zenun",
+                title: "Aviso ZenUN",
                 text: '{{mensaje}}',
                 icon: 'warning',
                 confirmButtonText: 'Aceptar'
@@ -72,7 +72,7 @@
                     </div>
                 </form>
                 <!-- Formulario pra devolver el prestamo -->
-                <form action="{% url 'devolucionImplementos_procesarDevolucion' numeroDocumento=numeroDocumento %}" method="POST">
+                <form id="formularioDevolverPrestamo" action="{% url 'devolucionImplementos_procesarDevolucion' numeroDocumento=numeroDocumento %}" method="POST">
                     <!-- token de validacion -->
                     {% csrf_token %}
                     <div id="contenedorDevolverPrestamo">
@@ -173,9 +173,24 @@
             else if (revision_datos == "0") {
                 mostrarAlertaError("Error", 'Por favor, revise los datos del estudiante')
                 event.preventDefault();
-            }
+            }else {
+            // Mostrar confirmación de devolución
+            Swal.fire({
+                title: 'Confirmar devolución',
+                text: '¿Estás seguro de que quieres devolver este préstamo?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, devolver',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Realizar la devolución solo si el usuario confirma
+                    document.getElementById('formularioDevolverPrestamo').submit();
+                }
+            });
+            event.preventDefault(); // Detener el envío del formulario por defecto
         }
-
+    }
         // funcion para mostrar los errores 
         function mostrarAlertaError(titulo = "", texto) {
             // Mostrar alerta personalizada con SweetAlert2
@@ -183,15 +198,6 @@
                 title: titulo,
                 text: texto,
                 icon: 'error',
-                confirmButtonText: 'Aceptar'
-            });
-        }
-        function mostrarAlertaSuccess(titulo = "", texto) {
-            // Mostrar alerta personalizada con SweetAlert2
-            Swal.fire({
-                title: titulo,
-                text: texto,
-                icon: 'success',
                 confirmButtonText: 'Aceptar'
             });
         }

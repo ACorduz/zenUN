@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.contrib.auth.decorators import login_required
 
 #Rutas de la aplicación "Usuarios"
 urlpatterns = [
@@ -24,7 +25,11 @@ urlpatterns = [
             name="devolucionImplementos_procesarDevolucion"
         ), #En la vista  devolucionImplementos( con paramentro CORREO en la URL)  procesar devolucion implemento
         ##vista Disponibilidad Implementos
-        path('tabla_implementos/', views.tabla_reservas, name='tabla_reservas'),
+        path('tablaDisponibilidadImplementos/', 
+             login_required(views.mostrar_tabla_disponibilidad_implementos), 
+             name='tablaDisponibilidadImplementos'),
         ## Ejemplo Pasar los parametros a la vista solicitar Prestamo
-        path('solicitarPrestamo/<int:implemento_id>/', views.solicitar_prestamo, name='solicitar_prestamo')
+        path('solicitarPrestamo/<int:implemento_id>/', 
+             views.solicitar_prestamo, 
+             name='solicitar_prestamo')
 ]
