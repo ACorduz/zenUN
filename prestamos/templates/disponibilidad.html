@@ -102,6 +102,7 @@
         $('#searchInput, #edificio').on('keyup change', function() {
             var searchText = $('#searchInput').val().toLowerCase();
             var edificio = $('#edificio').val();
+            var anyRowVisible = false; // Variable para verificar si hay alguna fila visible
             
             // Restablecer los colores de fondo de todas las filas
             $('#tabla-implementos tbody tr').not(':first').css('background-color', ''); 
@@ -118,6 +119,8 @@
                 if ((nombre.indexOf(searchText) === -1 && searchText !== '') ||
                     (edificio !== '' && edificio !== edificioTd)) {
                     $(this).hide();
+                } else {
+                    anyRowVisible = true; // Marcar que al menos una fila es visible
                 }
             });
             
@@ -129,9 +132,15 @@
                     $(this).css('background-color', '#e6e6e6'); // Color de fondo para filas impares
                 }
             });
+            
+            // Mostrar mensaje si no se encontraron resultados y si no se ha mostrado antes
+            if (!anyRowVisible && !$('.no-results-message').length) {
+                $('#tabla-implementos').after('<p class="no-results-message">No se encontraron implementos que coincidan con los criterios de búsqueda.</p>');
+            } else if (anyRowVisible && $('.no-results-message').length) {
+                $('.no-results-message').remove(); // Eliminar el mensaje si se encontraron resultados
+            }
         });
     });
 </script>
-</html>
 
 
