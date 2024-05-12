@@ -1,47 +1,69 @@
+@font-face {
+    font-family: 'MiFuente';
+    src: url('../static/AveriaSerifLibre-Regular.ttf') format('truetype');
+}
+
 /* Estilos generales */
 body {
     font-family: Arial, sans-serif;
     background-color: #f2f2f2;
+    margin-top: 80px;
 }
 
-/* Estilos para el banner */
-.banner {
-    background-color: hwb(122 58% 16%); /* Verde */
-    color: white;
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px;
+    background-color: #c0febf;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header-title {
+    font-family: 'MiFuente', sans-serif;
+    font-size: 30px;
     text-align: center;
-    padding: 20px;
+    margin-right: 100px;
+}
+
+.button1-wrapper {
     display: flex;
-    justify-content: space-between; /* Espacio igual entre los elementos */
-    align-items: center; /* Centrar verticalmente */
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
-.left-content {
-    display: flex;
-    align-items: center; /* Centrar verticalmente */
+.button1-wrapper img[alt="Botón 1"] {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    transform: scaleX(-1);
+    margin-right: 10px;
 }
 
-.logo {
-    width: 80px; /* Ajusta el tamaño de la imagen según sea necesario */
-    margin-right: 5px; /* Espacio entre la imagen y el texto */
+.button1-wrapper span {
+    font-family: 'MiFuente', sans-serif;
+    font-size: 30px;
+    color: black; 
 }
 
-.right-content {
-    display: flex;
-    align-items: center; /* Centrar verticalmente */
+.header img[alt="Botón 2"] {
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
 }
 
-.right-content p {
-    margin-left: 10px; /* Espacio entre el texto y la imagen */
-    color: black; /* Cambia el color del texto a negro */
+.table-container {
+    margin-top: 20px; /* Agrega un margen superior para dejar espacio entre el encabezado y la tabla */
 }
 
-.right-content img {
-    width: 50px; /* Ajusta el tamaño de la imagen según sea necesario */
-    margin-left: 10px; /* Espacio entre la imagen y el texto */
-}
-.banner h2 {
-    color: black; /* Cambia el color del texto a negro */
-}
 /* Estilos para el formulario de búsqueda */
 .search-container {
     text-align: center;
@@ -57,8 +79,8 @@ select {
     margin-right: 10px;
 }
 
-/* Estilos para los botones */
-button {
+/* Estilos específicos para el botón con id "reservarBtn" */
+#reservarBtn {
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
@@ -68,12 +90,12 @@ button {
     transition: background-color 0.3s ease; /* Agregar una transición suave al cambio de color de fondo */
 }
 
-button:enabled {
+#reservarBtn:enabled {
     background-color: #4CAF50; /* Verde */
     color: white;
 }
 
-button:disabled {
+#reservarBtn:disabled {
     background-color: rgb(211, 203, 203); /* Rojo */
     color: hsl(0, 0%, 8%); /* Texto gris para indicar deshabilitado */
     cursor: default; /* Cambiar el cursor a predeterminado */
@@ -84,6 +106,7 @@ table {
     border-collapse: collapse;
     width: 100%;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 th, td {
@@ -107,20 +130,23 @@ tr:nth-child(odd) {
 
 .footer {
     display: flex;
-    padding:10px;
+    padding: 20px; /* Reducir el padding */
     background-color: #c0febf;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 1000;
     width: 100%;
-    height:10%;
+    height: 10%;
     align-items: center;
     justify-content: flex-end;
     margin-top: auto;
     box-sizing: border-box;
-} 
-.textfooter{
+}
+
+.textfooter {
+    font-family: 'MiFuente', sans-serif;
+    font-weight: bold;
     display: flex;
     position: relative;
     flex-direction: column;
@@ -128,10 +154,15 @@ tr:nth-child(odd) {
     text-align: end;
 }
 
+.textfooter p {
+    margin: 3px 0; /* Reducir el margen entre párrafos */
+    font-size: 14px; /* Reducir el tamaño de la fuente si es necesario */
+}
+
 .lineafooter {
     position: relative;
-    border-left: 1px solid black; 
-    height: 100px; 
-    margin-left: 10px; 
+    border-left: 1px solid black;
+    height: 100px;
+    margin-left: 10px;
     right: 50px;
- }
+}
