@@ -23,6 +23,7 @@
     font-size: 30px;
     text-align: center;
     margin-right: 100px;
+    font-weight: bold;
 }
 
 .button-wrapper {
@@ -99,8 +100,8 @@ body::after {
 
 #informacionUsuario {
     position: absolute;
-    left: 20px;
-    top: 90px;
+    left: 40px;
+    top: 130px;
     text-align: left;
 }
 
@@ -141,10 +142,10 @@ input[type="button"] {
     color: #fff;
     cursor: pointer;
     border-radius: 30px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: absolute;
     left: 160px;
-    top: 480px;
+    top: 450px;
 }
 
 input[type="button"]:hover {
