@@ -8,6 +8,10 @@ urlpatterns = [
             views.mostrar_solicitarPrestamo, 
             name='solicitarPrestamo'
         ), #Vista solicitarPrestamo
+        path('reservaExitosa/<int:implemento_id>/', 
+            views.guardar_informacionPrestamo, 
+            name='reservaExitosa'
+        ), #Vista devolucionImplementos
         path('devolucionImplementos/', 
             views.mostrar_devolucionImplementos_administradorBienestar, 
             name='devolucionImplementos'

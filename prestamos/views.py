@@ -11,8 +11,6 @@ from django.db.models import Max
 from usuarios.views import role_required
 
 
-
-
 ################# Funcionalidad Solicitar Prestamo Estudiante ################
 
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
@@ -35,6 +33,7 @@ def mostrar_solicitarPrestamo(request,implemento_id):
     # Pasar los datos al contexto para que puedan ser renderizados y mostrados en el html
     context = {
         'implemento': implementoPrestamo,
+        'implemento_id': implemento_id,
         'edificio': edificioPrestamo,
         'nombre_estudiante': nombre_estudiante,
         'correo_estudiante': correo_estudiante,
@@ -43,38 +42,50 @@ def mostrar_solicitarPrestamo(request,implemento_id):
         'devolucion_implemento': hora_devolucion_implemento
     }
     
-    #Función para guardar la información del prestamo en la BD 
-    #guardar_informacionPrestamo(request,hora_inicio_reserva, hora_fin_reserva,hora_devolucion_implemento,implemento_id)
-
     return render(request, 'LoanApply.html', context)
 
 #Función para guardar la información del prestamo en la base de datos
-def guardar_informacionPrestamo(request,hora_inicio_reserva,hora_fin_reserva,hora_devolucion_implemento,implemento_id):#,hora_inicio_reserva,hora_fin_reserva,hora_devolucion_implemento):
+def guardar_informacionPrestamo(request,implemento_id):
     
-    # Instaciar el objeto usuario para guardarlo en el prestamo
-    estudiante = usuario.objects.get(numeroDocumento=request.user.numeroDocumento)  
-    
-    #Hay que cambiar el estado del implemento a 1 "RESERVA"
-    Implemento = implemento.objects.get(idImplemento = implemento_id)
-    Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 1)
-    Implemento.estadoImplementoId = Estado_Implemento
-    Implemento.save()
+    # ver si alguien más ya reservo el objeto antes que la persona actual
+    if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1"): # En la BD 1 = RESERVADO
+        
+        mensaje = f"Parece que alguien más ya pidio este objeto lo sentimos" # solo se le pasaria el mensaje en la URL 
+        return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
 
-    #Instanciar el estado del prestamo 1 "PROCESO" para guardarlo en la información del prestamo
-    Estado_Prestamo = estadoPrestamo.objects.get(idEstadoPrestamo = 1)
+    else:
+        # Instaciar el objeto usuario para guardarlo en el prestamo
+        estudiante = usuario.objects.get(numeroDocumento=request.user.numeroDocumento)  
+        
+        #Hay que cambiar el estado del implemento a 1 "RESERVA"
+        Implemento = implemento.objects.get(idImplemento = implemento_id)
+        Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 1)
+        Implemento.estadoImplementoId = Estado_Implemento
+        Implemento.save()
 
-    # Crear una nueva instancia de Prestamo y asignar valores a sus campos
-    Prestamo = prestamo.objects.create(
-        estudianteNumeroDocumento=estudiante,
-        fechaHoraCreacion=hora_inicio_reserva,
-        fechaHoraInicioPrestamo=hora_fin_reserva,
-        fechaHoraFinPrestamo=hora_devolucion_implemento,
-        estadoPrestamo=Estado_Prestamo,
-        idImplemento = Implemento,
-        comentario=""
-    )
-    
-    Prestamo.save()
+        #Instanciar el estado del prestamo 1 "PROCESO" para guardarlo en la información del prestamo
+        Estado_Prestamo = estadoPrestamo.objects.get(idEstadoPrestamo = 1)
+
+        #Obtener la hora en la cual el estudiante dio click en el boton realizar reserva
+
+        hora_inicio_reserva = timezone.now()
+        hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
+        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
+
+        # Crear una nueva instancia de Prestamo y asignar valores a sus campos
+        Prestamo = prestamo.objects.create(
+            estudianteNumeroDocumento=estudiante,
+            fechaHoraCreacion=hora_inicio_reserva,
+            fechaHoraInicioPrestamo=hora_fin_reserva,
+            fechaHoraFinPrestamo=hora_devolucion_implemento,
+            estadoPrestamo=Estado_Prestamo,
+            idImplemento = Implemento,
+            comentario=""
+        )
+        
+        Prestamo.save()
+        
+        return render(request, 'CheckLoan.html')
 
 
 ################# Funcionalidad Devolucion Prestamo AdministradorBienestar ################

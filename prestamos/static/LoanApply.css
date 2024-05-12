@@ -130,7 +130,7 @@ body::after {
     background-color: #000000;
 }
 
-input[type="button"] {
+input[type="submit"] {
     font-family: 'MiFuente', sans-serif;
     font-size: 23px;
     width: 40%;
@@ -147,6 +147,6 @@ input[type="button"] {
     top: 450px;
 }
 
-input[type="button"]:hover {
+input[type="submit"]:hover {
     background-color: #6b00b3; 
 }
