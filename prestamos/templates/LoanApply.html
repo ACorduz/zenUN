@@ -34,14 +34,33 @@
             <p>¡Listo! Tu implemento quedó reservado, no olvides que solo tienes 15 minutos 
                 para ir a la facultad en la que reservaste el objeto y reclamarlo.</p>
         </div>
-        <form>
-            <input type="button" value="Realizar reserva" onclick="mostrarReserva()">
+        <form id="myForm" action="{% url 'reservaExitosa' implemento_id %}" method="POST">
+            <!-- token de validacion -->
+            {% csrf_token %}
+            <input type="button" id="submitButton" value="Realizar reserva">
         </form>
         <script>
-        function mostrarReserva() {
-            var contenedorReserva = document.getElementById("contenedorReserva");
-            contenedorReserva.style.display = "block";
-        }
+            document.getElementById("submitButton").addEventListener("click", function() {
+            document.getElementById("myForm").submit();
+            });
+
+
+        function mostrarAlerta() {
+            Swal.fire({
+                title: '¡Atención!',
+                text: '¿Quieres volver a la página principal sin completar tu reserva?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/paginaPrincipalEstudiante/';
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // No se hace nada, se cierra el modal
+                }
+            });
+        };
         </script>
     </div>
 </body>
