@@ -91,8 +91,10 @@ def procesar_registro_estudiante(request):
                 estudiante.save()
 
                 #Asignar el rol de estudiante
-                estudiante.roles.add(estudiante.numeroDocumento, 1)
-                
+                idRazonCambio = razonCambio.objects.get(pk=7) #Razón cambio 7: Asignación rol estudiante
+                estudiante._change_reason = idRazonCambio
+                estudiante.roles.add(estudiante.numeroDocumento, 1)                
+
                 ##Envio de correo con el código de verificación
                 #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
                 subject = "Codigo de verificación"
@@ -397,6 +399,8 @@ def procesar_cambio_contrasena(request, correo_usuario, token):
                         user = usuario.objects.get(correoInstitucional= correo_usuario)
                         password_hash = make_password(nuevaContraseña)
                         user.password = password_hash
+                        idRazonCambio = razonCambio.objects.get(pk=4) #Razon de cambio 4: Cambio de contraseña
+                        user._change_reason = idRazonCambio
                         user.save()
 
                         mensaje = "EL CAMBIO DE CONTRASEÑA FUE EXITOSO"
@@ -500,7 +504,7 @@ def procesar_registro_administrador_bienestar(request):
                 password_hash = make_password(password)
 
                 #Luego, crear el objeto usuario utilizando el hash de la contraseña
-                administradorBienestar = usuario.objects.create(
+                administradorBienestar = usuario(
                         numeroDocumento = numero_documento,
                         idTipoDocumento = tipo_doc,
                         nombres = nombres,
@@ -511,9 +515,13 @@ def procesar_registro_administrador_bienestar(request):
                         codigoVerificacion = crear_otp(),
                         usuarioVerificado = False
                 )
+                idRazonCambio = razonCambio.objects.get(pk=6) #Razón cambio 6: Registro usuario desde el formulario admin
+                administradorBienestar._change_reason = idRazonCambio
                 administradorBienestar.save()
 
                 #Asignar el rol de administrador de Bienestar
+                idRazonCambio = razonCambio.objects.get(pk=5) #Razón cambio 5: Asignación rol admin
+                administradorBienestar._change_reason = idRazonCambio
                 administradorBienestar.roles.add(administradorBienestar.numeroDocumento, 2)
                 
                 ##Envio de correo con el código de verificación
@@ -570,8 +578,10 @@ def procesar_asignacion_rol_administrador_bienestar(request):
             else:
                 #Asignacion de rol de administrador de Bienestar
                 user = usuario.objects.get(correoInstitucional= correoUsuario)
-
+                idRazonCambio = razonCambio.objects.get(pk=5)
+                user._change_reason = idRazonCambio
                 user.roles.add(user.numeroDocumento, 2)
+
                 mensaje = "Asignación de rol Administrador de Bienestar exitosa!"
                 return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
     except Exception as e:
