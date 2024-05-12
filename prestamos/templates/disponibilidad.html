@@ -12,20 +12,20 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% if mensaje %}
-<script>     
-    Swal.fire({
-      position: "top",
-      title: "Aviso Zenun",
-      text: 'No puedes reservar más implementos si tienes un préstamo activo',
-      icon: 'warning',
-      confirmButtonText: 'Aceptar'
-    });
-  </script>
+    <script>     
+        Swal.fire({
+        position: "top",
+        title: "Aviso Zenun",
+        text: 'No puedes reservar más implementos si tienes un préstamo activo',
+        icon: 'warning',
+        confirmButtonText: 'Aceptar'
+        });
+    </script>
 {% endif %}
 
 <!-- Banner con el título -->
 <div class="header">
-    <button class="button1-wrapper" onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
+    <button class="button1-wrapper" onclick="window.location.href = '{% url 'paginaPrincipal_estudiante' %}'">
         <img src="{% static 'icono.png' %}" alt="Botón 1">
         <span>zenUN</span>
     </button>
@@ -102,6 +102,7 @@
         $('#searchInput, #edificio').on('keyup change', function() {
             var searchText = $('#searchInput').val().toLowerCase();
             var edificio = $('#edificio').val();
+            var anyRowVisible = false; // Variable para verificar si hay alguna fila visible
             
             // Restablecer los colores de fondo de todas las filas
             $('#tabla-implementos tbody tr').not(':first').css('background-color', ''); 
@@ -118,6 +119,8 @@
                 if ((nombre.indexOf(searchText) === -1 && searchText !== '') ||
                     (edificio !== '' && edificio !== edificioTd)) {
                     $(this).hide();
+                } else {
+                    anyRowVisible = true; // Marcar que al menos una fila es visible
                 }
             });
             
@@ -129,9 +132,15 @@
                     $(this).css('background-color', '#e6e6e6'); // Color de fondo para filas impares
                 }
             });
+            
+            // Mostrar mensaje si no se encontraron resultados y si no se ha mostrado antes
+            if (!anyRowVisible && !$('.no-results-message').length) {
+                $('#tabla-implementos').after('<p class="no-results-message">No se encontraron implementos que coincidan con los criterios de búsqueda.</p>');
+            } else if (anyRowVisible && $('.no-results-message').length) {
+                $('.no-results-message').remove(); // Eliminar el mensaje si se encontraron resultados
+            }
         });
     });
 </script>
-</html>
 
 
