@@ -64,7 +64,7 @@
         <td>{{ implemento.idImplemento }}</td>
         <td>{{ implemento.edificioId.nombreEdificio }}</td>
         <td>{{ implemento.estadoImplementoId.nombreEstadoImplemento }}</td>
-        {% if implemento.estadoImplementoId.nombreEstadoImplemento == 'DISPONIBLE' or implemento_obj.estadoImplementoId.nombreEstadoImplemento == 'NO DISPONIBLE' %}
+        {% if implemento.estadoImplementoId.nombreEstadoImplemento == 'DISPONIBLE' or implemento.estadoImplementoId.nombreEstadoImplemento == 'NO DISPONIBLE' %}
             <td></td>
             <td></td>
         {% else %}
