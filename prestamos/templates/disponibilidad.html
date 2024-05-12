@@ -5,19 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disponibilidad Implementos</title>
-    <link rel="stylesheet" href="../static/estilosDispImplementos.css">
+    <link rel="stylesheet" href="{% static 'estilosDispImplementos.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% if mensaje %}
+<script>     
+    Swal.fire({
+      position: "top",
+      title: "Aviso Zenun",
+      text: 'No puedes reservar más implementos si tienes un préstamo activo',
+      icon: 'warning',
+      confirmButtonText: 'Aceptar'
+    });
+  </script>
+{% endif %}
 
 <!-- Banner con el título -->
 <div class="header">
     <button class="button1-wrapper" onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
-        <img src="../static/icono.png" alt="Botón 1">
+        <img src="{% static 'icono.png' %}" alt="Botón 1">
         <span>zenUN</span>
     </button>
     <div class="header-title">Disponibilidad Implementos</div>
-    <img src="../static/perfil.png" alt="Botón 2">
+    <img src="{% static 'perfil.png' %}" alt="Botón 2">
 </div>
 <br>
 <!-- Formulario de búsqueda y filtro -->
@@ -62,7 +75,8 @@
             {% else %}
                 <td>
                     <!-- Esta parte se puede editar para enviar el id a la vista de prestamo -->
-                    <form action="{% url 'solicitar_prestamo' implemento.idImplemento %}" method="get">
+                    <form action="{% url 'reservar_implemento' implemento.idImplemento %}" method="post">
+                        {% csrf_token %}
                         <button id="reservarBtn" type="submit">Reservar</button>
                     </form>
                 </td>
@@ -71,17 +85,16 @@
         {% endfor %}
     </table>
 </div>
-<!--<footer class="footer">
+<div class="footer">
     <div class="textfooter">
-      <p>© Copyright 2024</p>
-      <p>Algunos derechos reservados.</p>
-      <p>Contáctenos</p>
-      <p>Acerca de este sitio web</p>
-      <p>Actualización: 09/05/2024</p>
+        <p><strong>©</strong> Copyright 2024</p>
+        <p>Algunos derechos reservados.</p>
+        <p>Contáctenos</p>
+        <p>Acerca de este sitio web</p>
+        <p>Actualización: <strong>09/05/2024</strong></p>
     </div>
-    <div class="lineafooter">
-    </div>
-  </footer>-->
+    <div class="lineafooter"></div>
+</div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>

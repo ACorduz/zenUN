@@ -31,5 +31,6 @@ urlpatterns = [
         ## Ejemplo Pasar los parametros a la vista solicitar Prestamo
         path('solicitarPrestamo/<int:implemento_id>/', 
              views.solicitar_prestamo, 
-             name='solicitar_prestamo')
+             name='solicitar_prestamo'),
+        path('reservar-implemento/<int:implemento_id>/', views.reservar_implemento, name='reservar_implemento'),
 ]
