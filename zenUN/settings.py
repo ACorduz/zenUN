@@ -36,7 +36,7 @@ ALLOWED_HOSTS = []
 
 RENDER_EXTERNAL_HOST = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOST:
- ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOST)
+  ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOST)
 
 # Application definition
 
@@ -163,4 +163,4 @@ if DEBUG:
     EMAIL_HOST_USER="zenununiversidadnacional@gmail.com"
     EMAIL_HOST_PASSWORD="dpuw cgvi rmyp jpnm"
 
-    STATICFILE_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  
+    STATICFILE_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'    
