@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar préstamo</title>
+    <link rel="stylesheet" href="{% static 'LoanApply.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="header">
+        <button class="button-wrapper" ;>
+            <img src="{% static 'icono.png' %}" alt="Botón 1">
+            <span>zenUN</span>
+        </button>
+        <div class="header-title">Solicitar Préstamo</div>
+        <img src="{% static 'perfil.png' %}" alt="Botón 2">
+    </div>
+    </div>
+    <script>
+        Swal.fire({
+            title: '¡Listo!',
+            text: 'Tu implemento quedó reservado, no olvides que solo tienes 15 minutos para ir a la facultad en la que reservaste el objeto y reclamarlo.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            showLoaderOnConfirm: true,
+            allowOutsideClick: false,
+            preConfirm: () => {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, 5000); 
+                });
+            }
+        }).then(() => {
+            window.location.href = '/paginaPrincipalEstudiante/';
+        });
+    </script>
+</body>
+</html>

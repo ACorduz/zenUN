@@ -2,12 +2,16 @@ from django.urls import path
 from . import views
 from django.contrib.auth.decorators import login_required
 
-#Rutas de la aplicación "Usuarios"
+#Rutas de la aplicación "Prestamos"
 urlpatterns = [
-        path('solicitarPrestamo/', 
+        path('solicitarPrestamo/<int:implemento_id>/', 
             views.mostrar_solicitarPrestamo, 
             name='solicitarPrestamo'
         ), #Vista solicitarPrestamo
+        path('reservaExitosa/<int:implemento_id>/', 
+            views.guardar_informacionPrestamo, 
+            name='reservaExitosa'
+        ), #Vista devolucionImplementos
         path('devolucionImplementos/', 
             views.mostrar_devolucionImplementos_administradorBienestar, 
             name='devolucionImplementos'
@@ -27,10 +31,5 @@ urlpatterns = [
         ##vista Disponibilidad Implementos
         path('tablaDisponibilidadImplementos/', 
              login_required(views.mostrar_tabla_disponibilidad_implementos), 
-             name='tablaDisponibilidadImplementos'),
-        ## Ejemplo Pasar los parametros a la vista solicitar Prestamo
-        path('solicitarPrestamo/<int:implemento_id>/', 
-             views.solicitar_prestamo, 
-             name='solicitar_prestamo'),
-        path('reservar-implemento/<int:implemento_id>/', views.reservar_implemento, name='reservar_implemento'),
+             name='tablaDisponibilidadImplementos')
 ]

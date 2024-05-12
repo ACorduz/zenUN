@@ -46,46 +46,44 @@
 </div>
 <div class="table-container"></div>
 <!-- Tabla de implementos -->
-    <table id="tabla-implementos">
-        <tr>
-            <th>Nombre</th>
-            <th>Código</th>
-            <th>Edificio</th>
-            <th>Disponibilidad</th>
-            <th>Hora de Reserva</th>
-            <th>Hora de Devolución</th>
-            <th>Reservar</th>
-        </tr>
-        <!-- Iterar sobre los implementos y mostrarlos en la tabla -->
-        {% for implemento in implementos %}
-        <tr>
-            <td>{{ implemento.nombreImplemento }}</td>
-            <td>{{ implemento.idImplemento }}</td>
-            <td>{{ implemento.edificioId.nombreEdificio }}</td>
-            <td>{{ implemento.estadoImplementoId.nombreEstadoImplemento }}</td>
-            {% if implemento.estadoImplementoId.nombreEstadoImplemento == 'DISPONIBLE' or implemento_obj.estadoImplementoId.nombreEstadoImplemento == 'NO DISPONIBLE' %}
-                <td></td>
-                <td></td>
-            {% else %}
-                <td>{{ implemento.ultima_fecha_inicio_prestamo|default_if_none:"" }}</td>
-                <td>{{ implemento.ultima_fecha_fin_prestamo|default_if_none:"" }}</td>    
-            {% endif %}
-            {% if implemento.estadoImplementoId.nombreEstadoImplemento != 'DISPONIBLE' %}
-                <td><button id="reservarBtn" type="submit" disabled>Reservar</button></td>
-            {% else %}
-                <td>
-                    <!-- Esta parte se puede editar para enviar el id a la vista de prestamo -->
-                    <form action="{% url 'reservar_implemento' implemento.idImplemento %}" method="post">
-                        {% csrf_token %}
-                        <button id="reservarBtn" type="submit">Reservar</button>
-                    </form>
-                </td>
-            {% endif %}
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-<div class="footer">
+<table id="tabla-implementos">
+    <tr>
+        <th>Nombre</th>
+        <th>Código</th>
+        <th>Edificio</th>
+        <th>Disponibilidad</th>
+        <th>Hora de Reserva</th>
+        <th>Hora de Devolución</th>
+        <th>Reservar</th>
+    </tr>
+    <!-- Iterar sobre los implementos y mostrarlos en la tabla -->
+    {% for implemento in implementos %}
+    <tr>
+        <td>{{ implemento.nombreImplemento }}</td>
+        <td>{{ implemento.idImplemento }}</td>
+        <td>{{ implemento.edificioId.nombreEdificio }}</td>
+        <td>{{ implemento.estadoImplementoId.nombreEstadoImplemento }}</td>
+        {% if implemento.estadoImplementoId.nombreEstadoImplemento == 'DISPONIBLE' or implemento_obj.estadoImplementoId.nombreEstadoImplemento == 'NO DISPONIBLE' %}
+            <td></td>
+            <td></td>
+        {% else %}
+            <td>{{ implemento.ultima_fecha_inicio_prestamo|default_if_none:"" }}</td>
+            <td>{{ implemento.ultima_fecha_fin_prestamo|default_if_none:"" }}</td>    
+        {% endif %}
+        {% if implemento.estadoImplementoId.nombreEstadoImplemento != 'DISPONIBLE' %}
+            <td><button disabled>Reservar</button></td>
+        {% else %}
+            <td>
+                 <!-- Esta parte se puede editar para enviar el id a la vista de prestamo -->
+                <form action="{% url 'solicitarPrestamo' implemento.idImplemento %}" method="get">
+                    <button type="submit">Reservar</button>
+                </form>
+            </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+<!--<footer class="footer">
     <div class="textfooter">
         <p><strong>©</strong> Copyright 2024</p>
         <p>Algunos derechos reservados.</p>
