@@ -8,6 +8,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f2f2f2;
     margin-top: 80px;
+    margin-bottom: 150px;
 }
 
 .header {
@@ -130,17 +131,18 @@ tr:nth-child(odd) {
 
 .footer {
     display: flex;
-    padding: 20px; /* Reducir el padding */
+    padding: 20px;
     background-color: #c0febf;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 1000;
     width: 100%;
-    height: 10%;
+    /*height: 12%; */
+    height: 120px;
     align-items: center;
     justify-content: flex-end;
-    margin-top: auto;
+    position: fixed; /* Cambia a posición fija */
     box-sizing: border-box;
 }
 
