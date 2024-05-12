@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from prestamos.models import prestamo, implemento, edificio, comentarioImplemento, estadoImplemento,estadoPrestamo
 from usuarios.models import usuario
+from usuarios.models import razonCambio
 from django.conf import settings
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
@@ -165,7 +166,13 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request, nu
 
             # Guardar los objetos cambiados o creados por si pasa algo y no se ejecuta bien por eso aqui
             comentario.save()
+
+            idRazonCambio = razonCambio.objects.get(pk=15) #Razon de cambio 15: Préstamo finalizado
+            objetoPrestamo._change_reason = idRazonCambio
             objetoPrestamo.save()
+
+            idRazonCambio = razonCambio.objects.get(pk=14) #Razon de cambio 14: Implemento disponible tras finalizar el préstamo
+            objetoImplemento._change_reason = idRazonCambio
             objetoImplemento.save()
 
             # link  para el login
