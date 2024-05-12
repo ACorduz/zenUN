@@ -17,42 +17,66 @@ from django.contrib import messages
 
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
 def mostrar_solicitarPrestamo(request,implemento_id):
-    # A partir del id del implemento pasado por URL se instancian los objetos de implemento y edificio para mostrarlos en pantalla
-    implemento_obj = implemento.objects.get(pk=implemento_id)
-    edificio_obj = edificio.objects.get(pk = implemento_obj.edificioId.idEdificio)
-    implementoPrestamo = implemento_obj.nombreImplemento
-    edificioPrestamo = edificio_obj.nombreEdificio
 
-    #Como hay una sesión iniciada recuperamos los datos de la cooki del usuario logeado
-    nombre_estudiante = f"{request.user.nombres.strip()} {request.user.apellidos.strip()}"
-    correo_estudiante = request.user.correoInstitucional
+    #Verificar si el usuario ya pidio un implemento antes
+    # Obtener el usuario que ha iniciado sesión
+    usuario_actual = request.user
+    nombre_usuario = usuario_actual.nombres
+    documento_usuario = usuario_actual.numeroDocumento
+    print("Nombre del usuario:", nombre_usuario)
+    print("Documento del usuario:", documento_usuario)
 
-    #Tomamos el tiempo actual y calculamos el tiempo de la reserva y el tiempo para devolver el implemento
-    hora_inicio_reserva = timezone.now()
-    hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
-    hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
+    # Obtener todos los préstamos activos del usuario
+    prestamos_activos = prestamo.objects.filter(
+    estudianteNumeroDocumento=usuario_actual,
+    estadoPrestamo__nombreEstado__in=['PROCESO', 'ACTIVO']
+    )
+    print("Prestamos activos del usuario:", prestamos_activos)
+    # Verificar si el usuario tiene préstamos activos
+    if prestamos_activos.exists():
+        # Mostrar un mensaje de error al usuario
+        print("NO puedes reselvar con prestamos activos")
+        mensaje = "No puedes reservar con préstamos activos"
+        # Redireccionar al usuario a la página de disponibilidad de implementos o a donde desees
+        mensaje = "El usuario ya se encuentra registrado como Administrador de Bienestar."
+        return mostrar_tabla_disponibilidad_implementos(request, mensaje=mensaje)
+    else:
+        # A partir del id del implemento pasado por URL se instancian los objetos de implemento y edificio para mostrarlos en pantalla
+        implemento_obj = implemento.objects.get(pk=implemento_id)
+        edificio_obj = edificio.objects.get(pk = implemento_obj.edificioId.idEdificio)
+        implementoPrestamo = implemento_obj.nombreImplemento
+        edificioPrestamo = edificio_obj.nombreEdificio
 
-    # Pasar los datos al contexto para que puedan ser renderizados y mostrados en el html
-    context = {
-        'implemento': implementoPrestamo,
-        'implemento_id': implemento_id,
-        'edificio': edificioPrestamo,
-        'nombre_estudiante': nombre_estudiante,
-        'correo_estudiante': correo_estudiante,
-        'inicio_reserva': hora_inicio_reserva,
-        'fin_reserva': hora_fin_reserva,
-        'devolucion_implemento': hora_devolucion_implemento
-    }
-    
-    return render(request, 'LoanApply.html', context)
+        #Como hay una sesión iniciada recuperamos los datos de la cooki del usuario logeado
+        nombre_estudiante = f"{request.user.nombres.strip()} {request.user.apellidos.strip()}"
+        correo_estudiante = request.user.correoInstitucional
+
+        #Tomamos el tiempo actual y calculamos el tiempo de la reserva y el tiempo para devolver el implemento
+        hora_inicio_reserva = timezone.now()
+        hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
+        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
+
+        # Pasar los datos al contexto para que puedan ser renderizados y mostrados en el html
+        context = {
+            'implemento': implementoPrestamo,
+            'implemento_id': implemento_id,
+            'edificio': edificioPrestamo,
+            'nombre_estudiante': nombre_estudiante,
+            'correo_estudiante': correo_estudiante,
+            'inicio_reserva': hora_inicio_reserva,
+            'fin_reserva': hora_fin_reserva,
+            'devolucion_implemento': hora_devolucion_implemento
+        }
+        
+        return render(request, 'LoanApply.html', context)
 
 #Función para guardar la información del prestamo en la base de datos
 def guardar_informacionPrestamo(request,implemento_id):
     
     # ver si alguien más ya reservo el objeto antes que la persona actual
-    if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1"): # En la BD 1 = RESERVADO
+    if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1") or prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="2") : # En la BD 1 = RESERVADO
         
-        mensaje = f"Parece que alguien más ya pidio este objeto lo sentimos, puedes elegir otro implemento" # solo se le pasaria el mensaje en la URL 
+        mensaje = f"Parece que alguien más ya pidio este objeto, lo sentimos, puedes elegir otro implemento" # solo se le pasaria el mensaje en la URL 
         return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
 
     else:
@@ -339,31 +363,3 @@ def solicitar_prestamo(request, implemento_id):
     implemento_obj = implemento.objects.get(pk=implemento_id)
     # Pasar el implemento a la plantilla de solicitud de préstamo, ejemplo:
     return render(request, 'principalAdminBienestar.html', {'implemento': implemento_obj})
-
-def reservar_implemento(request, implemento_id):
-    # Obtener el usuario que ha iniciado sesión
-    usuario_actual = request.user
-    nombre_usuario = usuario_actual.nombres
-    documento_usuario = usuario_actual.numeroDocumento
-    print("Nombre del usuario:", nombre_usuario)
-    print("Documento del usuario:", documento_usuario)
-
-    # Obtener todos los préstamos activos del usuario
-    prestamos_activos = prestamo.objects.filter(
-    estudianteNumeroDocumento=usuario_actual,
-    estadoPrestamo__nombreEstado__in=['PROCESO', 'ACTIVO']
-    )
-    print("Prestamos activos del usuario:", prestamos_activos)
-    # Verificar si el usuario tiene préstamos activos
-    if prestamos_activos.exists():
-        # Mostrar un mensaje de error al usuario
-        print("NO puedes reselvar con prestamos activos")
-        mensaje = "No puedes reservar con préstamos activos"
-        # Redireccionar al usuario a la página de disponibilidad de implementos o a donde desees
-        mensaje = "El usuario ya se encuentra registrado como Administrador de Bienestar."
-        return mostrar_tabla_disponibilidad_implementos(request, mensaje=mensaje)
-    else:
-        # El usuario no tiene préstamos activos, por lo que puede reservar el implemento
-        implemento_obj = implemento.objects.get(pk=implemento_id)
-        print("Implemento a reservar:", implemento_obj)
-        return render(request, 'principalAdminBienestar.html', {'implemento': implemento_obj})
