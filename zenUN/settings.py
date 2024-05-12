@@ -30,9 +30,9 @@ ALLOWED_HOSTS = ["*"]
 """ LOCAL SETTINGS"""
 
 #Cuando se trabaje de manera local se deben usar las siguientes varaibles de entorno 
-"""DEBUG = True
-SECRET_KEY = 'django-insecure-+x&k4xqe2en_l2+l@6ekv_-9slmm64nk@#gs2xpqyuqms7s8s0'
-ALLOWED_HOSTS = []"""
+# DEBUG = True
+# SECRET_KEY = 'django-insecure-+x&k4xqe2en_l2+l@6ekv_-9slmm64nk@#gs2xpqyuqms7s8s0'
+# ALLOWED_HOSTS = []
 
 RENDER_EXTERNAL_HOST = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOST:
@@ -149,4 +149,4 @@ if DEBUG:
     EMAIL_HOST_USER="zenununiversidadnacional@gmail.com"
     EMAIL_HOST_PASSWORD="dpuw cgvi rmyp jpnm"
 
-    STATICFILE_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  
+    STATICFILE_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'    

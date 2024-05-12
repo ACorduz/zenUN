@@ -5,22 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disponibilidad Implementos</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'estilosDispImplementos.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% if mensaje %}
+<script>     
+    Swal.fire({
+      position: "top",
+      title: "Aviso Zenun",
+      text: 'No puedes reservar más implementos si tienes un préstamo activo',
+      icon: 'warning',
+      confirmButtonText: 'Aceptar'
+    });
+  </script>
+{% endif %}
 
 <!-- Banner con el título -->
-<div class="banner">
-    <div class="left-content">
-        <img src="{% static 'icono.png' %}" alt="ZenUN" class="logo">
-        <h2>zenUN</h2>
-    </div>
-    <div class="right-content">
-        <p>{{ correo }}</p>
-        <img src="{% static 'usuario.png' %}" alt="user">
-    </div>
+<div class="header">
+    <button class="button1-wrapper" onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
+        <img src="{% static 'icono.png' %}" alt="Botón 1">
+        <span>zenUN</span>
+    </button>
+    <div class="header-title">Disponibilidad Implementos</div>
+    <img src="{% static 'perfil.png' %}" alt="Botón 2">
 </div>
-
+<br>
 <!-- Formulario de búsqueda y filtro -->
 <div class="search-container">
     <input type="text" id="searchInput" placeholder="Buscar por nombre...">
@@ -32,7 +44,7 @@
         {% endfor %}
     </select>
 </div>
-
+<div class="table-container"></div>
 <!-- Tabla de implementos -->
 <table id="tabla-implementos">
     <tr>
@@ -73,15 +85,14 @@
 </table>
 <!--<footer class="footer">
     <div class="textfooter">
-      <p>© Copyright 2024</p>
-      <p>Algunos derechos reservados.</p>
-      <p>Contáctenos</p>
-      <p>Acerca de este sitio web</p>
-      <p>Actualización: 09/05/2024</p>
+        <p><strong>©</strong> Copyright 2024</p>
+        <p>Algunos derechos reservados.</p>
+        <p>Contáctenos</p>
+        <p>Acerca de este sitio web</p>
+        <p>Actualización: <strong>09/05/2024</strong></p>
     </div>
-    <div class="lineafooter">
-    </div>
-  </footer>-->
+    <div class="lineafooter"></div>
+</div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
@@ -90,11 +101,14 @@
             var searchText = $('#searchInput').val().toLowerCase();
             var edificio = $('#edificio').val();
             
+            // Restablecer los colores de fondo de todas las filas
+            $('#tabla-implementos tbody tr').not(':first').css('background-color', ''); 
+            
             // Mostrar todas las filas, excluyendo el encabezado
             $('#tabla-implementos tbody tr').not(':first').show();
             
             // Filtrar las filas de la tabla y ocultar las que no coinciden
-            $('#tabla-implementos tbody tr').not(':first').each(function() {
+            $('#tabla-implementos tbody tr').not(':first').each(function(index) {
                 var nombre = $(this).find('td:first').text().toLowerCase();
                 var edificioTd = $(this).find('td:nth-child(3)').text();
                 
@@ -104,9 +118,18 @@
                     $(this).hide();
                 }
             });
+            
+            // Actualizar el color de fondo de las filas visibles
+            $('#tabla-implementos tbody tr:visible').not(':first').each(function(index) {
+                if (index % 2 === 0) {
+                    $(this).css('background-color', '#f9f9f9'); // Color de fondo para filas pares
+                } else {
+                    $(this).css('background-color', '#e6e6e6'); // Color de fondo para filas impares
+                }
+            });
         });
     });
-    </script>
+</script>
 </html>
 
 

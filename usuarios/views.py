@@ -262,7 +262,7 @@ def procesar_seleccionar_rol(request):
         elif rol == '2':
             return redirect(reverse('paginaPrincipalAdministradorBienestar'))
         else:
-            return redirect(reverse('paginaPrincipalAdministradorMaster'))
+            return redirect(reverse('principalAdminMaster'))
 
 @role_required('Estudiante')
 #Este método se encarga de mostrar la vista de PaginaPrincipal Estudiante
@@ -272,8 +272,13 @@ def mostrar_mainPage_estudiante(request):
 
 @role_required('Administrador Bienestar')
 def mostrar_principalAdminBienestar(request):
-    return render(request,"PrincipalAdminBienestar.html")
+    correo_usuario = request.user.correoInstitucional
+    return render(request,"PrincipalAdminBienestar.html", {'correo':correo_usuario})
 
+@role_required('Administrador Informes')
+def mostrar_principalAdminMaster(request):
+    correo_usuario = request.user.correoInstitucional
+    return render(request, 'PrincipalAdminMaster.html', {'correo':correo_usuario})
 
 #Cerrar Sesión
 def cerrar_sesion(request):
@@ -406,6 +411,7 @@ def procesar_cambio_contrasena(request, correo_usuario, token):
 
 #Método para mostrar la vista en donde se puede verificar si un posible usuario administrador ya está
 #registrado como estudiante o como admin de bienestar
+@role_required('Administrador Informes')
 def mostrar_vistaVerificarCorreoAdminBienestar(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     return render(request, 'VerificacionCorreoRegistroAdministradorBienestar.html', {'mensaje': mensaje})
@@ -450,6 +456,7 @@ def procesar_verificar_correo_Admin_Bienestar(request):
         return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
     
 
+@role_required('Administrador Informes')
 #Método para mostrar la vista de registro admnistrador bienestar
 def mostrar_registro_administrativo(request):
     tipos_documentos = tipoDocumento.objects.all()
