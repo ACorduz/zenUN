@@ -136,23 +136,23 @@
   function cumpleCriteriosPassword(contraseña) {
     // Verificar si la contraseña cumple con los criterios de seguridad
     if(!/[a-z]/.test(contraseña)){
-      mostrarAlertaAviso("aviso Contraseña", "debe contener almenos una letra minuscula.");
+      mostrarAlertaAviso("Aviso Contraseña", "debe contener al menos una letra minúscula.");
       return(false);
     }
     else if(!/[A-Z]/.test(contraseña)){
-      mostrarAlertaAviso("aviso Contraseña", "debe contener almenos una letra MAYUSCULA.");
+      mostrarAlertaAviso("Aviso Contraseña", "debe contener al menos una letra MAYUSCULA.");
       return(false);
     }
     else if(!/\d/.test(contraseña)){
-      mostrarAlertaAviso("aviso Contraseña", "debe contener almenos un numero.");
+      mostrarAlertaAviso("Aviso Contraseña", "debe contener al menos un número.");
       return(false);
     }
     else if(!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(contraseña)){
-      mostrarAlertaAviso("aviso Contraseña", "debe contener almenos un simbolo especial.");
+      mostrarAlertaAviso("Aviso Contraseña", "debe contener al menos un simbolo especial.");
       return(false);
     }
     else if (contraseña.length < 8){
-      mostrarAlertaAviso("aviso Contraseña", "longitud de contraseña mayor o igual a 8.");
+      mostrarAlertaAviso("Aviso Contraseña", "Longitud de contraseña mayor o igual a 8 carácteres.");
       return(false); 
     } 
 

@@ -439,14 +439,14 @@ def procesar_verificar_correo_Admin_Bienestar(request):
                 
                 #Verificar si el usuario tiene el rol de ESTUDIANTE y no tiene el de ADMINISTRADOR DE BIENESTAR
                 if user.usuarioVerificado==True and user.roles.filter(idRol="1").exists() and not (user.roles.filter(idRol="2").exists()):
-                    mensaje = "El usuario ya se encuentra registrado como estudiante, por favor asigne el rol de Administrador de Bienestar."
+                    mensaje = "El usuario" + " " + correoUsuario + " " + "ya se encuentra registrado como estudiante, por favor asigne el rol de Administrador de Bienestar."
                     numeroDocumento = user.numeroDocumento
                     nombres = user.nombres
                     apellidos = user.apellidos
                     return render(request, 'AsignacionRolAdministradorBienestar.html', {'mensaje': mensaje, 'correo': correoUsuario, 'numeroDocumento': numeroDocumento, 'nombres':nombres, 'apellidos':apellidos})
                 
                 elif user.roles.filter(idRol="2").exists():
-                    mensaje = "El usuario ya se encuentra registrado como Administrador de Bienestar."
+                    mensaje = "El usuario" + " " + correoUsuario + " " + "ya se encuentra registrado como Administrador de Bienestar."
                     return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
                 
                 else:
