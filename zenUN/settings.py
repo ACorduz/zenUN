@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'zenUN.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 #"String" de conexión a la base de datos
-"""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -100,8 +100,9 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-"""
+
 #String de conexión para la prueba de trazabilidad con la app simple history de django
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -112,7 +113,7 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
+"""
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
