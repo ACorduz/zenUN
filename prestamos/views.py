@@ -131,9 +131,6 @@ def generar_tareaSegundoPlano():
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
 def mostrar_solicitarPrestamo(request,implemento_id):
 
-    #llamar la funcion que verifica en segundo plano los tiempos de los prestamos
-    generar_tareaSegundoPlano()
-
     #Verificar si el usuario ya pidio un implemento antes
     # Obtener el usuario que ha iniciado sesión
     usuario_actual = request.user
@@ -188,6 +185,9 @@ def mostrar_solicitarPrestamo(request,implemento_id):
 
 #Función para guardar la información del prestamo en la base de datos
 def guardar_informacionPrestamo(request,implemento_id):
+
+    #llamar la funcion que verifica en segundo plano los tiempos de los prestamos
+    generar_tareaSegundoPlano()
     
     # ver si alguien más ya reservo el objeto antes que la persona actual
     if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1") or prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="2") : # En la BD 1 = RESERVADO
