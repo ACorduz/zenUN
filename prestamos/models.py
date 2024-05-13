@@ -18,7 +18,7 @@ class implemento(models.Model):
     nombreImplemento = models.CharField(max_length=45)
     edificioId = models.ForeignKey(edificio, on_delete=models.CASCADE)
     estadoImplementoId = models.ForeignKey(estadoImplemento, on_delete=models.CASCADE)
-    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE))
+    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE),table_name='trazabilidadImplemento',cascade_delete_history=True)
 
 
 class estadoPrestamo(models.Model):
@@ -36,7 +36,7 @@ class prestamo(models.Model):
     idImplemento = models.ForeignKey(implemento, on_delete=models.CASCADE)
     estadoPrestamo = models.ForeignKey(estadoPrestamo, on_delete=models.CASCADE)
     comentario = models.TextField(null=True)
-    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null = True, on_delete=models.CASCADE))
+    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null = True, on_delete=models.CASCADE),table_name='trazabilidadPrestamo',cascade_delete_history=True)
 
 class comentarioImplemento(models.Model):
     idComentarioImplemento = models.AutoField(primary_key=True)

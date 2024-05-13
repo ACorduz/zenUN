@@ -31,7 +31,7 @@ class usuario(models.Model):
     codigoVerificacion = models.IntegerField() #Campo INT para el proceso de verificación de correo
     usuarioVerificado = models.BooleanField(default=False) #Si es TRUE el usuario ha sido verificado    
     lastLogin = models.DateTimeField(null = True) #Mantiene registro de la última vez que inició sesión un usuario
-    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE),m2m_fields=[roles],m2m_fields_model_field_name='RolesUsuarios')       
+    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE),m2m_fields=[roles],table_name = 'trazabilidadUsuarios',cascade_delete_history=True)           
     USERNAME_FIELD = 'correoInstitucional'
     REQUIRED_FIELDS = [
         'numeroDocumento',
