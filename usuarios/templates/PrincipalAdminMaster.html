@@ -19,6 +19,20 @@
         <img src="../static/perfil.png" alt="Botón 2">
     </div>
 <body>
+        <!-- Traer Libreria SweetAlertTwo-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Mensaje del backend-->
+  {% if mensaje %}
+    <script>     
+      Swal.fire({
+        position: "top",
+        title: "Aviso Zenun",
+        text: '{{mensaje}}',
+        icon: 'warning',
+        confirmButtonText: 'Aceptar'
+      });
+    </script>
+  {% endif %}
     <div class = "grid-container">        
         <a id = "aprobarPrestamoButton" href=""><span class="texto">Informes</span></a>
         <a id = "devolverPrestamoButton" href="{% url 'verificacionCorreoAdminBienestar' %}"><span class="texto">Registrar Administrador Bienestar</span></a>

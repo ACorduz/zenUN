@@ -278,7 +278,8 @@ def mostrar_principalAdminBienestar(request):
 @role_required('Administrador Informes')
 def mostrar_principalAdminMaster(request):
     correo_usuario = request.user.correoInstitucional
-    return render(request, 'PrincipalAdminMaster.html', {'correo':correo_usuario})
+    mensaje = request.GET.get('mensaje', '')
+    return render(request, 'PrincipalAdminMaster.html', {'correo':correo_usuario, 'mensaje':mensaje})
 
 #Cerrar Sesión
 def cerrar_sesion(request):
@@ -431,20 +432,21 @@ def procesar_verificar_correo_Admin_Bienestar(request):
             # Revisar si el usuario existe
             if not usuario.objects.filter(correoInstitucional=correoUsuario).exists():
                 mensaje = "Por favor registre los siguientes datos del nuevo administrador de bienestar."
-                return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}')
+                print(correoUsuario)
+                return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}&correo={correoUsuario}')
             else:
                 user = usuario.objects.get(correoInstitucional= correoUsuario)
                 
                 #Verificar si el usuario tiene el rol de ESTUDIANTE y no tiene el de ADMINISTRADOR DE BIENESTAR
                 if user.usuarioVerificado==True and user.roles.filter(idRol="1").exists() and not (user.roles.filter(idRol="2").exists()):
-                    mensaje = "El usuario ya se encuentra registrado como estudiante, por favor asigne el rol de Administrador de Bienestar."
+                    mensaje = "El usuario" + " " + correoUsuario + " " + "ya se encuentra registrado como estudiante, por favor asigne el rol de Administrador de Bienestar."
                     numeroDocumento = user.numeroDocumento
                     nombres = user.nombres
                     apellidos = user.apellidos
                     return render(request, 'AsignacionRolAdministradorBienestar.html', {'mensaje': mensaje, 'correo': correoUsuario, 'numeroDocumento': numeroDocumento, 'nombres':nombres, 'apellidos':apellidos})
                 
                 elif user.roles.filter(idRol="2").exists():
-                    mensaje = "El usuario ya se encuentra registrado como Administrador de Bienestar."
+                    mensaje = "El usuario" + " " + correoUsuario + " " + "ya se encuentra registrado como Administrador de Bienestar."
                     return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
                 
                 else:
@@ -543,8 +545,8 @@ def procesar_registro_administrador_bienestar(request):
                 email.attach_alternative(content, "text/html")
                 email.send()
 
-                mensaje = '¡Registro exitoso! Revise su correo para verificar la cuenta y poder acceder.'
-                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+                mensaje = '¡Registro exitoso! Revise el correo para verificar la cuenta y poder acceder.'
+                return redirect(reverse('principalAdminMaster') + f'?mensaje={mensaje}')
             
     except Exception as e:
         mensaje = f"Ocurrió un error: {str(e)}"
