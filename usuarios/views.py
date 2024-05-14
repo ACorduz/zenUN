@@ -4,11 +4,13 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login, logout
 from usuarios.models import usuario
 from usuarios.models import tipoDocumento
+from usuarios.models import razonCambio
 from django.urls import reverse
 from django.conf import settings
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from django.core.signing import Signer, BadSignature
+from datetime import datetime
 import time
 import random
 
@@ -70,7 +72,7 @@ def procesar_registro_estudiante(request):
                 password_hash = make_password(password)
 
                 #Luego, crear el objeto usuario utilizando el hash de la contraseña
-                estudiante = usuario.objects.create(
+                estudiante = usuario(
                         numeroDocumento = numero_documento,
                         idTipoDocumento = tipo_doc,
                         nombres = nombres,
@@ -79,13 +81,20 @@ def procesar_registro_estudiante(request):
                         password = password_hash,
                         numeroCelular = phone,
                         codigoVerificacion = crear_otp(),
-                        usuarioVerificado = False
+                        usuarioVerificado = False                        
                 )
+                #Se asigna el tipo de cambio que se hace para trazabilidad
+                #El cambio 1 es cuando se registra el usuario en la bd faltando todavía verificar el correo
+                idRazonCambio = razonCambio.objects.get(pk=1)
+                estudiante._change_reason = idRazonCambio
+                
                 estudiante.save()
 
                 #Asignar el rol de estudiante
-                estudiante.roles.add(estudiante.numeroDocumento, 1)
-                
+                idRazonCambio = razonCambio.objects.get(pk=7) #Razón cambio 7: Asignación rol estudiante
+                estudiante._change_reason = idRazonCambio
+                estudiante.roles.add(estudiante.numeroDocumento, 1)                
+
                 ##Envio de correo con el código de verificación
                 #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
                 subject = "Codigo de verificación"
@@ -163,6 +172,8 @@ def aprobar_OTP(request, token):
 
                 if OTP == user.codigoVerificacion:
                     user.usuarioVerificado = True
+                    idRazonCambio = razonCambio.objects.get(pk=2) #Cambio 2 es cuando se verfica el correo
+                    user._change_reason = idRazonCambio
                     user.save()
                     mensaje = "Validación exitosa. Ya puede iniciar sesión."
                     return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
@@ -216,7 +227,10 @@ def autenticar_credenciales_usuario(request):
                     if(validacionUsuario == True):
                         #autenticar usuario
                         login(request, user)
-
+                        user.lastLogin = datetime.now()
+                        idRazonCambio = razonCambio.objects.get(pk=3)
+                        user._change_reason = idRazonCambio
+                        user.save() #Guarda el último inicio de sesión
                         # Verifica cuántos roles tiene el usuario
                         roles_count = user.roles.count()
                         roles = user.roles.all()
@@ -278,7 +292,8 @@ def mostrar_principalAdminBienestar(request):
 @role_required('Administrador Informes')
 def mostrar_principalAdminMaster(request):
     correo_usuario = request.user.correoInstitucional
-    return render(request, 'PrincipalAdminMaster.html', {'correo':correo_usuario})
+    mensaje = request.GET.get('mensaje', '')
+    return render(request, 'PrincipalAdminMaster.html', {'correo':correo_usuario, 'mensaje':mensaje})
 
 #Cerrar Sesión
 def cerrar_sesion(request):
@@ -390,6 +405,8 @@ def procesar_cambio_contrasena(request, correo_usuario, token):
                         user = usuario.objects.get(correoInstitucional= correo_usuario)
                         password_hash = make_password(nuevaContraseña)
                         user.password = password_hash
+                        idRazonCambio = razonCambio.objects.get(pk=4) #Razon de cambio 4: Cambio de contraseña
+                        user._change_reason = idRazonCambio
                         user.save()
 
                         mensaje = "EL CAMBIO DE CONTRASEÑA FUE EXITOSO"
@@ -431,20 +448,21 @@ def procesar_verificar_correo_Admin_Bienestar(request):
             # Revisar si el usuario existe
             if not usuario.objects.filter(correoInstitucional=correoUsuario).exists():
                 mensaje = "Por favor registre los siguientes datos del nuevo administrador de bienestar."
-                return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}')
+                print(correoUsuario)
+                return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}&correo={correoUsuario}')
             else:
                 user = usuario.objects.get(correoInstitucional= correoUsuario)
                 
                 #Verificar si el usuario tiene el rol de ESTUDIANTE y no tiene el de ADMINISTRADOR DE BIENESTAR
                 if user.usuarioVerificado==True and user.roles.filter(idRol="1").exists() and not (user.roles.filter(idRol="2").exists()):
-                    mensaje = "El usuario ya se encuentra registrado como estudiante, por favor asigne el rol de Administrador de Bienestar."
+                    mensaje = "El usuario" + " " + correoUsuario + " " + "ya se encuentra registrado como estudiante, por favor asigne el rol de Administrador de Bienestar."
                     numeroDocumento = user.numeroDocumento
                     nombres = user.nombres
                     apellidos = user.apellidos
                     return render(request, 'AsignacionRolAdministradorBienestar.html', {'mensaje': mensaje, 'correo': correoUsuario, 'numeroDocumento': numeroDocumento, 'nombres':nombres, 'apellidos':apellidos})
                 
                 elif user.roles.filter(idRol="2").exists():
-                    mensaje = "El usuario ya se encuentra registrado como Administrador de Bienestar."
+                    mensaje = "El usuario" + " " + correoUsuario + " " + "ya se encuentra registrado como Administrador de Bienestar."
                     return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
                 
                 else:
@@ -495,7 +513,7 @@ def procesar_registro_administrador_bienestar(request):
                 password_hash = make_password(password)
 
                 #Luego, crear el objeto usuario utilizando el hash de la contraseña
-                administradorBienestar = usuario.objects.create(
+                administradorBienestar = usuario(
                         numeroDocumento = numero_documento,
                         idTipoDocumento = tipo_doc,
                         nombres = nombres,
@@ -506,9 +524,13 @@ def procesar_registro_administrador_bienestar(request):
                         codigoVerificacion = crear_otp(),
                         usuarioVerificado = False
                 )
+                idRazonCambio = razonCambio.objects.get(pk=6) #Razón cambio 6: Registro usuario desde el formulario admin
+                administradorBienestar._change_reason = idRazonCambio
                 administradorBienestar.save()
 
                 #Asignar el rol de administrador de Bienestar
+                idRazonCambio = razonCambio.objects.get(pk=5) #Razón cambio 5: Asignación rol admin
+                administradorBienestar._change_reason = idRazonCambio
                 administradorBienestar.roles.add(administradorBienestar.numeroDocumento, 2)
                 
                 ##Envio de correo con el código de verificación
@@ -543,8 +565,8 @@ def procesar_registro_administrador_bienestar(request):
                 email.attach_alternative(content, "text/html")
                 email.send()
 
-                mensaje = '¡Registro exitoso! Revise su correo para verificar la cuenta y poder acceder.'
-                return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
+                mensaje = '¡Registro exitoso! Revise el correo para verificar la cuenta y poder acceder.'
+                return redirect(reverse('principalAdminMaster') + f'?mensaje={mensaje}')
             
     except Exception as e:
         mensaje = f"Ocurrió un error: {str(e)}"
@@ -565,8 +587,10 @@ def procesar_asignacion_rol_administrador_bienestar(request):
             else:
                 #Asignacion de rol de administrador de Bienestar
                 user = usuario.objects.get(correoInstitucional= correoUsuario)
-
+                idRazonCambio = razonCambio.objects.get(pk=5)
+                user._change_reason = idRazonCambio
                 user.roles.add(user.numeroDocumento, 2)
+
                 mensaje = "Asignación de rol Administrador de Bienestar exitosa!"
                 return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
     except Exception as e:
