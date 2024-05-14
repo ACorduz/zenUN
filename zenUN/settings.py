@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'simple_history',#App para trazabilidad
     'usuarios', #App usuarios
     'prestamos' #App prestamos
 ]
@@ -60,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware' #Middleware para trazabilidad, obtiene el usuario que realiza los cambios
 ]
 
 ROOT_URLCONF = 'zenUN.urls'
@@ -87,6 +89,7 @@ WSGI_APPLICATION = 'zenUN.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 #"String" de conexión a la base de datos
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -98,7 +101,19 @@ DATABASES = {
     }
 }
 
-
+#String de conexión para la prueba de trazabilidad con la app simple history de django
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bwxoih5j5lheves1bz4f',
+        'USER': 'uujzlypqbijd42cj',
+        'PASSWORD': 'oEueJF7QjEKeiv31NNOI',
+        'HOST': 'bwxoih5j5lheves1bz4f-mysql.services.clever-cloud.com',
+        'PORT': '3306',
+    }
+}
+"""
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
