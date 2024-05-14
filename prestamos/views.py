@@ -130,11 +130,11 @@ def generar_tareaSegundoPlano(request):
     scheduler = BackgroundScheduler()
 
     # Agrega la tarea programada al planificador
-    scheduler.add_job(verificar_tiempoReserva, 'interval', seconds=60)  # Ejecuta la tarea cada 60 segundos
+    scheduler.add_job(verificar_tiempoReserva, 'interval', seconds=300)  # Ejecuta la tarea cada 60 segundos
 
     # Inicia el planificador
     scheduler.start()
-    return render(request, 'principalAdminMaster.html')
+    return render(request, 'PrincipalAdminMaster.html')
 
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
 def mostrar_solicitarPrestamo(request,implemento_id):
