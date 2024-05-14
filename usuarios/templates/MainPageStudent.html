@@ -35,7 +35,9 @@
     <div class="header-title">
       <h1>Pagina Principal Estudiantes</h1>
     </div>
-    <img src="{% static 'perfil.png' %}" alt="Botón 2">
+    <label for="btn-menu">
+      <img src="{% static 'menuIcon.png' %} " alt="Botón 2">
+    </label>
 
   </div>
 
@@ -76,11 +78,16 @@
     <div class="lineafooter">
     </div>
   </footer>
-  <!-- <h1>¿Estás seguro de que deseas cerrar sesión?</h1>
-  <form action="{% url 'cerrar_sesion' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Cerrar Sesión</button>
-  </form> -->
+  <!-- Menú Cerrar Sesión -->
+  <input type="checkbox" id = "btn-menu"> 
+  <div class="container-menu">
+      <div class="cont-menu">
+          <nav>
+              <a href="{% url 'cerrar_sesion'%}"><img src="{% static 'logoutIcon.png' %}" alt="Menu" class="imgCerrarSesion">Cerrar Sesión</a>
+              <!-- Etiqueta "a" para agregar más items al menú -->
+          </nav>            
+      </div>
+  </div>
 </body>
 
 </html>
