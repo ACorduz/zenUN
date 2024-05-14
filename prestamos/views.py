@@ -527,7 +527,7 @@ def procesar_implemento_AdministradorBienestar(request, idImplemento, estudiante
             
     nombreImplemento = implemento_obj.nombreImplemento
 
-    hora = timezone.now()
+    hora = timezone.now()+timedelta(hours=-5)
 
     context = {
         "fecha_aprobacion": hora,
@@ -546,7 +546,7 @@ def procesar_implemento_AdministradorBienestar(request, idImplemento, estudiante
 def procesar_aprobar_prestamo(request, idImplemento, estudianteNumeroDocumento, documento_usuario):
     try:
         if request.method == "POST":
-            prestamo_obj = prestamo.objects.get(estudianteNumeroDocumento=estudianteNumeroDocumento) 
+            prestamo_obj = prestamo.objects.filter(estudianteNumeroDocumento=estudianteNumeroDocumento).order_by('-fechaHoraCreacion').first() 
             implemento_obj = implemento.objects.get(pk=idImplemento)
             # Obtenemos la información del estudiante
             estudiante_info = usuario.objects.get(numeroDocumento=estudianteNumeroDocumento)
