@@ -174,7 +174,7 @@ def mostrar_solicitarPrestamo(request,implemento_id):
         #Tomamos el tiempo actual y calculamos el tiempo de la reserva y el tiempo para devolver el implemento
         hora_inicio_reserva = timezone.now() + timedelta(hours=-5)
         hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
-        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
+        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=2)
 
         # Pasar los datos al contexto para que puedan ser renderizados y mostrados en el html
         context = {
@@ -222,7 +222,7 @@ def guardar_informacionPrestamo(request,implemento_id):
 
         hora_inicio_reserva = timezone.now() + timedelta(hours=-5)
         hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
-        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
+        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=2)
 
         # Crear una nueva instancia de Prestamo y asignar valores a sus campos
         Prestamo = prestamo(
@@ -360,12 +360,15 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request, nu
             # cambiar el estado del prestamo 
             objetoEstadoPrestamoFinalizado = estadoPrestamo.objects.get(idEstadoPrestamo= "3")
             objetoPrestamo.estadoPrestamo = objetoEstadoPrestamoFinalizado  # FINALIZADO
-         
+            
+          
 
             #cambiar el estado del implemento 
             objetoEstadoImplementoFinalizado = estadoImplemento.objects.get(idEstadoImplemento= "3") 
             objetoImplemento.estadoImplementoId = objetoEstadoImplementoFinalizado  # DISPONIBLE
     
+            # cambiar el estado de finalizacion del prestamo
+            objetoPrestamo.fechaHoraFinPrestamo =  timezone.now() + timedelta(hours=-5) 
 
             # Guardar los objetos cambiados o creados por si pasa algo y no se ejecuta bien por eso aqui
             comentario.save()
