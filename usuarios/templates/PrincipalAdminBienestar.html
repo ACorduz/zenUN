@@ -6,23 +6,25 @@
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Principal Administrador Bienestar</title>
-    <link rel="stylesheet" href="../static/principalAdminBienestar.css">
+    <link rel="stylesheet" href="{% static 'principalAdminBienestar.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">    
 </head>
     <div class="header">
         <button class="button-wrapper" onclick="window.location.href = 'principalAdminBienestar'">
-            <img src="../static/icono.png" alt="Botón 1">
+            <img src="{% static 'icono.png' %}" alt="Botón 1">
             <span>zenUN</span>
         </button>
         <div class="header-title">Página Principal Administradores de Bienestar</div>
-        <img src="../static/perfil.png" alt="Botón 2">
+        <label for="btn-menu">
+            <img src="{% static 'menuIcon.png' %}" alt="Botón 2">
+        </label>
     </div>
 <body>
     <div class = "grid-container">        
-        <a id = "aprobarPrestamoButton" href=""><span class="texto">Aprobar Préstamo</span></a>
+        <a id = "aprobarPrestamoButton" href="{% url 'Mostrar_aprobarPrestamo_tabla' %}"><span class="texto">Aprobar Préstamo</span></a>
         <a id = "devolverPrestamoButton" href="{% url 'devolucionImplementos' %}"><span class="texto">Devolver Préstamo</span></a>
         <a id = "crearEventoButton" href=""><span class="texto">Crear Evento</span></a>
-    </div>
+    </div>   
     <div class = "footer">
         <div class="derechos">@Copyright 2024<br>  
               Algunos derechos reservados.<br>
@@ -30,6 +32,16 @@
               Acerca de este sitio web<br>
               Actualización: 04/05/2024
         </div>        
+    </div>
+    <!-- Menú Cerrar Sesión -->
+    <input type="checkbox" id = "btn-menu"> 
+    <div class="container-menu">
+        <div class="cont-menu">
+            <nav>
+                <a href="{% url 'cerrar_sesion' %}"><img src="{% static 'logoutIcon.png' %}" alt="Menu" class="imgCerrarSesion">Cerrar Sesión</a>
+                <!-- Etiqueta "a" para agregar más items al menú -->
+            </nav>            
+        </div>
     </div>
 </body>
 

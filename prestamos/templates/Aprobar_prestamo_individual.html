@@ -1,0 +1,70 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0">
+        <title>Aprobar Prestamos</title>
+        <link rel="stylesheet" type="text/css" href="{% static 'Aprobar_prestamo_individual.css' %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+
+    <body>
+        <!-- Encabezado -->
+        <div class="Encabezado">
+            <button class="button-wrapper" onclick="mostrarAlerta()">
+                <img src="{% static 'icono.png' %}" alt="Botón 1">
+                <span>zenUN</span>
+            </button>
+            <div class="Encabezado-titulo">Aprobar Préstamo</div>
+            <img src="{% static 'perfil.png' %}" alt="Botón 2" width="80px" height="80px">
+        </div>
+
+        <div class="container-content">
+            <h1>Resumen préstamo</h1>
+            <hr class="linea">
+            <div id="informacionUsuario">
+                <div id="datosEncargado">
+                    <p>Fecha y hora de la aprobación: <span id="fechaAprobación">{{ fecha_aprobacion }}</span></p>
+                    <p>Nombre del encargado: <span id="nombreEncargado"> {{ nombre_administrador }}</span></p>
+                    <p>Documento del encargado: <span id="documentoEncargado">{{ documento_administrador }}</span></p>
+                </div>
+
+                <div id="datosPrestamo">
+                    <p>Número del implemento solicitado: <span id="implemento">{{ idImplemento }}</span></p>
+                    <p>Nombre del implemento: <span id="nombreImplemento"> {{ nombreImplemento}}</span></p>
+                    <p>Nombre del estudiante: <span id="nombreEstudiante">{{ nombre_estudiante }}</span></p>
+                    <p>Correo del estudiante: <span id="correoEstudiante">{{ correo_estudiante }}</span></p>
+                    <p>Documento del estudiante: <span id="documentoEstudiante">{{ documento_estudiante }}</span></p>
+                </div>
+                <form id="myForm" action="{% url 'procesarPrestamo' idImplemento documento_estudiante documento_administrador  %}" method="POST">
+                    {% csrf_token %}
+                    <input type="button" id="submitButton" value="Aprobar Préstamo">
+                </form>
+            </div>
+            <script>
+                document.getElementById("submitButton").addEventListener("click", function() {
+                    document.getElementById("myForm").submit();
+                });
+                
+                function mostrarAlerta() {
+                Swal.fire({
+                    title: '¡Atención!',
+                    text: '¿Quieres volver a la página principal sin completar tu reserva?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/principalAdminBienestar/';
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    }
+                });
+            };
+            </script>
+        </div>
+    </body>
+</html>
