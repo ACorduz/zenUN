@@ -397,8 +397,9 @@ def procesar_implemento_AdministradorBienestar(request, idImplemento, estudiante
         "nombreImplemento": nombreImplemento,
         "nombre_estudiante": nombreEstudiante,
         "correo_estudiante": correoEstudiante,
-        "documento_estudiante": estudianteNumeroDocumento
+        "documento_estudiante": estudianteNumeroDocumento,
         }
+    
     
     return render(request, 'Aprobar_prestamo_individual.html', context)
 
@@ -407,6 +408,8 @@ def procesar_aprobar_prestamo(request, idImplemento, estudianteNumeroDocumento, 
         if request.method == "POST":
             prestamo_obj = prestamo.objects.get(estudianteNumeroDocumento=estudianteNumeroDocumento) 
             implemento_obj = implemento.objects.get(pk=idImplemento)
+            # Obtenemos la información del estudiante
+            estudiante_info = usuario.objects.get(numeroDocumento=estudianteNumeroDocumento)
 
             prestamo_obj.administradorBienestarNumeroDocumento_id = documento_usuario
             prestamo_obj.fechaHoraInicioPrestamo = timezone.now()
@@ -422,6 +425,38 @@ def procesar_aprobar_prestamo(request, idImplemento, estudianteNumeroDocumento, 
             prestamo_obj.save()
             implemento_obj.save()
 
+            ############## Envio de correo ############################     
+            # Generación del resumen para enviarse por correo
+            subject = "Resumen de aprobación de préstamo"
+            message = ""
+            email_form = settings.EMAIL_HOST_USER
+            recipient_list = [estudiante_info.correoInstitucional]
+
+            # Generar el contenido del correo
+            context = {
+                "nombreEstudiante": estudiante_info.nombres,
+                "nombreImplemento": implemento_obj.nombreImplemento,
+                "fechaCreacion": prestamo_obj.fechaHoraCreacion,
+                "link_login": request.build_absolute_uri(reverse('loginUsuario'))
+            }
+
+            # Renderizar el template html
+            template = get_template("CorreoResumenAprobar.html")
+            content = template.render(context)
+
+            # Armamos el correo a enviar
+
+            email = EmailMultiAlternatives(
+                subject,
+                message,
+                email_form,
+                recipient_list
+            )
+
+            email.attach_alternative(content, "text/html")
+            email.send()
+
+            ###########################################################
             mensaje = f'Se ha realizado la transacción con exito.'
             return redirect(reverse("Mostrar_aprobarPrestamo_tabla") + f'?mensaje={mensaje}')
 

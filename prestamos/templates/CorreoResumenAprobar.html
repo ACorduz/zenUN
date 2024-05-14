@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen Implemento Aprobado</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+        .message {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .link:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>HEMOS CONFIRMADO TU SOLICITUD</h2>
+        <p>
+            Hola <strong>{{nombreEstudiante}}</strong>,<br>
+            Tu solicitud de prestamo ha sido aprobada.
+        <p>
+            Solicitaste: <strong>{{nombreImplemento}}</strong>.
+        </p>
+        <p> Esta solitud fue realizada el: <strong> {{fechaCreacion}}.</strong><br>
+            Por normativas internas de la universidad te recordadmos que el prestamos tienen un limite de uso de dos horas por usuario.
+        </p>
+        <p>
+            Gracias por confiar en nosotros.
+        </p>
+        <p>
+            Si deseas volver a sacar un implemento, por favor accede a nuestro portal Zenun.
+        </p>
+        <div class="message">
+            <a class="link" href="{{link_login}}">Login Zenun</a>
+        </div>
+
+        <footer>
+            Atentamente,<br>
+            El equipo de zenUN Los Capis<br>
+            "Tomarse un tiempo cada día para relajarse y renovarse es esencial para vivir bien"
+        </footer>
+    </div>
+</body>
+</html>
