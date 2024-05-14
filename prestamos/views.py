@@ -124,7 +124,7 @@ def Proceso_enviarCorreo_cancelarPrestamo(numeroDocumento, nombreImplemento, fec
         return(False , f"no se pudo enviar correo devolución: {e}")
     
 #Metodo para iniciar el trabajo en segundo plano
-def generar_tareaSegundoPlano():
+def generar_tareaSegundoPlano(request):
     #Funcion para llamar periodicamente la revisión de la reserva
     # Crea una instancia del planificador
     scheduler = BackgroundScheduler()
@@ -134,6 +134,7 @@ def generar_tareaSegundoPlano():
 
     # Inicia el planificador
     scheduler.start()
+    return render(request, 'principalAdminMaster.html')
 
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
 def mostrar_solicitarPrestamo(request,implemento_id):
