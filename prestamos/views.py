@@ -52,11 +52,17 @@ def verificar_tiempoReserva():
             prestamo_cancelar = prestamo.objects.get(idPrestamo = id_prestamo)
             Estado_prestamo = estadoPrestamo.objects.get(idEstadoPrestamo = 4)
             prestamo_cancelar.estadoPrestamo = Estado_prestamo
+            #Trazabilidad
+            idRazonCambio = razonCambio.objects.get(pk=11) #Razón de cambio 11: Préstamo cancelado por pasar más de 15 mins 
+            prestamo_cancelar._change_reason = idRazonCambio            
             prestamo_cancelar.save()
             #Pasar el estado del implemento a 3 "DISPONIBLE"
             implemento_devolver = implemento.objects.get(idImplemento= id_implemento)
             Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 3)
             implemento_devolver.estadoImplementoId = Estado_Implemento
+            #Trazabilidad
+            idRazonCambio = razonCambio.objects.get(pk=10) #Razón de cambio 10: Implemento disponible al ser cancelado el préstamo
+            implemento_devolver._change_reason = idRazonCambio
             implemento_devolver.save()
             print("El prestamo fue cancelado y el implemento ahora esta disponible") 
             #Enviar correo
@@ -204,6 +210,9 @@ def guardar_informacionPrestamo(request,implemento_id):
         Implemento = implemento.objects.get(idImplemento = implemento_id)
         Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 1)
         Implemento.estadoImplementoId = Estado_Implemento
+        #Trazabilidad
+        idRazonCambio = razonCambio.objects.get(pk=8) #Razón de cambio 8: Implemento en reserva al solicitar un préstamo
+        Implemento._change_reason = idRazonCambio
         Implemento.save()
 
         #Instanciar el estado del prestamo 1 "PROCESO" para guardarlo en la información del prestamo
@@ -216,7 +225,7 @@ def guardar_informacionPrestamo(request,implemento_id):
         hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
 
         # Crear una nueva instancia de Prestamo y asignar valores a sus campos
-        Prestamo = prestamo.objects.create(
+        Prestamo = prestamo(
             estudianteNumeroDocumento=estudiante,
             fechaHoraCreacion=hora_inicio_reserva,
             fechaHoraInicioPrestamo=hora_fin_reserva,
@@ -225,6 +234,10 @@ def guardar_informacionPrestamo(request,implemento_id):
             idImplemento = Implemento,
             comentario=""
         )
+
+        #Trazabilidad
+        idRazonCambio = razonCambio.objects.get(pk=9) #Razón de cambio 9: Préstamo en proceso al crearlo
+        Prestamo._change_reason = idRazonCambio
         
         Prestamo.save()
         
@@ -542,7 +555,15 @@ def procesar_aprobar_prestamo(request, idImplemento, estudianteNumeroDocumento, 
             obejtoEstadoImplementoPrestado = estadoImplemento.objects.get(idEstadoImplemento= "2")
             implemento_obj.estadoImplementoId = obejtoEstadoImplementoPrestado
 
+            #Trazabilidad préstamo
+            idRazonCambio = razonCambio.objects.get(pk=13) #Razón de cambio 13: Préstamo activo
+            prestamo_obj._change_reason = idRazonCambio
+
             prestamo_obj.save()
+
+            #Trazabilidad implemento
+            idRazonCambio = razonCambio.objects.get(pk=12) #Razón de cambio 12: Implemento prestado
+            implemento_obj._change_reason = idRazonCambio
             implemento_obj.save()
 
             mensaje = f'Se ha realizado la transacción con exito.'

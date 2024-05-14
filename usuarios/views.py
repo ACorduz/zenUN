@@ -11,6 +11,7 @@ from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from django.core.signing import Signer, BadSignature
 from datetime import datetime
+from django.utils import timezone
 import time
 import random
 
@@ -227,7 +228,7 @@ def autenticar_credenciales_usuario(request):
                     if(validacionUsuario == True):
                         #autenticar usuario
                         login(request, user)
-                        user.lastLogin = datetime.now()
+                        user.lastLogin = timezone.now()
                         idRazonCambio = razonCambio.objects.get(pk=3)
                         user._change_reason = idRazonCambio
                         user.save() #Guarda el último inicio de sesión
