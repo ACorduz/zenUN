@@ -194,7 +194,7 @@ def mostrar_solicitarPrestamo(request,implemento_id):
 def guardar_informacionPrestamo(request,implemento_id):
 
     #llamar la funcion que verifica en segundo plano los tiempos de los prestamos
-    generar_tareaSegundoPlano()
+    #generar_tareaSegundoPlano()
     
     # ver si alguien más ya reservo el objeto antes que la persona actual
     if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1") or prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="2") : # En la BD 1 = RESERVADO
@@ -456,7 +456,7 @@ def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento
 def mostrar_tabla_disponibilidad_implementos(request, mensaje=None):
     # Obtener todos los implementos
     implementos_con_ultimos_prestamos = implemento.objects.annotate(
-        ultima_fecha_inicio_prestamo=Max('prestamo__fechaHoraInicioPrestamo'),
+        ultima_fecha_inicio_prestamo=Max('prestamo__fechaHoraCreacion'),
         ultima_fecha_fin_prestamo=Max('prestamo__fechaHoraFinPrestamo')
     )
     edificios = edificio.objects.all()
@@ -551,7 +551,7 @@ def procesar_aprobar_prestamo(request, idImplemento, estudianteNumeroDocumento, 
             estudiante_info = usuario.objects.get(numeroDocumento=estudianteNumeroDocumento)
 
             prestamo_obj.administradorBienestarNumeroDocumento_id = documento_usuario
-            prestamo_obj.fechaHoraInicioPrestamo = timezone.now()
+            prestamo_obj.fechaHoraInicioPrestamo = timezone.now() + timedelta(hours=-5)
 
             # Cambiar el estado del prestamo a ACTIVO
             objetoEstadoPrestamoActivo = estadoPrestamo.objects.get(idEstadoPrestamo= "2")
