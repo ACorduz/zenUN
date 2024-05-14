@@ -32,5 +32,16 @@ urlpatterns = [
         ##vista Disponibilidad Implementos
         path('tablaDisponibilidadImplementos/', 
              login_required(views.mostrar_tabla_disponibilidad_implementos), 
-             name='tablaDisponibilidadImplementos')
+             name='tablaDisponibilidadImplementos'),
+        path("aprobarPrestamoTabla/",
+            login_required(views.mostrar_tabla_aprobar),
+            name="Mostrar_aprobarPrestamo_tabla"
+        ),# Vista de la tabla de prestamos por aprobar por parte del administrador de bienestar
+        path("procesarImplemento/<int:idImplemento>/<int:estudianteNumeroDocumento>/",
+             views.procesar_implemento_AdministradorBienestar,
+             name="procesarImplemento"),
+        path("aprobarPrestamo/<int:idImplemento>/<int:estudianteNumeroDocumento>/<int:documento_usuario>/",
+             views.procesar_aprobar_prestamo,
+             name="procesarPrestamo")
+
 ]

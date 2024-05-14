@@ -328,7 +328,6 @@ def mostrar_tabla_disponibilidad_implementos(request, mensaje=None):
         ultima_fecha_fin_prestamo=Max('prestamo__fechaHoraFinPrestamo')
     )
     edificios = edificio.objects.all()
-
     correo_usuario = request.user.correoInstitucional
     return render(request, 'disponibilidad.html', {'implementos': implementos_con_ultimos_prestamos, 'edificios': edificios, 'correo': correo_usuario, 'mensaje': mensaje})
     
@@ -370,3 +369,69 @@ def solicitar_prestamo(request, implemento_id):
     implemento_obj = implemento.objects.get(pk=implemento_id)
     # Pasar el implemento a la plantilla de solicitud de préstamo, ejemplo:
     return render(request, 'principalAdminBienestar.html', {'implemento': implemento_obj})
+
+
+ ################# Funcionalidad Aprobar Prestamo Estudiante ################
+@role_required('Administrador Bienestar')
+def mostrar_tabla_aprobar(request):
+    prestamos = prestamo.objects.all().filter(estadoPrestamo_id=1)
+    print(prestamos) # En la BD 1 = PROCESO
+    return render(request, 'Aprobar_prestamo_tabla.html', {'Prestamos': prestamos})
+
+
+################# Actualizamos la vista principal de aprobar prestamo individual################
+def procesar_implemento_AdministradorBienestar(request, idImplemento, estudianteNumeroDocumento):
+    usuario_actual = request.user
+    nombre_usuario = usuario_actual.nombres
+    documento_usuario = usuario_actual.numeroDocumento
+
+    # Traemos la información del estudiante
+    estudiente_obj = usuario.objects.get(pk=estudianteNumeroDocumento)
+    implemento_obj = implemento.objects.get(pk = idImplemento)
+            
+    nombreEstudiante = estudiente_obj.nombres
+    correoEstudiante = estudiente_obj.correoInstitucional
+            
+    nombreImplemento = implemento_obj.nombreImplemento
+
+    hora = timezone.now()
+
+    context = {
+        "fecha_aprobacion": hora,
+        "nombre_administrador": nombre_usuario,
+        "documento_administrador": documento_usuario,
+        "idImplemento": idImplemento,
+        "nombreImplemento": nombreImplemento,
+        "nombre_estudiante": nombreEstudiante,
+        "correo_estudiante": correoEstudiante,
+        "documento_estudiante": estudianteNumeroDocumento
+        }
+    
+    return render(request, 'Aprobar_prestamo_individual.html', context)
+
+def procesar_aprobar_prestamo(request, idImplemento, estudianteNumeroDocumento, documento_usuario):
+    try:
+        if request.method == "POST":
+            prestamo_obj = prestamo.objects.get(estudianteNumeroDocumento=estudianteNumeroDocumento) 
+            implemento_obj = implemento.objects.get(pk=idImplemento)
+
+            prestamo_obj.administradorBienestarNumeroDocumento_id = documento_usuario
+            prestamo_obj.fechaHoraInicioPrestamo = timezone.now()
+
+            # Cambiar el estado del prestamo a ACTIVO
+            objetoEstadoPrestamoActivo = estadoPrestamo.objects.get(idEstadoPrestamo= "2")
+            prestamo_obj.estadoPrestamo = objetoEstadoPrestamoActivo # ACTIVO
+
+            # Cambiar el estado del implemento a PRESTADO
+            obejtoEstadoImplementoPrestado = estadoImplemento.objects.get(idEstadoImplemento= "2")
+            implemento_obj.estadoImplementoId = obejtoEstadoImplementoPrestado
+
+            prestamo_obj.save()
+            implemento_obj.save()
+
+            mensaje = f'Se ha realizado la transacción con exito.'
+            return redirect(reverse("Mostrar_aprobarPrestamo_tabla") + f'?mensaje={mensaje}')
+
+    except Exception as e:
+        mensaje = f"Ocurrió un error: {str(e)}" # solo se le pasaria el mensaje en la URL 
+        return redirect(reverse('Mostrar_aprobarPrestamo_tabla') + f'?mensaje={mensaje}')
