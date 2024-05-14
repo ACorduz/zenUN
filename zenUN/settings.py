@@ -23,16 +23,16 @@ AUTH_USER_MODEL = 'usuarios.usuario'
 """ DEPLOY SETTINGS """
 
 # Cuando se realize un pull request en el repositiorio de github, recordar que estas lines son variables de entorno necesarias para el despliegue en Render
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG')
-ALLOWED_HOSTS = ["*"]
+#SECRET_KEY = os.environ.get('SECRET_KEY')
+#DEBUG = os.environ.get('DEBUG')
+#ALLOWED_HOSTS = ["*"]
 
 """ LOCAL SETTINGS"""
 
 #Cuando se trabaje de manera local se deben usar las siguientes varaibles de entorno 
-# DEBUG = True
-# SECRET_KEY = 'django-insecure-+x&k4xqe2en_l2+l@6ekv_-9slmm64nk@#gs2xpqyuqms7s8s0'
-# ALLOWED_HOSTS = []
+DEBUG = True
+SECRET_KEY = 'django-insecure-+x&k4xqe2en_l2+l@6ekv_-9slmm64nk@#gs2xpqyuqms7s8s0'
+ALLOWED_HOSTS = []
 
 RENDER_EXTERNAL_HOST = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOST:
@@ -47,19 +47,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'simple_history',#App para trazabilidad
     'usuarios', #App usuarios
     'prestamos' #App prestamos
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware' #Middleware para trazabilidad, obtiene el usuario que realiza los cambios
 ]
 
 ROOT_URLCONF = 'zenUN.urls'
@@ -87,6 +89,7 @@ WSGI_APPLICATION = 'zenUN.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 #"String" de conexión a la base de datos
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -98,7 +101,19 @@ DATABASES = {
     }
 }
 
-
+#String de conexión para la prueba de trazabilidad con la app simple history de django
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'bwxoih5j5lheves1bz4f',
+        'USER': 'uujzlypqbijd42cj',
+        'PASSWORD': 'oEueJF7QjEKeiv31NNOI',
+        'HOST': 'bwxoih5j5lheves1bz4f-mysql.services.clever-cloud.com',
+        'PORT': '3306',
+    }
+}
+"""
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 

@@ -4,11 +4,13 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login, logout
 from usuarios.models import usuario
 from usuarios.models import tipoDocumento
+from usuarios.models import razonCambio
 from django.urls import reverse
 from django.conf import settings
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from django.core.signing import Signer, BadSignature
+from datetime import datetime
 import time
 import random
 
@@ -70,7 +72,7 @@ def procesar_registro_estudiante(request):
                 password_hash = make_password(password)
 
                 #Luego, crear el objeto usuario utilizando el hash de la contraseña
-                estudiante = usuario.objects.create(
+                estudiante = usuario(
                         numeroDocumento = numero_documento,
                         idTipoDocumento = tipo_doc,
                         nombres = nombres,
@@ -79,13 +81,20 @@ def procesar_registro_estudiante(request):
                         password = password_hash,
                         numeroCelular = phone,
                         codigoVerificacion = crear_otp(),
-                        usuarioVerificado = False
+                        usuarioVerificado = False                        
                 )
+                #Se asigna el tipo de cambio que se hace para trazabilidad
+                #El cambio 1 es cuando se registra el usuario en la bd faltando todavía verificar el correo
+                idRazonCambio = razonCambio.objects.get(pk=1)
+                estudiante._change_reason = idRazonCambio
+                
                 estudiante.save()
 
                 #Asignar el rol de estudiante
-                estudiante.roles.add(estudiante.numeroDocumento, 1)
-                
+                idRazonCambio = razonCambio.objects.get(pk=7) #Razón cambio 7: Asignación rol estudiante
+                estudiante._change_reason = idRazonCambio
+                estudiante.roles.add(estudiante.numeroDocumento, 1)                
+
                 ##Envio de correo con el código de verificación
                 #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
                 subject = "Codigo de verificación"
@@ -163,6 +172,8 @@ def aprobar_OTP(request, token):
 
                 if OTP == user.codigoVerificacion:
                     user.usuarioVerificado = True
+                    idRazonCambio = razonCambio.objects.get(pk=2) #Cambio 2 es cuando se verfica el correo
+                    user._change_reason = idRazonCambio
                     user.save()
                     mensaje = "Validación exitosa. Ya puede iniciar sesión."
                     return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
@@ -216,7 +227,10 @@ def autenticar_credenciales_usuario(request):
                     if(validacionUsuario == True):
                         #autenticar usuario
                         login(request, user)
-
+                        user.lastLogin = datetime.now()
+                        idRazonCambio = razonCambio.objects.get(pk=3)
+                        user._change_reason = idRazonCambio
+                        user.save() #Guarda el último inicio de sesión
                         # Verifica cuántos roles tiene el usuario
                         roles_count = user.roles.count()
                         roles = user.roles.all()
@@ -391,6 +405,8 @@ def procesar_cambio_contrasena(request, correo_usuario, token):
                         user = usuario.objects.get(correoInstitucional= correo_usuario)
                         password_hash = make_password(nuevaContraseña)
                         user.password = password_hash
+                        idRazonCambio = razonCambio.objects.get(pk=4) #Razon de cambio 4: Cambio de contraseña
+                        user._change_reason = idRazonCambio
                         user.save()
 
                         mensaje = "EL CAMBIO DE CONTRASEÑA FUE EXITOSO"
@@ -497,7 +513,7 @@ def procesar_registro_administrador_bienestar(request):
                 password_hash = make_password(password)
 
                 #Luego, crear el objeto usuario utilizando el hash de la contraseña
-                administradorBienestar = usuario.objects.create(
+                administradorBienestar = usuario(
                         numeroDocumento = numero_documento,
                         idTipoDocumento = tipo_doc,
                         nombres = nombres,
@@ -508,9 +524,13 @@ def procesar_registro_administrador_bienestar(request):
                         codigoVerificacion = crear_otp(),
                         usuarioVerificado = False
                 )
+                idRazonCambio = razonCambio.objects.get(pk=6) #Razón cambio 6: Registro usuario desde el formulario admin
+                administradorBienestar._change_reason = idRazonCambio
                 administradorBienestar.save()
 
                 #Asignar el rol de administrador de Bienestar
+                idRazonCambio = razonCambio.objects.get(pk=5) #Razón cambio 5: Asignación rol admin
+                administradorBienestar._change_reason = idRazonCambio
                 administradorBienestar.roles.add(administradorBienestar.numeroDocumento, 2)
                 
                 ##Envio de correo con el código de verificación
@@ -567,8 +587,10 @@ def procesar_asignacion_rol_administrador_bienestar(request):
             else:
                 #Asignacion de rol de administrador de Bienestar
                 user = usuario.objects.get(correoInstitucional= correoUsuario)
-
+                idRazonCambio = razonCambio.objects.get(pk=5)
+                user._change_reason = idRazonCambio
                 user.roles.add(user.numeroDocumento, 2)
+
                 mensaje = "Asignación de rol Administrador de Bienestar exitosa!"
                 return redirect(reverse('loginUsuario') + f'?mensaje={mensaje}')
     except Exception as e:
