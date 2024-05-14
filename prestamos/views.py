@@ -11,10 +11,123 @@ from django.utils import timezone
 from django.db.models import Max
 from usuarios.views import role_required
 from django.contrib import messages
-
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 ################# Funcionalidad Solicitar Prestamo Estudiante ################
+#Función para revisar periodicamente si existe algun prestamo que se haya pasado de los 15 minutos 
+
+def verificar_tiempoReserva():
+    print("Entro a la función")
+    # Obtener la fecha actual en la zona horaria deseada
+    fecha_actual = timezone.now() + timedelta(hours=-5)
+    # Formatear la fecha actual
+    fecha_actual_formateada = fecha_actual.strftime("%H:%M")
+
+    # Filtrar los préstamos
+    prestamos_filtrados = prestamo.objects.filter(estadoPrestamo_id="1")
+    # Diccionario para almacenar las fechas y los IDs de los préstamos
+    fechas_y_ids_prestamo = {}
+
+    # Recorrer los préstamos filtrados y obtener la fechaHoraInicioPrestamo y el idPrestamo de cada uno
+    for prestamo_obj in prestamos_filtrados:
+        id_prestamo = prestamo_obj.idPrestamo
+        id_implemento = prestamo_obj.idImplemento.idImplemento
+        fecha_inicio_prestamo = prestamo_obj.fechaHoraInicioPrestamo
+        # Formatear la fecha en el mismo formato
+        fecha_formateada = fecha_inicio_prestamo.strftime("%H:%M")
+        # Agregar la fecha y el ID del préstamo al diccionario
+        # Agregar la fecha, el ID del préstamo y el ID del implemento al diccionario
+        fechas_y_ids_prestamo[fecha_formateada] = {'id_prestamo': id_prestamo, 'id_implemento': id_implemento}
+
+    # Recorrer las fechas formateadas de inicio de préstamo
+    for fecha, datos_prestamo in fechas_y_ids_prestamo.items():
+        id_prestamo = datos_prestamo['id_prestamo']
+        id_implemento = datos_prestamo['id_implemento']
+
+        if fecha < fecha_actual_formateada:
+            print("La reserva se paso de su tiempo limite")
+            print("La reserva del implemento termina a las", fecha, "y son las", fecha_actual_formateada, "el presstamo es el #", id_prestamo, "y el implemento es el #", id_implemento)
+            #Pasar el estado del prestamo a 4 "CANCELADO"
+            prestamo_cancelar = prestamo.objects.get(idPrestamo = id_prestamo)
+            Estado_prestamo = estadoPrestamo.objects.get(idEstadoPrestamo = 4)
+            prestamo_cancelar.estadoPrestamo = Estado_prestamo
+            prestamo_cancelar.save()
+            #Pasar el estado del implemento a 3 "DISPONIBLE"
+            implemento_devolver = implemento.objects.get(idImplemento= id_implemento)
+            Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 3)
+            implemento_devolver.estadoImplementoId = Estado_Implemento
+            implemento_devolver.save()
+            print("El prestamo fue cancelado y el implemento ahora esta disponible") 
+            #Enviar correo
+
+            #Recuperar los datos de la base de datos para enviarlos por el correo electronico
+            numeroDocumento = prestamo_cancelar.estudianteNumeroDocumento.numeroDocumento
+            nombreImplemento = prestamo_cancelar.idImplemento.nombreImplemento
+            fechaFinalizacionReserva = prestamo_cancelar.fechaHoraInicioPrestamo
+
+            Proceso_enviarCorreo_cancelarPrestamo(
+                numeroDocumento, 
+                nombreImplemento, 
+                fechaFinalizacionReserva, 
+                fecha_actual)
+        else:
+            print("El préstamo aún puede ser tomado")
+            print("La reserva termina a las", fecha, "y son las", fecha_actual_formateada, "el prestamo es el #", id_prestamo, "y el implemento es el #", id_implemento)
+            
+
+# Metodo para enviar el correo electronico de que la reserva fue cancelada
+def Proceso_enviarCorreo_cancelarPrestamo(numeroDocumento, nombreImplemento, fechaFinalizacionReserva,fechaActual):
+    try: 
+        # obtener el correo del usuario
+        usuarioObject = usuario.objects.get(numeroDocumento = numeroDocumento)
+        correoUsuario = usuarioObject.correoInstitucional
+        # no se verifica si el correo ingresado existe pues para llamar a este metodo ya deberia haberse verificado esto    
+
+        #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
+        subject = "Tu prestamo a sido cancelado"
+        message = ""
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [correoUsuario]
+
+        #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+        context = {
+                    "nombreImplemento": nombreImplemento,
+                    "nombreEstudiante": f"{usuarioObject.nombres.strip()} {usuarioObject.apellidos.strip()}",
+                    "numeroDocumentoEstudiante":numeroDocumento,
+                    "fechaFinalizacionReserva": fechaFinalizacionReserva,
+                    "fechaActual": fechaActual
+                }
+        #Renderizamos el template html
+        template = get_template("SendMessageEmailCancelarPrestamo.html")
+        content = template.render(context)
+
+        email = EmailMultiAlternatives(
+                subject,
+                message,
+                email_from,
+                recipient_list
+            )
+
+        email.attach_alternative(content, "text/html")
+        email.send()
+        
+        return(True, "envio correo devolución exitoso")
+
+    except Exception as e:
+        return(False , f"no se pudo enviar correo devolución: {e}")
+    
+#Metodo para iniciar el trabajo en segundo plano
+def generar_tareaSegundoPlano():
+    #Funcion para llamar periodicamente la revisión de la reserva
+    # Crea una instancia del planificador
+    scheduler = BackgroundScheduler()
+
+    # Agrega la tarea programada al planificador
+    scheduler.add_job(verificar_tiempoReserva, 'interval', seconds=60)  # Ejecuta la tarea cada 60 segundos
+
+    # Inicia el planificador
+    scheduler.start()
 
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
 def mostrar_solicitarPrestamo(request,implemento_id):
@@ -53,7 +166,7 @@ def mostrar_solicitarPrestamo(request,implemento_id):
         correo_estudiante = request.user.correoInstitucional
 
         #Tomamos el tiempo actual y calculamos el tiempo de la reserva y el tiempo para devolver el implemento
-        hora_inicio_reserva = timezone.now()
+        hora_inicio_reserva = timezone.now() + timedelta(hours=-5)
         hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
         hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
 
@@ -73,6 +186,9 @@ def mostrar_solicitarPrestamo(request,implemento_id):
 
 #Función para guardar la información del prestamo en la base de datos
 def guardar_informacionPrestamo(request,implemento_id):
+
+    #llamar la funcion que verifica en segundo plano los tiempos de los prestamos
+    generar_tareaSegundoPlano()
     
     # ver si alguien más ya reservo el objeto antes que la persona actual
     if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1") or prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="2") : # En la BD 1 = RESERVADO
@@ -95,7 +211,7 @@ def guardar_informacionPrestamo(request,implemento_id):
 
         #Obtener la hora en la cual el estudiante dio click en el boton realizar reserva
 
-        hora_inicio_reserva = timezone.now()
+        hora_inicio_reserva = timezone.now() + timedelta(hours=-5)
         hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
         hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
 
