@@ -1,0 +1,79 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name = "viewport" content="width=device-width, initial-scale=1.0">
+        <title>Aprobar Prestamos</title>
+        <link rel="stylesheet" type="text/css" href="{% static 'Aprobar_prestamo_tabla.css' %}">
+    </head>
+
+    <body>
+        <!-- Encabezado -->
+        <div class="header">
+            <button class="button1-wrapper" onclick="window.location.href = '../principalAdminBienestar';">
+                <img src="{% static 'icono.png' %}" alt="Botón 1">
+                <span>zenUN</span>
+            </button>
+            <div class="header-title">Aprobar prestamo</div>
+            <img src="{% static 'perfil.png' %}" alt="Botón 2">
+        </div>
+        <br>
+
+        <!-- Formulario de búquesda y filtro -->
+        <div class="Busqueda">
+            <input type="number" id="barraBusqueda" placeholder="Buscar por documento...">
+        </div>
+
+        <!-- Tabla a aprobar -->
+        <div class="Tabla">
+            <table id="Tabla_aprobar">
+                <tr>
+                    <th>#</th>
+                    <th>Cédula</th>
+                    <th>Hora</th>
+                    <th>Código Implemento</th>
+                    <th>Aprobar</th>
+                </tr>
+                
+                {% for prestamos in Prestamos %}
+                <tr>
+                    <td> {{ prestamos.idPrestamo }}</td>
+                    <td> {{ prestamos.estudianteNumeroDocumento.numeroDocumento }}</td>
+                    <td> {{ prestamos.fechaHoraCreacion }}</td>
+                    <td> {{ prestamos.idImplemento.idImplemento}}</td>
+                    <td>
+                        <form action="{% url 'procesarImplemento' prestamos.idImplemento.idImplemento prestamos.estudianteNumeroDocumento.numeroDocumento   %}">
+                            {% csrf_token%}
+                            <button id="aprobar" type="submit">Revisar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table> 
+        </div>
+
+        <div class="footer">
+            <div class="textfooter">
+                <p><strong>©</strong> Copyright 2024</p>
+                <p>Algunos derechos reservados.</p>
+                <p>Contáctenos</p>
+                <p>Acerca de este sitio web</p>
+                <p>Actualización: <strong>09/05/2024</strong></p>
+            </div>
+            <div class="lineafooter"></div>
+        </div>
+    </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#barraBusqueda").on("keyup", function() {
+                var value = $(this).val();
+                $("#Tabla_aprobar tr").filter(function() {
+                    $(this).toggle($(this).text().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+</html>
