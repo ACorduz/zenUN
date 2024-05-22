@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'simple_history',#App para trazabilidad
     'usuarios', #App usuarios
-    'prestamos' #App prestamos
+    'prestamos', #App prestamos
+    'eventos'
 ]
 
 MIDDLEWARE = [
