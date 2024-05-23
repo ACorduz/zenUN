@@ -15,72 +15,55 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 ################# Funcionalidad Solicitar Prestamo Estudiante ################
-#Función para revisar periodicamente si existe algun prestamo que se haya pasado de los 15 minutos 
+#Función para revisar si pasaron 15 minutos desde que el estudiante pidio el prestamo
 
-def verificar_tiempoReserva():
-    print("Entro a la función")
-    # Obtener la fecha actual en la zona horaria deseada
+def verificar_tiempoReserva(request):
+    #print("Entro a la función")
+
+    #Obtener el numero de documento del usuario que esta en la sesión y la hora actual
+    numeroDocumento = request.user.numeroDocumento
     fecha_actual = timezone.now() + timedelta(hours=-5)
-    # Formatear la fecha actual
-    fecha_actual_formateada = fecha_actual.strftime("%H:%M")
 
-    # Filtrar los préstamos
-    prestamos_filtrados = prestamo.objects.filter(estadoPrestamo_id="1")
-    # Diccionario para almacenar las fechas y los IDs de los préstamos
-    fechas_y_ids_prestamo = {}
+    #Verificar si el estudiante aun no ha reclamado su implemento, si esta vacia la lista es False
+    prestamo_filtrado = prestamo.objects.filter(estadoPrestamo_id="1",estudianteNumeroDocumento=numeroDocumento)
+    if prestamo_filtrado:
+        #print("La reserva se paso de su tiempo limite")
+        #Obtener el id del prestamo y del implemento del prestamo que se encontro del estudiante
+        for prestamo_obj in prestamo_filtrado:
+            id_prestamo = prestamo_obj.idPrestamo
+            id_implemento = prestamo_obj.idImplemento.idImplemento
 
-    # Recorrer los préstamos filtrados y obtener la fechaHoraInicioPrestamo y el idPrestamo de cada uno
-    for prestamo_obj in prestamos_filtrados:
-        id_prestamo = prestamo_obj.idPrestamo
-        id_implemento = prestamo_obj.idImplemento.idImplemento
-        fecha_inicio_prestamo = prestamo_obj.fechaHoraInicioPrestamo
-        # Formatear la fecha en el mismo formato
-        fecha_formateada = fecha_inicio_prestamo.strftime("%H:%M")
-        # Agregar la fecha y el ID del préstamo al diccionario
-        # Agregar la fecha, el ID del préstamo y el ID del implemento al diccionario
-        fechas_y_ids_prestamo[fecha_formateada] = {'id_prestamo': id_prestamo, 'id_implemento': id_implemento}
+        #Pasar el estado del prestamo a 4 "CANCELADO"
+        prestamo_cancelar = prestamo.objects.get(idPrestamo = id_prestamo)
+        Estado_prestamo = estadoPrestamo.objects.get(idEstadoPrestamo = 4)
+        prestamo_cancelar.estadoPrestamo = Estado_prestamo
+        #Trazabilidad
+        idRazonCambio = razonCambio.objects.get(pk=11) #Razón de cambio 11: Préstamo cancelado por pasar más de 15 mins 
+        prestamo_cancelar._change_reason = idRazonCambio            
+        prestamo_cancelar.save()
 
-    # Recorrer las fechas formateadas de inicio de préstamo
-    for fecha, datos_prestamo in fechas_y_ids_prestamo.items():
-        id_prestamo = datos_prestamo['id_prestamo']
-        id_implemento = datos_prestamo['id_implemento']
+        #Pasar el estado del implemento a 3 "DISPONIBLE"
+        implemento_devolver = implemento.objects.get(idImplemento= id_implemento)
+        Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 3)
+        implemento_devolver.estadoImplementoId = Estado_Implemento
+        #Trazabilidad
+        idRazonCambio = razonCambio.objects.get(pk=10) #Razón de cambio 10: Implemento disponible al ser cancelado el préstamo
+        implemento_devolver._change_reason = idRazonCambio
+        implemento_devolver.save()
 
-        if fecha < fecha_actual_formateada:
-            print("La reserva se paso de su tiempo limite")
-            print("La reserva del implemento termina a las", fecha, "y son las", fecha_actual_formateada, "el presstamo es el #", id_prestamo, "y el implemento es el #", id_implemento)
-            #Pasar el estado del prestamo a 4 "CANCELADO"
-            prestamo_cancelar = prestamo.objects.get(idPrestamo = id_prestamo)
-            Estado_prestamo = estadoPrestamo.objects.get(idEstadoPrestamo = 4)
-            prestamo_cancelar.estadoPrestamo = Estado_prestamo
-            #Trazabilidad
-            idRazonCambio = razonCambio.objects.get(pk=11) #Razón de cambio 11: Préstamo cancelado por pasar más de 15 mins 
-            prestamo_cancelar._change_reason = idRazonCambio            
-            prestamo_cancelar.save()
-            #Pasar el estado del implemento a 3 "DISPONIBLE"
-            implemento_devolver = implemento.objects.get(idImplemento= id_implemento)
-            Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 3)
-            implemento_devolver.estadoImplementoId = Estado_Implemento
-            #Trazabilidad
-            idRazonCambio = razonCambio.objects.get(pk=10) #Razón de cambio 10: Implemento disponible al ser cancelado el préstamo
-            implemento_devolver._change_reason = idRazonCambio
-            implemento_devolver.save()
-            print("El prestamo fue cancelado y el implemento ahora esta disponible") 
-            #Enviar correo
+        #print("El prestamo fue cancelado y el implemento ahora esta disponible") 
 
-            #Recuperar los datos de la base de datos para enviarlos por el correo electronico
-            numeroDocumento = prestamo_cancelar.estudianteNumeroDocumento.numeroDocumento
-            nombreImplemento = prestamo_cancelar.idImplemento.nombreImplemento
-            fechaFinalizacionReserva = prestamo_cancelar.fechaHoraInicioPrestamo
+        #Enviar correo
+        #Recuperar los datos del estudiante de la base de datos para enviarlos por el correo electronico
+        numeroDocumento = prestamo_cancelar.estudianteNumeroDocumento.numeroDocumento
+        nombreImplemento = prestamo_cancelar.idImplemento.nombreImplemento
+        fechaFinalizacionReserva = prestamo_cancelar.fechaHoraInicioPrestamo
 
-            Proceso_enviarCorreo_cancelarPrestamo(
+        Proceso_enviarCorreo_cancelarPrestamo(
                 numeroDocumento, 
                 nombreImplemento, 
                 fechaFinalizacionReserva, 
                 fecha_actual)
-        else:
-            print("El préstamo aún puede ser tomado")
-            print("La reserva termina a las", fecha, "y son las", fecha_actual_formateada, "el prestamo es el #", id_prestamo, "y el implemento es el #", id_implemento)
-            
 
 # Metodo para enviar el correo electronico de que la reserva fue cancelada
 def Proceso_enviarCorreo_cancelarPrestamo(numeroDocumento, nombreImplemento, fechaFinalizacionReserva,fechaActual):
@@ -129,8 +112,9 @@ def generar_tareaSegundoPlano(request):
     # Crea una instancia del planificador
     scheduler = BackgroundScheduler()
 
-    # Agrega la tarea programada al planificador
-    scheduler.add_job(verificar_tiempoReserva, 'interval', seconds=300)  # Ejecuta la tarea cada 60 segundos
+    hora_actual = timezone.now() #+ timedelta(hours=-5)
+    # Agrega la tarea programada al planificador que se ejecuta 15 minutos despues de realizar la reserva
+    scheduler.add_job(verificar_tiempoReserva, 'date', run_date=hora_actual + timedelta(minutes=15), args=[request])
 
     # Inicia el planificador
     scheduler.start()
@@ -139,25 +123,24 @@ def generar_tareaSegundoPlano(request):
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
 def mostrar_solicitarPrestamo(request,implemento_id):
 
-    #Verificar si el usuario ya pidio un implemento antes
     # Obtener el usuario que ha iniciado sesión
     usuario_actual = request.user
     nombre_usuario = usuario_actual.nombres
     documento_usuario = usuario_actual.numeroDocumento
-    print("Nombre del usuario:", nombre_usuario)
-    print("Documento del usuario:", documento_usuario)
+    #print("Nombre del usuario:", nombre_usuario)
+    #print("Documento del usuario:", documento_usuario)
 
     # Obtener todos los préstamos activos del usuario
     prestamos_activos = prestamo.objects.filter(
     estudianteNumeroDocumento=usuario_actual,
     estadoPrestamo__nombreEstado__in=['PROCESO', 'ACTIVO']
     )
-    print("Prestamos activos del usuario:", prestamos_activos)
+    #print("Prestamos activos del usuario:", prestamos_activos)
     # Verificar si el usuario tiene préstamos activos
     if prestamos_activos.exists():
         # Mostrar un mensaje de error al usuario
-        print("NO puedes reselvar con prestamos activos")
-        mensaje = "No puedes reservar con préstamos activos"
+        #print("NO puedes reservar con prestamos activos")
+        mensaje = "No puedes reservar si ya tienes un prestamo activo"
         # Redireccionar al usuario a la página de disponibilidad de implementos o a donde desees
         mensaje = "El usuario ya se encuentra registrado como Administrador de Bienestar."
         return mostrar_tabla_disponibilidad_implementos(request, mensaje=mensaje)
@@ -194,17 +177,17 @@ def mostrar_solicitarPrestamo(request,implemento_id):
 #Función para guardar la información del prestamo en la base de datos
 def guardar_informacionPrestamo(request,implemento_id):
 
-    #llamar la funcion que verifica en segundo plano los tiempos de los prestamos
-    #generar_tareaSegundoPlano()
-    
-    # ver si alguien más ya reservo el objeto antes que la persona actual
-    if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1") or prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="2") : # En la BD 1 = RESERVADO
+    # ver si alguien más ya reservo o pidio prestado el mismo objeto que el usuario
+    if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1") or prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="2") : # En la BD 1 = RESERVADO 2 = PRESTADO
         
         mensaje = f"Parece que alguien más ya pidio este objeto, lo sentimos, puedes elegir otro implemento" # solo se le pasaria el mensaje en la URL 
         return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
 
     else:
-        # Instaciar el objeto usuario para guardarlo en el prestamo
+        #llamar la funcion que verifica despues de 15 minutos si el prestamo ya fue tomado
+        generar_tareaSegundoPlano(request)
+
+        # Instanciar el objeto usuario para guardarlo en el prestamo
         estudiante = usuario.objects.get(numeroDocumento=request.user.numeroDocumento)  
         
         #Hay que cambiar el estado del implemento a 1 "RESERVA"
