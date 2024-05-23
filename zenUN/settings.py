@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'simple_history',#App para trazabilidad
     'usuarios', #App usuarios
     'prestamos', #App prestamos
-    'eventos'
+    'eventos' #App eventos
 ]
 
 MIDDLEWARE = [
