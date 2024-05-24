@@ -4,3 +4,9 @@ from django.shortcuts import render
 
 
 #######################LOGICA PARA ASISTIR A EVENTO#######################################
+
+def mostrar_asistirEvento(request):
+
+    print("aja")
+    
+    return render(request, 'asistirEvento.html')
