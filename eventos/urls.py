@@ -10,5 +10,8 @@ urlpatterns = [
         path("asistirEvento/",
              views.mostrar_asistirevento,
              name='asistirEvento'
-             )
+            ),
+  path('generarInformes/',
+         views.mostra_vista_informes,
+         name='generarInformes') #Vista principal de informes
         ]

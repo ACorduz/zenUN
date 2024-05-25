@@ -26,6 +26,12 @@ def mostrar_listaEventos(request):
     return render(request, 'listaEventos.html', {'eventos': eventos})
 
 #######################LOGICA PARA ASISTIR A EVENTO#######################################
-
 def mostrar_asistirevento(request):
     return render(request, 'listaEventos.html')
+  
+
+#######################LOGICA PARA GENERAR INFORMES#######################################
+""" Función que muestra la vista principal de la sección de informes """
+def mostra_vista_informes(request):
+    return render(request, 'vistaPrincipal_informes.html')
+

@@ -24,5 +24,6 @@ urlpatterns = [
     #path para urls de la aplicación "prestamos"
     path('', include('prestamos.urls')),#Se importan las URLS de la aplicación prestamos
     #path para urls de la aplicación "eventos"
-    path('', include('eventos.urls'))#Se importan las URLS de la aplicación prestamos
+    path('', include('eventos.urls'))#Se importan las URLS de la aplicación eventos
+
 ]
