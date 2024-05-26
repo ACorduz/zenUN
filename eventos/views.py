@@ -3,8 +3,8 @@ from django.shortcuts import render
 # Create your views here.
 
 
-#######################LOGICA PARA LISTA DE EVENTOS#######################################
-
+#######################LOGICA PARA EL CASO DE USO ASISTIR EVENTO#######################################
+#Muestra la lista de todos los eventos a los que el estudiante se puede inscribir
 def mostrar_listaEventos(request):
     eventos = [
         {
@@ -25,7 +25,10 @@ def mostrar_listaEventos(request):
     ]
     return render(request, 'listaEventos.html', {'eventos': eventos})
 
-#######################LOGICA PARA ASISTIR A EVENTO#######################################
-
+#muestra el resumen del evento que el estudiante de click y al cual el estudiante puede inscribirse
 def mostrar_asistirevento(request):
-    return render(request, 'listaEventos.html')
+    return render(request, 'asistirEvento.html')
+
+#Logica para cancelar la inscripción a un evento
+def cancelar_inscripcionEvento(request):
+    return render(request, 'asistirEvento.html')

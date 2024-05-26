@@ -301,6 +301,11 @@ def cerrar_sesion(request):
     logout(request)
     return redirect(reverse('loginUsuario'))
 
+##Metodo para mostrar la pestaña de los eventos a los que esta inscrito el estudiante
+def mostrar_eventosInscritos(request):
+
+    return render(request, 'eventosInscritos.html')
+
 
 ########################Funcionalidad de Recuperar Contraseña####################################
 
