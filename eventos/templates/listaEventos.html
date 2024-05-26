@@ -8,9 +8,10 @@
 <body>
     {% for evento in eventos %}
             <li>
-                <h2>{{ evento.nombre }}</h2>
-                <p>{{ evento.descripción }}</p>
-                <img src="{{ evento.URL }}" alt="{{ evento.nombre }}" width="50">
+                <h2>{{ evento.nombreEvento }}</h2>
+                <p>Fecha: {{ evento.fechaHoraEvento|date:"d/m/Y" }}</p>
+                <p>Hora: {{ evento.fechaHoraEvento|time:"H:i:s" }}</p>
+                <img src="data:image/jpeg;base64,{{ evento.imagen_base64 }}" alt="{{ evento.nombreEvento}}">
             </li>
         {% endfor %}
 </body>
