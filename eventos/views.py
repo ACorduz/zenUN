@@ -35,3 +35,6 @@ def mostrar_asistirevento(request):
 def mostra_vista_informes(request):
     return render(request, 'vistaPrincipal_informes.html')
 
+#######################LOGICA PARA CREAR EVENTOS#######################################
+def mostrar_crear_evento(request):
+    return render(request, 'crearEvento.html')
