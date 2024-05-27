@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.contrib.auth.decorators import login_required
 
+#Rutas de la aplicación "eventos"
 urlpatterns = [
     path('eventos/', 
         views.mostrar_listaEventos, 
@@ -30,5 +31,9 @@ urlpatterns = [
     path('generarInformes/descargaReportes/<str:nombreArchivoReporte>/<int:numeroReporte>/',
         views.descarga_reportes,
         name='DescargarInforme_prueba'
-    ) #Descargar informe
+    ), #Descargar informe
+    path('crearEvento/', 
+         views.mostrar_crear_evento, 
+         name='mostrar_crear_evento'
+    ) #Vista para crear eventos
 ]

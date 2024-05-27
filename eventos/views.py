@@ -244,3 +244,6 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento, lugarEvento
     lienzo.setFont("Helvetica-Bold", 12)
     lienzo.drawString(480, 730, "fechaDeAhora")
     return(None)
+#######################LOGICA PARA CREAR EVENTOS#######################################
+def mostrar_crear_evento(request):
+    return render(request, 'crearEvento.html')

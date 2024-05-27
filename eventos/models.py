@@ -14,12 +14,12 @@ class estadoEvento(models.Model):
 
 class evento(models.Model):
     idEvento = models.AutoField(primary_key=True)
-    fechaHoraCreacion = models.DateField()
+    fechaHoraCreacion = models.DateTimeField()
     numeroDocumento_AdministradorBienestar = models.ForeignKey(usuario, on_delete=models.CASCADE, related_name='NumeroDocumentoadministradorBienestar')
     nombreEvento = models.CharField(max_length=255)
     categoriaEvento_id = models.ForeignKey(categoriaEvento, on_delete=models.CASCADE)
     organizador = models.CharField(max_length=255)
-    fechaHoraEvento = models.DateField()
+    fechaHoraEvento = models.DateTimeField()
     edificio_id = models.ForeignKey(edificio, on_delete=models.CASCADE)
     lugar = models.CharField(max_length=255)
     flyer = models.BinaryField() #El tipo de dato puede cambiar
