@@ -37,9 +37,10 @@
     </script>
   {% endif %}
     <div class = "grid-container">        
-        <a id = "aprobarPrestamoButton" href=""><span class="texto">Informes</span></a>
+        <a id = "aprobarPrestamoButton" href="{% url 'generarInformes' %}"><span class="texto">Informes</span></a>
         <a id = "devolverPrestamoButton" href="{% url 'verificacionCorreoAdminBienestar' %}"><span class="texto">Registrar Administrador Bienestar</span></a>
         <a id = "crearEventoButton" href=""><span class="texto"></span></a>
+        <a style=" display: none;" id = "crearEventoButton" href="{% url 'TareaAsincronica' %}"><span class="texto">Iniciar Tarea</span></a>
     </div>
     <div class = "footer">
         <div class="derechos">@Copyright 2024<br>  

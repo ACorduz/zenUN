@@ -11,33 +11,136 @@ from django.utils import timezone
 from django.db.models import Max
 from usuarios.views import role_required
 from django.contrib import messages
-
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 ################# Funcionalidad Solicitar Prestamo Estudiante ################
+#Función para revisar si pasaron 15 minutos desde que el estudiante pidio el prestamo
+
+def verificar_tiempoReserva(request):
+    #print("Entro a la función")
+
+    #Obtener el numero de documento del usuario que esta en la sesión y la hora actual
+    numeroDocumento = request.user.numeroDocumento
+    fecha_actual = timezone.now() + timedelta(hours=-5)
+
+    #Verificar si el estudiante aun no ha reclamado su implemento, si esta vacia la lista es False
+    prestamo_filtrado = prestamo.objects.filter(estadoPrestamo_id="1",estudianteNumeroDocumento=numeroDocumento)
+    if prestamo_filtrado:
+        #print("La reserva se paso de su tiempo limite")
+        #Obtener el id del prestamo y del implemento del prestamo que se encontro del estudiante
+        for prestamo_obj in prestamo_filtrado:
+            id_prestamo = prestamo_obj.idPrestamo
+            id_implemento = prestamo_obj.idImplemento.idImplemento
+
+        #Pasar el estado del prestamo a 4 "CANCELADO"
+        prestamo_cancelar = prestamo.objects.get(idPrestamo = id_prestamo)
+        Estado_prestamo = estadoPrestamo.objects.get(idEstadoPrestamo = 4)
+        prestamo_cancelar.estadoPrestamo = Estado_prestamo
+        #Trazabilidad
+        idRazonCambio = razonCambio.objects.get(pk=11) #Razón de cambio 11: Préstamo cancelado por pasar más de 15 mins 
+        prestamo_cancelar._change_reason = idRazonCambio            
+        prestamo_cancelar.save()
+
+        #Pasar el estado del implemento a 3 "DISPONIBLE"
+        implemento_devolver = implemento.objects.get(idImplemento= id_implemento)
+        Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 3)
+        implemento_devolver.estadoImplementoId = Estado_Implemento
+        #Trazabilidad
+        idRazonCambio = razonCambio.objects.get(pk=10) #Razón de cambio 10: Implemento disponible al ser cancelado el préstamo
+        implemento_devolver._change_reason = idRazonCambio
+        implemento_devolver.save()
+
+        #print("El prestamo fue cancelado y el implemento ahora esta disponible") 
+
+        #Enviar correo
+        #Recuperar los datos del estudiante de la base de datos para enviarlos por el correo electronico
+        numeroDocumento = prestamo_cancelar.estudianteNumeroDocumento.numeroDocumento
+        nombreImplemento = prestamo_cancelar.idImplemento.nombreImplemento
+        fechaFinalizacionReserva = prestamo_cancelar.fechaHoraInicioPrestamo
+
+        Proceso_enviarCorreo_cancelarPrestamo(
+                numeroDocumento, 
+                nombreImplemento, 
+                fechaFinalizacionReserva, 
+                fecha_actual)
+
+# Metodo para enviar el correo electronico de que la reserva fue cancelada
+def Proceso_enviarCorreo_cancelarPrestamo(numeroDocumento, nombreImplemento, fechaFinalizacionReserva,fechaActual):
+    try: 
+        # obtener el correo del usuario
+        usuarioObject = usuario.objects.get(numeroDocumento = numeroDocumento)
+        correoUsuario = usuarioObject.correoInstitucional
+        # no se verifica si el correo ingresado existe pues para llamar a este metodo ya deberia haberse verificado esto    
+
+        #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
+        subject = "Tu prestamo a sido cancelado"
+        message = ""
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [correoUsuario]
+
+        #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+        context = {
+                    "nombreImplemento": nombreImplemento,
+                    "nombreEstudiante": f"{usuarioObject.nombres.strip()} {usuarioObject.apellidos.strip()}",
+                    "numeroDocumentoEstudiante":numeroDocumento,
+                    "fechaFinalizacionReserva": fechaFinalizacionReserva,
+                    "fechaActual": fechaActual
+                }
+        #Renderizamos el template html
+        template = get_template("SendMessageEmailCancelarPrestamo.html")
+        content = template.render(context)
+
+        email = EmailMultiAlternatives(
+                subject,
+                message,
+                email_from,
+                recipient_list
+            )
+
+        email.attach_alternative(content, "text/html")
+        email.send()
+        
+        return(True, "envio correo devolución exitoso")
+
+    except Exception as e:
+        return(False , f"no se pudo enviar correo devolución: {e}")
+    
+#Metodo para iniciar el trabajo en segundo plano
+def generar_tareaSegundoPlano(request):
+    #Funcion para llamar periodicamente la revisión de la reserva
+    # Crea una instancia del planificador
+    scheduler = BackgroundScheduler()
+
+    hora_actual = timezone.now() #+ timedelta(hours=-5)
+    # Agrega la tarea programada al planificador que se ejecuta 15 minutos despues de realizar la reserva
+    scheduler.add_job(verificar_tiempoReserva, 'date', run_date=hora_actual + timedelta(minutes=15), args=[request])
+
+    # Inicia el planificador
+    scheduler.start()
+    return render(request, 'PrincipalAdminMaster.html')
 
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
 def mostrar_solicitarPrestamo(request,implemento_id):
 
-    #Verificar si el usuario ya pidio un implemento antes
     # Obtener el usuario que ha iniciado sesión
     usuario_actual = request.user
     nombre_usuario = usuario_actual.nombres
     documento_usuario = usuario_actual.numeroDocumento
-    print("Nombre del usuario:", nombre_usuario)
-    print("Documento del usuario:", documento_usuario)
+    #print("Nombre del usuario:", nombre_usuario)
+    #print("Documento del usuario:", documento_usuario)
 
     # Obtener todos los préstamos activos del usuario
     prestamos_activos = prestamo.objects.filter(
     estudianteNumeroDocumento=usuario_actual,
     estadoPrestamo__nombreEstado__in=['PROCESO', 'ACTIVO']
     )
-    print("Prestamos activos del usuario:", prestamos_activos)
+    #print("Prestamos activos del usuario:", prestamos_activos)
     # Verificar si el usuario tiene préstamos activos
     if prestamos_activos.exists():
         # Mostrar un mensaje de error al usuario
-        print("NO puedes reselvar con prestamos activos")
-        mensaje = "No puedes reservar con préstamos activos"
+        #print("NO puedes reservar con prestamos activos")
+        mensaje = "No puedes reservar si ya tienes un prestamo activo"
         # Redireccionar al usuario a la página de disponibilidad de implementos o a donde desees
         mensaje = "El usuario ya se encuentra registrado como Administrador de Bienestar."
         return mostrar_tabla_disponibilidad_implementos(request, mensaje=mensaje)
@@ -53,9 +156,9 @@ def mostrar_solicitarPrestamo(request,implemento_id):
         correo_estudiante = request.user.correoInstitucional
 
         #Tomamos el tiempo actual y calculamos el tiempo de la reserva y el tiempo para devolver el implemento
-        hora_inicio_reserva = timezone.now()
+        hora_inicio_reserva = timezone.now() + timedelta(hours=-5)
         hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
-        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
+        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=2)
 
         # Pasar los datos al contexto para que puedan ser renderizados y mostrados en el html
         context = {
@@ -73,21 +176,27 @@ def mostrar_solicitarPrestamo(request,implemento_id):
 
 #Función para guardar la información del prestamo en la base de datos
 def guardar_informacionPrestamo(request,implemento_id):
-    
-    # ver si alguien más ya reservo el objeto antes que la persona actual
-    if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1") or prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="2") : # En la BD 1 = RESERVADO
+
+    # ver si alguien más ya reservo o pidio prestado el mismo objeto que el usuario
+    if prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="1") or prestamo.objects.filter(idImplemento=implemento_id, estadoPrestamo_id="2") : # En la BD 1 = RESERVADO 2 = PRESTADO
         
         mensaje = f"Parece que alguien más ya pidio este objeto, lo sentimos, puedes elegir otro implemento" # solo se le pasaria el mensaje en la URL 
         return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
 
     else:
-        # Instaciar el objeto usuario para guardarlo en el prestamo
+        #llamar la funcion que verifica despues de 15 minutos si el prestamo ya fue tomado
+        generar_tareaSegundoPlano(request)
+
+        # Instanciar el objeto usuario para guardarlo en el prestamo
         estudiante = usuario.objects.get(numeroDocumento=request.user.numeroDocumento)  
         
         #Hay que cambiar el estado del implemento a 1 "RESERVA"
         Implemento = implemento.objects.get(idImplemento = implemento_id)
         Estado_Implemento = estadoImplemento.objects.get(idEstadoImplemento = 1)
         Implemento.estadoImplementoId = Estado_Implemento
+        #Trazabilidad
+        idRazonCambio = razonCambio.objects.get(pk=8) #Razón de cambio 8: Implemento en reserva al solicitar un préstamo
+        Implemento._change_reason = idRazonCambio
         Implemento.save()
 
         #Instanciar el estado del prestamo 1 "PROCESO" para guardarlo en la información del prestamo
@@ -95,12 +204,12 @@ def guardar_informacionPrestamo(request,implemento_id):
 
         #Obtener la hora en la cual el estudiante dio click en el boton realizar reserva
 
-        hora_inicio_reserva = timezone.now()
+        hora_inicio_reserva = timezone.now() + timedelta(hours=-5)
         hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
-        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=1)
+        hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=2)
 
         # Crear una nueva instancia de Prestamo y asignar valores a sus campos
-        Prestamo = prestamo.objects.create(
+        Prestamo = prestamo(
             estudianteNumeroDocumento=estudiante,
             fechaHoraCreacion=hora_inicio_reserva,
             fechaHoraInicioPrestamo=hora_fin_reserva,
@@ -109,6 +218,10 @@ def guardar_informacionPrestamo(request,implemento_id):
             idImplemento = Implemento,
             comentario=""
         )
+
+        #Trazabilidad
+        idRazonCambio = razonCambio.objects.get(pk=9) #Razón de cambio 9: Préstamo en proceso al crearlo
+        Prestamo._change_reason = idRazonCambio
         
         Prestamo.save()
         
@@ -231,12 +344,15 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request, nu
             # cambiar el estado del prestamo 
             objetoEstadoPrestamoFinalizado = estadoPrestamo.objects.get(idEstadoPrestamo= "3")
             objetoPrestamo.estadoPrestamo = objetoEstadoPrestamoFinalizado  # FINALIZADO
-         
+            
+          
 
             #cambiar el estado del implemento 
             objetoEstadoImplementoFinalizado = estadoImplemento.objects.get(idEstadoImplemento= "3") 
             objetoImplemento.estadoImplementoId = objetoEstadoImplementoFinalizado  # DISPONIBLE
     
+            # cambiar el estado de finalizacion del prestamo
+            objetoPrestamo.fechaHoraFinPrestamo =  timezone.now() + timedelta(hours=-5) 
 
             # Guardar los objetos cambiados o creados por si pasa algo y no se ejecuta bien por eso aqui
             comentario.save()
@@ -324,7 +440,7 @@ def Proceso_enviarCorreo_devolucionImplementos(numeroDocumento, nombreImplemento
 def mostrar_tabla_disponibilidad_implementos(request, mensaje=None):
     # Obtener todos los implementos
     implementos_con_ultimos_prestamos = implemento.objects.annotate(
-        ultima_fecha_inicio_prestamo=Max('prestamo__fechaHoraInicioPrestamo'),
+        ultima_fecha_inicio_prestamo=Max('prestamo__fechaHoraCreacion'),
         ultima_fecha_fin_prestamo=Max('prestamo__fechaHoraFinPrestamo')
     )
     edificios = edificio.objects.all()
@@ -394,7 +510,7 @@ def procesar_implemento_AdministradorBienestar(request, idImplemento, estudiante
             
     nombreImplemento = implemento_obj.nombreImplemento
 
-    hora = timezone.now()
+    hora = timezone.now()+timedelta(hours=-5)
 
     context = {
         "fecha_aprobacion": hora,
@@ -404,19 +520,22 @@ def procesar_implemento_AdministradorBienestar(request, idImplemento, estudiante
         "nombreImplemento": nombreImplemento,
         "nombre_estudiante": nombreEstudiante,
         "correo_estudiante": correoEstudiante,
-        "documento_estudiante": estudianteNumeroDocumento
+        "documento_estudiante": estudianteNumeroDocumento,
         }
+    
     
     return render(request, 'Aprobar_prestamo_individual.html', context)
 
 def procesar_aprobar_prestamo(request, idImplemento, estudianteNumeroDocumento, documento_usuario):
     try:
         if request.method == "POST":
-            prestamo_obj = prestamo.objects.get(estudianteNumeroDocumento=estudianteNumeroDocumento) 
+            prestamo_obj = prestamo.objects.filter(estudianteNumeroDocumento=estudianteNumeroDocumento).order_by('-fechaHoraCreacion').first() 
             implemento_obj = implemento.objects.get(pk=idImplemento)
+            # Obtenemos la información del estudiante
+            estudiante_info = usuario.objects.get(numeroDocumento=estudianteNumeroDocumento)
 
             prestamo_obj.administradorBienestarNumeroDocumento_id = documento_usuario
-            prestamo_obj.fechaHoraInicioPrestamo = timezone.now()
+            prestamo_obj.fechaHoraInicioPrestamo = timezone.now() + timedelta(hours=-5)
 
             # Cambiar el estado del prestamo a ACTIVO
             objetoEstadoPrestamoActivo = estadoPrestamo.objects.get(idEstadoPrestamo= "2")
@@ -426,9 +545,49 @@ def procesar_aprobar_prestamo(request, idImplemento, estudianteNumeroDocumento, 
             obejtoEstadoImplementoPrestado = estadoImplemento.objects.get(idEstadoImplemento= "2")
             implemento_obj.estadoImplementoId = obejtoEstadoImplementoPrestado
 
+            #Trazabilidad préstamo
+            idRazonCambio = razonCambio.objects.get(pk=13) #Razón de cambio 13: Préstamo activo
+            prestamo_obj._change_reason = idRazonCambio
+
             prestamo_obj.save()
+
+            #Trazabilidad implemento
+            idRazonCambio = razonCambio.objects.get(pk=12) #Razón de cambio 12: Implemento prestado
+            implemento_obj._change_reason = idRazonCambio
             implemento_obj.save()
 
+            ############## Envio de correo ############################     
+            # Generación del resumen para enviarse por correo
+            subject = "Resumen de aprobación de préstamo"
+            message = ""
+            email_form = settings.EMAIL_HOST_USER
+            recipient_list = [estudiante_info.correoInstitucional]
+
+            # Generar el contenido del correo
+            context = {
+                "nombreEstudiante": estudiante_info.nombres,
+                "nombreImplemento": implemento_obj.nombreImplemento,
+                "fechaCreacion": prestamo_obj.fechaHoraCreacion,
+                "link_login": request.build_absolute_uri(reverse('loginUsuario'))
+            }
+
+            # Renderizar el template html
+            template = get_template("CorreoResumenAprobar.html")
+            content = template.render(context)
+
+            # Armamos el correo a enviar
+
+            email = EmailMultiAlternatives(
+                subject,
+                message,
+                email_form,
+                recipient_list
+            )
+
+            email.attach_alternative(content, "text/html")
+            email.send()
+
+            ###########################################################
             mensaje = f'Se ha realizado la transacción con exito.'
             return redirect(reverse("Mostrar_aprobarPrestamo_tabla") + f'?mensaje={mensaje}')
 

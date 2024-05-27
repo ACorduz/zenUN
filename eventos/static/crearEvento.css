@@ -1,0 +1,81 @@
+@font-face {
+    font-family: 'MiFuente';
+    src: url('../static/AveriaSerifLibre-Regular.ttf') format('truetype');
+}
+
+/*Header*/
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px;
+    background-color: #c0febf;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
+    box-sizing: border-box;
+}
+.header-title {
+    font-family: 'MiFuente', sans-serif;
+    font-size: 30px;
+    text-align: center;    
+}   
+.button-wrapper {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.button-wrapper img[alt="Botón 1"] {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    transform: scaleX(-1);
+    margin-right: 10px;
+}
+.button-wrapper span {
+    font-family: 'MiFuente', sans-serif;
+    font-size: 30px;
+    color: black; 
+}
+.header img[alt="Botón 2"] {
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+}
+/*Header*/
+
+body{
+    font-family: 'MiFuente', sans-serif;
+}
+
+#floatingInput, #floatingSelect, #datetimeInput{
+    max-width: 350px; /* Puedes ajustar este valor según tu preferencia */
+}
+
+/*Footer*/
+.footer{    
+    font-size: small;
+    text-align: right;    
+    align-items: right;
+    padding: 2px;
+    background-color: #c0febf;
+    position: relative;    
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
+    box-sizing: border-box;
+    
+}
+.derechos{
+    border-right: 1.5px solid black;
+    margin-right: 10px;
+    padding-right: 4px;
+}
+/*Footer*/

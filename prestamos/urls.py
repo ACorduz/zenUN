@@ -42,6 +42,9 @@ urlpatterns = [
              name="procesarImplemento"),
         path("aprobarPrestamo/<int:idImplemento>/<int:estudianteNumeroDocumento>/<int:documento_usuario>/",
              views.procesar_aprobar_prestamo,
-             name="procesarPrestamo")
+             name="procesarPrestamo"),
+        path("llamarTareaAsincronica",
+             views.generar_tareaSegundoPlano,
+             name="TareaAsincronica")
 
 ]

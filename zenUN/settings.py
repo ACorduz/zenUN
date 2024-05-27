@@ -165,4 +165,4 @@ if DEBUG:
     EMAIL_HOST_USER="zenununiversidadnacional@gmail.com"
     EMAIL_HOST_PASSWORD="dpuw cgvi rmyp jpnm"
 
-    STATICFILE_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'   
+    STATICFILE_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
