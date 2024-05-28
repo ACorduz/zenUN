@@ -5,7 +5,9 @@
 p {
     margin: 0;
 }
-
+h1 {
+ font-weight: normal;   
+}
 .header {
     display: flex;
     justify-content: space-between;
@@ -69,6 +71,7 @@ body {
     background-size: cover;
     background-position: center;
     position:relative;
+    gap:110px
 }
 
 .footer {

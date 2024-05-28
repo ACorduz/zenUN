@@ -1,30 +1,31 @@
 @font-face {
     font-family: 'MiFuente';
-    src: url('../usuarios/static/AveriaSerifLibre-Regular.ttf') format('truetype');
+    src: url('../static/AveriaSerifLibre-Regular.ttf') format('truetype');
 }
-
-.header{
+p {
+    margin: 0;
+}
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 2px;
     background-color: #c0febf;
-    position: relative;
+    position: sticky;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
     width: 100%;
+    height: 10%;
     box-sizing: border-box;
 }
 
 .header-title {
     font-family: 'MiFuente', sans-serif;
     font-size: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: auto;
+    text-align: center;
+    margin-right: 100px;
 }
 
 .button-wrapper {
@@ -46,103 +47,126 @@
 .button-wrapper span {
     font-family: 'MiFuente', sans-serif;
     font-size: 30px;
-    color: black; 
+    color: black;
 }
 
 .header img[alt="Botón 2"] {
-    width: 2%;
-    height: 2%;
+    width: 80px;
+    height: 80px;
     cursor: pointer;
 }
 
 .sideMenu {
-    width: 20%;
+    width: 30%;
     height: 100%;
     position: fixed;
     background-color: #c0febf;
     color: #fff;
     padding: 20px;
-
     display: flex; /* convierte el contenedor en un contenedor flex */
     justify-content: flex-start; /* centra los elementos hijos horizontalmente */
     flex-direction: column; /* alinea los elementos hijos en una fila */
-    gap: 10%; /* añade un espacio de 10px entre los elementos hijos */
-
-}
-
-.sideMenu button{
-    font-family: 'MiFuente', sans-serif;
-    font-size: 20px;
-    padding: 10px;
-    background-color: gray; 
-    color: white;
-    border: none;
-    cursor: pointer; 
-    border-radius: 10px;
-
-}
-
-body {
-    font-family: 'MiFuente', sans-serif;
-    margin: 0;
-    padding: 0;    
-    justify-content: space-between;
-    align-items: center;
-    min-height: 100vh;
-    background-image: url('../static/registro.jpg');    
-    background-size: cover;
-    background-position: center;
-}
-
-body::after {
-    content: "";
-    background: inherit;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    filter: blur(2px);
-    z-index: -1;
-}
-
-.content {
-    margin-left: 220px;
-    padding: 20px;
-    display: flex;
+    gap: 15%; /* añade un espacio de 10px entre los elementos hijos */
     justify-content: center;
     align-items: center;
 }
 
-#formContainer {
+.sideMenu button{
     font-family: 'MiFuente', sans-serif;
-    background-color: white; /* Esto hará que el fondo del contenedor sea blanco */
-    padding: 20px; /* Esto añadirá un poco de espacio alrededor del contenido del contenedor */
-    border-radius: 10px; /* Esto redondeará las esquinas del contenedor */
+    font-size: 26px;
+    padding: 10px;
+    background-color: lightgrey; 
+    color: black;
+    border: none;
+    cursor: pointer; 
+    border-radius: 10px;
+    width:400px;
+    height:100px;
+    transition: filter 1s; 
 }
 
+#btn1:hover {
+    filter: brightness(70%) saturate(100%);
+    cursor: pointer;
+}
+#btn2:hover {
+    filter: brightness(70%) saturate(100%);
+    cursor: pointer;
+}
+#btn3:hover {
+    filter: brightness(70%) saturate(100%);
+    cursor: pointer;
+}
 
+body {
+    display:flex;
+    flex-direction: column;
+    font-family: 'MiFuente', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    min-width: 100vh;
+    background-image: url('../static/registro.jpg');
+    background-size: cover;
+    background-position: center;
+    position:relative;
+    gap:79px;
+}
+
+.content {
+    display:flex;
+    flex-direction: column;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.container-forms {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 90px;
+}
+
+#formContainer {
+    font-family: 'MiFuente', sans-serif;
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.formVacio{
+    width:496.89px;
+}
 
 input[type="text"],
 input[type="number"],
 input[type="date"] {
+    margin:10px;
     font-family: 'MiFuente', sans-serif;
-    font-size: 16.5px;
-    padding: 10px 0.1px; 
+    font-size: 16px;
+    padding: 10px 15px; 
     width: 93%;
     border-radius: 10px; 
 }
 
+input[type="checkbox"] {
+    margin:5px;
+}
+
 label {
-    text-align: left;
-    font-size: 16px;
+    margin:3px;
 }
 
 button[type="submit"] {
     font-family: 'MiFuente', sans-serif; 
     font-size: 26px; 
-    padding: 2px 15px; 
-    background-color: #2eeb2e7c; 
+    padding: 10px 30px; 
+    background-color: #2eeb2e; 
     color: white;
     border: none;
     cursor: pointer; 
@@ -157,23 +181,33 @@ button[type="submit"]:hover {
     background-color: #6b00b3; 
 }
 
-.footer{    
-    font-size: small;
-    text-align: right;    
-    align-items: right;
-    padding: 2px;
+.footer {
+    display: flex;
+    padding:10px;
     background-color: #c0febf;
-    position: absolute;    
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 1000;
     width: 100%;
+    height:10%;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: auto;
     box-sizing: border-box;
-    
+} 
+.textfooter{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    right: 50px;
+    text-align: end;
 }
-.derechos{
-    border-right: 1.5px solid black;
-    margin-right: 10px;
-    padding-right: 4px;
-}
+
+.lineafooter {
+    position: relative;
+    border-left: 1px solid black; 
+    height: 100px; 
+    margin-left: 10px; 
+    right: 50px;
+ }
