@@ -23,24 +23,23 @@
 </div>
 
 <body>
-<!-- Traer Libreria SweetAlertTwo-->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <!-- Mensaje del backend-->
-  {% if mensaje %}
-    <div class="mensaje-exito">
-      <script>     
-        Swal.fire({
-          position: "top",
-          title: "Aviso Zenun",
-          text: '{{mensaje}}',
-          icon: 'warning',
-          confirmButtonText: 'Aceptar'
-        });
-      </script>
-      <!-- <h4>{{ mensaje }}</h4> -->
-    </div>
-  {% endif %}
-
+    <!-- Traer Libreria SweetAlertTwo-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Mensaje del backend-->
+    {% if mensaje %}
+        <div class="mensaje-exito">
+        <script>     
+            Swal.fire({
+            position: "top",
+            title: "Aviso Zenun",
+            text: '{{mensaje}}',
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+            });
+        </script>
+        <!-- <h4>{{ mensaje }}</h4> -->
+        </div>
+    {% endif %}
     <div class="sideMenu">
         <button id="btn1">Informes eventos</button>
         <button id="btn2">Informes asistencia</button>
@@ -49,7 +48,7 @@
 
     <div class="content">
         <div id="formContainer">
-            <form>
+            <form action="{% url 'procesar_informe_eventos' %}" method="POST">
                 {% csrf_token %}
                 <h1>Generar informes de eventos</h1>
                 <!-- Formulario de informe de eventos -->
@@ -89,7 +88,7 @@
     <script>
         $('#btn1').click(function() {
             $('#formContainer').html(`
-                <form>
+                <form action="{% url 'procesar_informe_eventos' %}" method="POST">
                     {% csrf_token %}
                     <h1>Generar informes de eventos</h1>
                     <!-- Formulario de informe de eventos -->
@@ -119,7 +118,7 @@
 
         $('#btn2').click(function() {
             $('#formContainer').html(`
-                <form>
+                <form action="{% url 'procesar_informe_asistencia' %}" method="POST">
                     {% csrf_token %}
                     <h1>Generar informes de asistencia de eventos</h1>
                     <!-- Formulario de informe de eventos -->
@@ -139,7 +138,7 @@
 
         $('#btn3').click(function() {
             $('#formContainer').html(`
-                <form>
+                <form action="{% url 'procesar_informe_prestamos' %}" method="POST">
                     {% csrf_token %}
                     <h1>Generar informes de prestamo de implementos</h1>
                     <!-- Formulario de informe de eventos -->
