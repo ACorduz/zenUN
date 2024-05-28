@@ -14,7 +14,8 @@ from datetime import datetime
 from django.utils import timezone
 import time
 import random
-
+import base64
+from eventos.models import evento
 
 ########################################Funcionalidad acceso según el ROL#########################
 def role_required(role_name):
@@ -302,6 +303,16 @@ def mostrar_principalAdminMaster(request):
 def cerrar_sesion(request):
     logout(request)
     return redirect(reverse('loginUsuario'))
+
+##Metodo para mostrar la pestaña de los eventos a los que esta inscrito el estudiante
+def mostrar_eventosInscritos(request):
+
+    numeroDocumento = request.user.numeroDocumento
+    eventos = evento.objects.filter(estadoEvento = "1" ,asistentes= numeroDocumento)
+    for evento_ in eventos:
+        evento_.imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')  # Convertir la imagen a base64
+    return render(request, 'eventosInscritos.html', {'eventos': eventos})
+
 
 
 ########################Funcionalidad de Recuperar Contraseña####################################
