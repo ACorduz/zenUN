@@ -69,5 +69,8 @@ urlpatterns = [
          name='ProcesarSeleccionRol'),
     path('principalAdminInformes/',
          views.mostrar_principalAdminMaster,
-         name='principalAdminMaster')
+         name='principalAdminMaster'),
+    path('eventosInscritos/', 
+         views.mostrar_eventosInscritos, 
+         name='eventosInscritos'), #mostrar los eventos que tiene inscritos el estudiante
 ]

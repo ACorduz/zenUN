@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Eventos</title>
+    <title>Eventos Inscritos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{% static 'listaEventos.css' %}">
 </head>
@@ -14,12 +14,12 @@
             <img src="{% static 'icono.png' %}" alt="Botón 1">
             <span>zenUN</span>
         </button>
-        <div class="header-title"><b>Eventos</b></div>
+        <div class="header-title"><b>Eventos Inscritos</b></div>
         <img src="{% static 'perfil.png' %}" alt="Botón 2">
     </div>
     <ul class="eventos-container">
         {% for evento in eventos %}
-            <a href="{% url 'asistirEvento' evento.idEvento %}" class="evento-link">
+            <a href="#" class="evento-link">
                 <li class="evento">
                     <div class="titulo">{{ evento.nombreEvento }}</div>
                     <div class="contenido">

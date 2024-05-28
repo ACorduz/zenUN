@@ -14,7 +14,8 @@ from datetime import datetime
 from django.utils import timezone
 import time
 import random
-
+import base64
+from eventos.models import evento
 
 ########################################Funcionalidad acceso según el ROL#########################
 def role_required(role_name):
@@ -282,13 +283,15 @@ def procesar_seleccionar_rol(request):
 @role_required('Estudiante')
 #Este método se encarga de mostrar la vista de PaginaPrincipal Estudiante
 def mostrar_mainPage_estudiante(request):
+    roles_count = request.user.roles.count()
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
-    return render(request, 'MainPageStudent.html', {'mensaje': mensaje})
+    return render(request, 'MainPageStudent.html', {'mensaje': mensaje,  'roles_count': roles_count})
 
 @role_required('Administrador Bienestar')
 def mostrar_principalAdminBienestar(request):
+    roles_count = request.user.roles.count()
     correo_usuario = request.user.correoInstitucional
-    return render(request,"PrincipalAdminBienestar.html", {'correo':correo_usuario})
+    return render(request,"PrincipalAdminBienestar.html", {'correo':correo_usuario ,'roles_count': roles_count})
 
 @role_required('Administrador Informes')
 def mostrar_principalAdminMaster(request):
@@ -300,6 +303,16 @@ def mostrar_principalAdminMaster(request):
 def cerrar_sesion(request):
     logout(request)
     return redirect(reverse('loginUsuario'))
+
+##Metodo para mostrar la pestaña de los eventos a los que esta inscrito el estudiante
+def mostrar_eventosInscritos(request):
+
+    numeroDocumento = request.user.numeroDocumento
+    eventos = evento.objects.filter(estadoEvento = "1" ,asistentes= numeroDocumento)
+    for evento_ in eventos:
+        evento_.imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')  # Convertir la imagen a base64
+    return render(request, 'eventosInscritos.html', {'eventos': eventos})
+
 
 
 ########################Funcionalidad de Recuperar Contraseña####################################

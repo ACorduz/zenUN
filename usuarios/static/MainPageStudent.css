@@ -215,7 +215,7 @@ transition: filter 1s;
 .cont-menu{
     visibility: hidden;
     width: 100%;
-    height: 170px;
+    height: 230px;
     position: absolute;
     right: 0;
     max-width: 250px;
@@ -251,7 +251,19 @@ transition: filter 1s;
     height: 40px;
     padding-right: 10px;    
 }
+.imgCambiarRol{
+    width: 40px;
+    height: 40px;
+    padding-right: 10px; 
 
+}
+.disabled-link {
+    color: #ccc; /* Cambia el color del texto a gris */
+    pointer-events: none; /* Evita que se puedan hacer clic en el enlace */
+    cursor: not-allowed; /* Cambia el cursor a "no permitido" */
+    text-decoration: none; /* Quita cualquier decoración de texto */
+    opacity: 0.5;
+}
 @media screen and (max-width: 1148px) {
     .container-forms{
         display:block;
