@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Informes</title>
+    <link rel="stylesheet" href="{% static 'vistaPrincipal_informes.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<!-- Encabezado -->
+<div class="header">
+    <a href="{% url 'principalAdminMaster' %}" style="text-decoration: none;">
+        <button class="button-wrapper">
+            <img src="../static/icono.png" alt="Botón 1">
+            <span>zenUN</span>
+        </button>
+    </a>
+    <div class="header-title">Página de genración de eventos</div>
+</div>
+
+<body>
+    <!-- Traer Libreria SweetAlertTwo-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Mensaje del backend-->
+    {% if mensaje %}
+        <div class="mensaje-exito">
+        <script>     
+            Swal.fire({
+            position: "top",
+            title: "Aviso Zenun",
+            text: '{{mensaje}}',
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+            });
+        </script>
+        <!-- <h4>{{ mensaje }}</h4> -->
+        </div>
+    {% endif %}
+    <div class="sideMenu">
+        <button id="btn1">Informes eventos</button>
+        <button id="btn2">Informes asistencia</button>
+        <button id="btn3">Informes prestamos</button>
+    </div>
+
+    <div class="content">
+        <div id="formContainer">
+            <form action="{% url 'procesar_informe_eventos' %}" method="POST">
+                {% csrf_token %}
+                <h1>Generar informes de eventos</h1>
+                <!-- Formulario de informe de eventos -->
+                <label for="fechaInicio"><strong>Fecha de inicio:</strong></label> <br>
+                <input type="date" id="fechaInicio" name="fechaInicio"><br><br>
+
+                <label for="fechaFin"><strong>Fecha de fin:</strong></label> <br>
+                <input type="date" id="fechaFin" name="fechaFin"><br><br>
+
+                <label for="lugarEvento"><strong>Lugar de los eventos:</strong></label><br>
+                <input type="text" id="lugarEvento" name="lugarEvento"><br><br>
+
+                <label> <strong>Elige una o más categorias:</strong> </label><br>
+                <input type="checkbox" id="opcion1" name="opciones" value="opcion1">
+                <label for="opcion1">Bienestar</label><br>
+                <input type="checkbox" id="opcion2" name="opciones" value="opcion2">
+                <label for="opcion2">Semillero</label><br>
+                <input type="checkbox" id="opcion3" name="opciones" value="opcion3">
+                <label for="opcion3">Convocatoria</label><br>
+                <input type="checkbox" id="opcion4" name="opciones" value="opcion4">
+                <label for="opcion4">Torneo</label><br><br>
+
+                <button type="submit">Generar informe</button>
+            </form>
+        </div>
+    </div>
+
+    <div class = "footer">
+        <div class="derechos">@Copyright 2024<br>  
+            Algunos derechos reservados.<br>
+            Contáctenos<br>
+            Acerca de este sitio web<br>
+            Actualización: 04/05/2024
+        </div>        
+    </div>
+
+    <script>
+        $('#btn1').click(function() {
+            $('#formContainer').html(`
+                <form action="{% url 'procesar_informe_eventos' %}" method="POST">
+                    {% csrf_token %}
+                    <h1>Generar informes de eventos</h1>
+                    <!-- Formulario de informe de eventos -->
+                    <label for="fechaInicio"><strong>Fecha de inicio:</strong></label> <br>
+                    <input type="date" id="fechaInicio" name="fechaInicio"><br><br>
+
+                    <label for="fechaFin"><strong>Fecha de fin:</strong></label> <br>
+                    <input type="date" id="fechaFin" name="fechaFin"><br><br>
+
+                    <label for="lugarEvento"><strong>Lugar de los eventos:</strong></label><br>
+                    <input type="text" id="lugarEvento" name="lugarEvento"><br><br>
+
+                    <label><strong>Elige una o más categorias:</strong></label><br>
+                    <input type="checkbox" id="opcion1" name="opciones" value="opcion1">
+                    <label for="opcion1">Bienestar</label><br>
+                    <input type="checkbox" id="opcion2" name="opciones" value="opcion2">
+                    <label for="opcion2">Semillero</label><br>
+                    <input type="checkbox" id="opcion3" name="opciones" value="opcion3">
+                    <label for="opcion3">Convocatoria</label><br>
+                    <input type="checkbox" id="opcion4" name="opciones" value="opcion4">
+                    <label for="opcion4">Torneo</label><br><br>
+
+                    <button type="submit">Generar informe</button>
+                </form>
+            `);
+        });
+
+        $('#btn2').click(function() {
+            $('#formContainer').html(`
+                <form action="{% url 'procesar_informe_asistencia' %}" method="POST">
+                    {% csrf_token %}
+                    <h1>Generar informes de asistencia de eventos</h1>
+                    <!-- Formulario de informe de eventos -->
+                    <label for="idEvento"><strong>ID del evento:</strong></label> <br>
+                    <input type="text" id="idEvento" name="idEvento"><br><br>
+
+                    <label for="lugarEvento"><strong>Lugar de los eventos:</strong></label><br>
+                    <input type="text" id="lugarEvento" name="lugarEvento"><br><br>
+
+                    <label for="nombreEvento"><strong>Nombre del evento:</strong></label> <br>
+                    <input type="text" id="nombreEvento" name="nombreEvento"><br><br>
+
+                    <button type="submit">Generar informe</button>
+                </form>
+            `);
+        });
+
+        $('#btn3').click(function() {
+            $('#formContainer').html(`
+                <form action="{% url 'procesar_informe_prestamos' %}" method="POST">
+                    {% csrf_token %}
+                    <h1>Generar informes de prestamo de implementos</h1>
+                    <!-- Formulario de informe de eventos -->
+                    <label for="fechaInicio"> <strong>Fecha de inicio:</strong></label> <br>
+                    <input type="date" id="fechaInicio" name="fechaInicio"><br><br>
+
+                    <label for="fechaFin"><strong>Fecha de fin:</strong></label> <br>
+                    <input type="date" id="fechaFin" name="fechaFin"><br><br>
+
+                    <label for="idImplemento"><strong>ID del implemento:</strong></label> <br>
+                    <input type="number" id="idImplemento" name="idImplemento"><br><br>
+
+                    <label> <strong> Elige una o más categorias: </strong></label><br>
+                    <input type="checkbox" id="opcion1" name="opciones" value="opcion1">
+                    <label for="opcion1">Reserva</label><br>
+                    <input type="checkbox" id="opcion2" name="opciones" value="opcion2">
+                    <label for="opcion2">Disponible</label><br>
+                    <input type="checkbox" id="opcion3" name="opciones" value="opcion3">
+                    <label for="opcion3">No disponible</label><br><br>
+
+                    <label for="documentoEncargado"><strong>Documento del encargado:</strong></label> <br>
+                    <input type="number" id="documentoEncargado" name="documentoEncargado"><br><br>
+
+                    <button type="submit">Generar informe</button>
+                </form>
+            `);
+        });
+    </script>
+</body>
+
+</html>

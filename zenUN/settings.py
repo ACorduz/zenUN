@@ -23,9 +23,9 @@ AUTH_USER_MODEL = 'usuarios.usuario'
 """ DEPLOY SETTINGS """
 
 # Cuando se realize un pull request en el repositiorio de github, recordar que estas lines son variables de entorno necesarias para el despliegue en Render
-"""SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG')
-ALLOWED_HOSTS = ["*"]"""
+# SECRET_KEY = os.environ.get('SECRET_KEY')
+# DEBUG = os.environ.get('DEBUG')
+# ALLOWED_HOSTS = ["*"]
 
 """ LOCAL SETTINGS"""
 
