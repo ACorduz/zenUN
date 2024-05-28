@@ -254,7 +254,13 @@ transition: filter 1s;
     padding-right: 10px; 
 
 }
-
+.disabled-link {
+    color: #ccc; /* Cambia el color del texto a gris */
+    pointer-events: none; /* Evita que se puedan hacer clic en el enlace */
+    cursor: not-allowed; /* Cambia el cursor a "no permitido" */
+    text-decoration: none; /* Quita cualquier decoración de texto */
+    opacity: 0.5;
+}
 @media screen and (max-width: 1148px) {
     .container-forms{
         display:block;
