@@ -282,13 +282,15 @@ def procesar_seleccionar_rol(request):
 @role_required('Estudiante')
 #Este método se encarga de mostrar la vista de PaginaPrincipal Estudiante
 def mostrar_mainPage_estudiante(request):
+    roles_count = request.user.roles.count()
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
-    return render(request, 'MainPageStudent.html', {'mensaje': mensaje})
+    return render(request, 'MainPageStudent.html', {'mensaje': mensaje,  'roles_count': roles_count})
 
 @role_required('Administrador Bienestar')
 def mostrar_principalAdminBienestar(request):
+    roles_count = request.user.roles.count()
     correo_usuario = request.user.correoInstitucional
-    return render(request,"PrincipalAdminBienestar.html", {'correo':correo_usuario})
+    return render(request,"PrincipalAdminBienestar.html", {'correo':correo_usuario ,'roles_count': roles_count})
 
 @role_required('Administrador Informes')
 def mostrar_principalAdminMaster(request):
