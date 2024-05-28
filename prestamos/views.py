@@ -447,7 +447,6 @@ def mostrar_tabla_disponibilidad_implementos(request, mensaje=None):
     correo_usuario = request.user.correoInstitucional
     return render(request, 'disponibilidad.html', {'implementos': implementos_con_ultimos_prestamos, 'edificios': edificios, 'correo': correo_usuario, 'mensaje': mensaje})
     
-
     # # Obtener la hora actual en UTC
     # hora_actual_utc = timezone.now()
 

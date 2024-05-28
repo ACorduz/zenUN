@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse
 # se va a utilizar la libreria reportLab para hacer los reportes
@@ -7,6 +7,7 @@ from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch, cm 
+from eventos.models import evento, estadoEvento
 
 from django.shortcuts import render
 from eventos.models import evento
@@ -254,3 +255,47 @@ def mostrar_crear_evento(request):
 #Logica para cancelar la inscripción a un evento
 def cancelar_inscripcionEvento(request):
     return render(request, 'asistirEvento.html')
+
+#Logica para cancelar el vento
+
+# def mostrar_cancelar_evento(request):
+#     eventos = evento.objects.all().select_related('categoriaEvento_id', 'edificio_id').prefetch_related('estadoEvento')
+#     eventos_info = []
+#     for e in eventos:
+#         estado = e.estadoEvento.first()  # Obtener el primer estado del evento
+#         eventos_info.append({
+#             'nombre': e.nombreEvento,
+#             'organizador': e.organizador,
+#             'fecha_hora': e.fechaHoraEvento,
+#             'lugar': e.lugar,
+#             'estado': estado.nombreEstadoEvento if estado else '',  # Obtener el nombre del estado o cadena vacía si no hay estado
+#         })
+#     return render(request, 'cancelarEvento.html', {'eventos_info': eventos_info})
+
+def mostrar_cancelar_evento(request):
+    # Filtrar los eventos que tienen el estado "Programado"
+    eventos = evento.objects.filter(estadoEvento__nombreEstadoEvento='Programado').select_related('categoriaEvento_id', 'edificio_id').prefetch_related('estadoEvento')
+    
+    eventos_info = []
+    for e in eventos:
+        estado = e.estadoEvento.first()  # Obtener el primer estado del evento
+        if estado and estado.nombreEstadoEvento == 'Programado':  # Filtrar solo los que tienen estado "Programado"
+            eventos_info.append({
+                'id':e.idEvento,
+                'nombre': e.nombreEvento,
+                'organizador': e.organizador,
+                'fecha_hora': e.fechaHoraEvento,
+                'lugar': e.lugar,
+                'estado': estado.nombreEstadoEvento,
+            })
+    
+    return render(request, 'cancelarEvento.html', {'eventos_info': eventos_info})
+
+def cancelar_evento(request, evento_id):
+    evento_a_cancelar = get_object_or_404(evento, idEvento=evento_id)
+    
+    estado_cancelado = get_object_or_404(estadoEvento, nombreEstadoEvento='Cancelado')
+    evento_a_cancelar.estadoEvento.clear()
+    evento_a_cancelar.estadoEvento.add(estado_cancelado)
+    
+    return redirect('mostrar_cancelar_evento')
