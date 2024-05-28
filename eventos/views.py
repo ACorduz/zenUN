@@ -26,8 +26,15 @@ def mostrar_listaEventos(request):
 
 #######################LOGICA PARA ASISTIR A EVENTO#######################################
 #muestra el resumen del evento que el estudiante de click y al cual el estudiante puede inscribirse
-def mostrar_asistirevento(request):
-    return render(request, 'listaEventos.html')
+def mostrar_asistirEvento(request,evento_id):
+
+    # Pasar los datos al contexto para que puedan ser renderizados y mostrados en el html
+    context = {
+        'evento_id': evento_id
+        }
+
+    print(evento_id)
+    return render(request, 'asistirEvento.html', context)
   
 
 #######################LOGICA PARA GENERAR INFORMES#######################################

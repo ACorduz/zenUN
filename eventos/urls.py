@@ -8,8 +8,8 @@ urlpatterns = [
         views.mostrar_listaEventos, 
         name='eventos'
     ), #Vista asitirEvento
-    path("asistirEvento/",
-        views.mostrar_asistirevento,
+    path("asistirEvento/<int:evento_id>/",
+        views.mostrar_asistirEvento,
         name='asistirEvento'
     ),
     path('generarInformes/',

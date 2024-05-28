@@ -19,7 +19,7 @@
     </div>
     <ul class="eventos-container">
         {% for evento in eventos %}
-            <a href="#" class="evento-link">
+            <a href="{% url 'asistirEvento' evento.idEvento %}" class="evento-link">
                 <li class="evento">
                     <div class="titulo">{{ evento.nombreEvento }}</div>
                     <div class="contenido">
