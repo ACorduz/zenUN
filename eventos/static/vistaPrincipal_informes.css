@@ -205,7 +205,7 @@ button[type="submit"]:hover {
     right: 50px;
  }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1120px) {
     .header{
     display: none;
     }
@@ -224,8 +224,8 @@ button[type="submit"]:hover {
         background-color: transparent;
     }
     #formContainer{
-        left:-124px;
-        bottom:-21px;
+        margin-left:auto;
+        display:block;
     }
     .sideMenu button {
         font-size: 26px;
