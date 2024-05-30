@@ -1,0 +1,134 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de eventos</title>
+    <link rel="stylesheet" href="{% static 'estilos_cancelarEvento.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+<!-- Banner con el título -->
+<div class="header">
+    <button class="button1-wrapper" onclick="window.location.href = '/principalAdminBienestar/';">
+        <img src="{% static 'icono.png' %}" alt="Botón 1">
+        <span>zenUN</span>
+    </button>
+    <div class="header-title">Lista de Eventos Activos</div>
+    <img src="{% static 'perfil.png' %}" alt="Botón 2">
+</div>
+<br>
+<!-- Formulario de búsqueda y filtro -->
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Buscar por nombre...">
+</div>
+<div class="table-container"></div>
+<!-- Tabla de eventos -->
+<table id="tabla-implementos">
+    <tr>
+        <th>Nombre</th>
+        <th>Organizador</th>
+        <th>fecha y hora</th>
+        <th>lugar</th>
+        <th>Cancelar</th>
+    </tr>
+    <!-- Iterar sobre los eventos y mostrarlos en la tabla -->
+    {% for evento_info in eventos_info %}
+    <tr>
+        <td>{{ evento_info.nombre }}</td>
+        <td>{{ evento_info.organizador }}</td>
+        <td>{{ evento_info.fecha_hora }}</td>
+        <td>{{ evento_info.lugar }}</td>
+        {% if evento_info.estado != 'Programado' %}
+            <td><button id="cancelarBtn" type="submit" disabled>Cancelar</button></td>
+        {% else %}
+            <td>
+                <!-- Esta parte se puede editar para cambiar el estado -->
+                <form id="cancelForm{{ forloop.counter }}" method="POST" action="{% url 'cancelar_evento' evento_info.id %}">
+                    {% csrf_token %}
+                    <button class="cancelarBtn" type="button" onclick="confirmarCancelacion('{{ forloop.counter }}')">Cancelar</button>
+                </form>
+            </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+</div>
+<div class="footer">
+    <div class="textfooter">
+        <p><strong>©</strong> Copyright 2024</p>
+        <p>Algunos derechos reservados.</p>
+        <p>Contáctenos</p>
+        <p>Acerca de este sitio web</p>
+        <p>Actualización: <strong>09/05/2024</strong></p>
+    </div>
+    <div class="lineafooter"></div>
+</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#searchInput').on('keyup change', function() {
+            var searchText = $('#searchInput').val().toLowerCase();
+            var anyRowVisible = false; // Variable para verificar si hay alguna fila visible
+            
+            // Restablecer los colores de fondo de todas las filas
+            $('#tabla-implementos tbody tr').not(':first').css('background-color', ''); 
+            
+            // Mostrar todas las filas, excluyendo el encabezado
+            $('#tabla-implementos tbody tr').not(':first').show();
+            
+            // Filtrar las filas de la tabla y ocultar las que no coinciden
+            $('#tabla-implementos tbody tr').not(':first').each(function(index) {
+                var nombre = $(this).find('td:first').text().toLowerCase();
+                
+                // Ocultar las filas que no coinciden con los criterios de búsqueda
+                if (nombre.indexOf(searchText) === -1 && searchText !== '') {
+                    $(this).hide();
+                } else {
+                    anyRowVisible = true; // Marcar que al menos una fila es visible
+                }
+            });
+            
+            // Actualizar el color de fondo de las filas visibles
+            $('#tabla-implementos tbody tr:visible').not(':first').each(function(index) {
+                if (index % 2 === 0) {
+                    $(this).css('background-color', '#f9f9f9'); // Color de fondo para filas pares
+                } else {
+                    $(this).css('background-color', '#e6e6e6'); // Color de fondo para filas impares
+                }
+            });
+            
+            // Mostrar mensaje si no se encontraron resultados y si no se ha mostrado antes
+            if (!anyRowVisible && !$('.no-results-message').length) {
+                $('#tabla-implementos').after('<p class="no-results-message">No se encontraron eventos que coincidan con los criterios de búsqueda.</p>');
+            } else if (anyRowVisible && $('.no-results-message').length) {
+                $('.no-results-message').remove(); // Eliminar el mensaje si se encontraron resultados
+            }
+        });
+    });
+    function confirmarCancelacion(id) {
+        Swal.fire({
+            title: '¡Atención!',
+            text: '¿Estás seguro de que deseas cancelar este evento?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, cancelar',
+            cancelButtonText: 'No, mantener'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('cancelForm' + id).submit();
+                // Muestra un mensaje de confirmación después de cancelar el evento
+                Swal.fire({
+                    title: 'Evento Cancelado',
+                    text: 'El evento ha sido cancelado exitosamente.',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        });
+    }
+</script>
+</html>
