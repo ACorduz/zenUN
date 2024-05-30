@@ -35,5 +35,10 @@ urlpatterns = [
     path('crearEvento/', 
          views.mostrar_crear_evento, 
          name='mostrar_crear_evento'
-    ) #Vista para crear eventos
+    ), #Vista para crear eventos
+    path('cancelarEvento/', 
+         views.mostrar_cancelar_evento, 
+         name='mostrar_cancelar_evento'
+    ), #Vista para crear eventos
+     path('cancelarEvento/<int:evento_id>/', views.cancelar_evento, name='cancelar_evento'),
 ]
