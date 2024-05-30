@@ -426,6 +426,18 @@ def generarCanvas_Reporte_prestamo(lienzo:canvas.Canvas, fechaInicio, fechaFin, 
 
 
 def crearTablaReportLab(data, lienzo:canvas.Canvas, numeroColumnas:int, valorHigh=650, PonerDesdeLimiteAbajo=True, alturaRow=18, anchoCol=3.7 ):
+    """_summary_Este metodo es para crear una tabla pasando unos datos y si necesita pasar de pagina en el PDF \n
+
+    Args:\n
+        \n\t\t data (array): Array de arrays: cada sub array es una fila 
+        \n\t\t lienzo (canvas.Canvas): lienzo canvas
+        \n\t\t numeroColumnas (int): numero de columnas de la tabla
+        \n\t\t valorHigh (int, optional): valor para desde abajo subir la tabla. Defaults to 650.
+        \n\t\t PonerDesdeLimiteAbajo (bool, optional): se pone en 100 la altura de la tabla desde abajo. Defaults to True.
+        \n\t\t alturaRow (int, optional): altura de la fila. Defaults to 18.
+        \n\t\t anchoCol (float, optional): El ancho de la columna. Defaults to 3.7.\n
+       
+    """
     high = valorHigh - (len(data) * alturaRow)
 
     # crear la tabla  y estilizar la tabla
