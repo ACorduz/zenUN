@@ -36,8 +36,9 @@
       });
     </script>
   {% endif %}
-    <div class = "grid-container">        
-        <a id = "aprobarPrestamoButton" href="{% url 'generarInformes' %}"><span class="texto">Informes</span></a>
+    <div class = "grid-container">
+          <!-- Modifique la url, verificar si funciona bien los informes-->
+        <a id = "aprobarPrestamoButton" href="{% url 'mostrar_vista_informes' %}"><span class="texto">Informes</span></a>
         <a id = "devolverPrestamoButton" href="{% url 'verificacionCorreoAdminBienestar' %}"><span class="texto">Registrar Administrador Bienestar</span></a>
         <a id = "crearEventoButton" href=""><span class="texto"></span></a>
         <a style=" display: none;" id = "crearEventoButton" href="{% url 'TareaAsincronica' %}"><span class="texto">Iniciar Tarea</span></a>
