@@ -43,8 +43,10 @@ def mostrar_asistirEvento(request,evento_id):
 # Función para mostrar la vista principal de la sección de informes 
 def mostrar_vista_informes(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    eventos = evento.objects.all()
     contexto = { # pasarle el contexto de lo que haya
                 'mensaje': mensaje,
+                'eventos': eventos,
             }
     # retornar la URL
     return render(request, 'vistaPrincipal_informes.html', contexto)
@@ -108,16 +110,18 @@ def procesar_informe_asistencia(request):
     try:
         if request.method == "POST":
             # Obtener los datos del formulario
-            idEvento = request.POST.get('idEvento')
-            lugarEvento = request.POST.get('lugarEvento')
-            nombreEvento = request.POST.get('nombreEvento')
+            idEvento = int(request.POST.get('selectEvento'))
+            print(idEvento)
+            #lugarEvento = request.POST.get('lugarEvento')
+            #nombreEvento = request.POST.get('nombreEvento')
 
             # LLamar a la URL que hace el informe 
             try:
                 mensaje = "Se esta procesando el informe de asistencia "
 
                 # pasar a la URL los parametros unos como argumentos y otros como cadena de mensaje 
-                cadenaURLParametros = f'?mensaje={mensaje}&idEvento={idEvento}&lugarEvento={lugarEvento}&nombreEvento={nombreEvento}'
+                cadenaURLParametros = f'?mensaje={mensaje}&idEvento={idEvento}'
+                #&lugarEvento={lugarEvento}&nombreEvento={nombreEvento}
                 return redirect(reverse("DescargarInforme_prueba", args=["Informe_asistencia", 3])+ f'{cadenaURLParametros}')   
             
             except Exception as e:
@@ -173,10 +177,11 @@ def descarga_reportes(request,nombreArchivoReporte:str,numeroReporte:int ):
 
     elif numeroReporte ==3:
         # obtener lo que se paso como mensajes por la url 
-        idEvento = request.POST.get('idEvento')
-        lugarEvento = request.POST.get('lugarEvento')
-        nombreEvento = request.POST.get('nombreEvento')
-        generarCanvas_Reporte_Asistencia(lienzo, idEvento, lugarEvento, nombreEvento)
+        idEvento = request.GET.get('idEvento')
+        print(idEvento)
+        #lugarEvento = request.POST.get('lugarEvento')
+        #nombreEvento = request.POST.get('nombreEvento')
+        generarCanvas_Reporte_Asistencia(lienzo, idEvento)
 
     else:
         buffer.close() # Cerrar buffer
@@ -227,11 +232,14 @@ def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, l
     lienzo.drawString(30, 730, "Reporte EVENTOS")
         # header-hora
     lienzo.setFont("Helvetica-Bold", 12)
-    lienzo.drawString(480, 730, "fechaDeAhora")
+    lienzo.drawString(480, 730, "fechaDeAhora")    
     return(None)
     
 # Reporte Asistencia
-def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento, lugarEvento, nombreEvento):
+def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento):
+    eventoSeleccionado = evento.objects.get(pk=idEvento)
+    inscritos = eventoSeleccionado.asistentes.all()
+
     ## header
         #header-titulo
     lienzo.setLineWidth(.3)
@@ -242,7 +250,13 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento, lugarEvento
     lienzo.drawString(x=30, y=750,text='ZenUN')
     lienzo.setFont('Helvetica', 12)
     lienzo.drawString(30, 730, "Reporte ASISTENCIA")
-        # header-hora
+    lienzo.drawString(100,100, eventoSeleccionado.nombreEvento)
+    
+    for personas in inscritos:
+        lienzo.drawString(100,150, personas.correoInstitucional)
+        print(personas.correoInstitucional)
+        
+    # header-hora
     lienzo.setFont("Helvetica-Bold", 12)
     lienzo.drawString(480, 730, "fechaDeAhora")
     return(None)
