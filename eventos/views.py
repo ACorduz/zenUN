@@ -33,6 +33,80 @@ from django.utils import timezone as djangoTimeZone
 
 
 # Create your views here.
+from eventos.models import evento, categoriaEvento
+from prestamos.models import edificio
+from usuarios.models import usuario
+import base64
+
+#######################LOGICA PARA CREAR EVENTOS#######################################
+def mostrar_crear_evento(request):
+    categorias = categoriaEvento.objects.all()
+    edificios = edificio.objects.all()
+    mensaje = request.GET.get('mensaje', '')
+    return render(request, 'crearEvento.html', {'categorias': categorias, 'edificios':edificios, 'mensaje':mensaje})
+
+def procesar_crear_evento(request):
+    try:
+        if request.method == "POST":
+            #validar que el formato del archivo sea solamente de imágen
+            if 'archivo' not in request.FILES:
+                mensaje = 'No se ha subido ningún archivo.'
+            else:
+                archivo = request.FILES['archivo']
+                max_size = 2 * 1024 * 1024  # 2MB
+                
+                # Verificar el tipo de archivo
+                if not archivo.content_type.startswith('image/'):
+                    mensaje = 'Solo se permiten archivos de imagen.'
+                    #Verificar el tamaño del archivo
+                elif archivo.size > max_size:
+                    mensaje = 'El archivo es demasiado grande. El tamaño máximo permitido es 2MB.'
+                else:
+                    #crear el evento
+                    fechaHoraCreacion = timezone.now().replace(second=0, microsecond=0)
+                    administradorBienestarId =  usuario.objects.get(numeroDocumento=request.user.numeroDocumento)
+                    nombreEvento = request.POST.get("nombreEvento")
+                    categoriaEvento_ = int(request.POST.get("categoria"))
+                    cat_Evento = categoriaEvento.objects.get(pk=categoriaEvento_)
+                    organizador = request.POST.get("organizador")
+                    fechaHoraEvento = request.POST.get("fechaHoraEvento")
+                    edificioId_ = int(request.POST.get("edificio"))
+                    edificio_ = edificio.objects.get(pk=edificioId_)
+                    lugar = request.POST.get("lugar")
+                    descripcion = request.POST.get("descripcion")
+                    aforo = int(request.POST.get("aforo"))
+                    
+                    # Leer los datos binarios del archivo
+                    datos_binarios = archivo.read()
+
+                    evento_ = evento(
+                    fechaHoraCreacion=fechaHoraCreacion,
+                    numeroDocumento_AdministradorBienestar=administradorBienestarId,
+                    nombreEvento=nombreEvento,
+                    categoriaEvento_id=cat_Evento,
+                    organizador=organizador,
+                    fechaHoraEvento=fechaHoraEvento,
+                    edificio_id=edificio_,
+                    lugar=lugar,
+                    flyer=datos_binarios,
+                    descripcion=descripcion,
+                    aforo=aforo
+                    )
+
+                    evento_.save()
+
+                    #Asignación del estado PROGRAMADO
+                    evento_.estadoEvento.add(evento_.idEvento, 1)
+
+                    mensaje = 'Evento creado exitosamente!'
+                    return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
+
+    except Exception as e:
+            mensaje = f"Ocurrió un error: {str(e)}"
+            return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
+
+    return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
+
 #######################LOGICA PARA LISTA DE EVENTOS#######################################
 
 
