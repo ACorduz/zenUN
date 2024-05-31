@@ -15,12 +15,11 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import (SimpleDocTemplate, PageBreak, Image, Spacer,
 Paragraph, Table, TableStyle, )
 from reportlab.lib import colors
-from eventos.models import evento, estadoEvento
 
 import base64
 
 # llamar a los modelos de la BD
-from eventos.models import evento
+from eventos.models import evento, estadoEvento, categoriaEvento
 from prestamos.models import prestamo, implemento, estadoPrestamo
 from usuarios.models import usuario
 from django.db.models import Count
@@ -33,7 +32,6 @@ from django.utils import timezone as djangoTimeZone
 
 
 # Create your views here.
-from eventos.models import evento, categoriaEvento
 from prestamos.models import edificio
 from usuarios.models import usuario
 import base64
@@ -582,9 +580,6 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento, lugarEvento
     return(None)
 
 #######################LOGICA PARA CREAR EVENTOS#######################################
-def mostrar_crear_evento(request):
-    return render(request, 'crearEvento.html')
-
 #Logica para cancelar la inscripción a un evento
 def cancelar_inscripcionEvento(request):
     return render(request, 'asistirEvento.html')
