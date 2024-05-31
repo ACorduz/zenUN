@@ -74,15 +74,15 @@ def procesar_informe_prestamos(request):
             # Obtener los datos del formulario
             fechaInicio = request.POST.get('fechaInicio')
             fechaFin = request.POST.get('fechaFin')
-            idImplemento = request.POST.get('idImplemento')
-            documentoEncargado = request.POST.get('documentoEncargado')
+            nombreImplemento = request.POST.get('nombreImplemento')
+            
 
             # LLamar a la URL que hace el informe 
             try:
                 mensaje = "Se esta procesando el informe de prestamos "
 
                 # pasar a la URL los parametros unos como argumentos y otros como cadena de mensaje 
-                cadenaURLParametros = f'?mensaje={mensaje}&fechaInicio={fechaInicio}&fechaFin={fechaFin}&idImplemento={idImplemento}&documentoEncargado={documentoEncargado}'
+                cadenaURLParametros = f'?mensaje={mensaje}&fechaInicio={fechaInicio}&fechaFin={fechaFin}&nombreImplemento={nombreImplemento}'
                 return redirect(reverse("DescargarInforme_prueba", args=["Informe_prestamos", 1])+ f'{cadenaURLParametros}')   
             
             except Exception as e:
@@ -176,7 +176,8 @@ def descarga_reportes(request,nombreArchivoReporte:str,numeroReporte:int ):
         # obtener lo que se paso como mensajes por la url 
         fechaInicio = request.GET.get('fechaInicio')
         fechaFin = request.GET.get('fechaFin')
-        nombreImplemento = "JENGA" #request.GET.get('idImplemento')
+        nombreImplemento = request.GET.get('nombreImplemento') 
+        print(nombreImplemento)
         generarCanvas_Reporte_prestamo(lienzo, fechaInicio, fechaFin, nombreImplemento)  
 
     elif numeroReporte ==2:
