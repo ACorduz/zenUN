@@ -74,7 +74,7 @@ def procesar_informe_prestamos(request):
             # Obtener los datos del formulario
             fechaInicio = request.POST.get('fechaInicio')
             fechaFin = request.POST.get('fechaFin')
-            nombreImplemento = request.POST.get('nombreImplemento')
+            nombreImplemento = request.POST.get('nombreImplemento', "")
             
 
             # LLamar a la URL que hace el informe 
@@ -101,14 +101,15 @@ def procesar_informe_eventos(request):
             # Obtener los datos del formulario
             fechaInicio = request.POST.get('fechaInicio')
             fechaFin = request.POST.get('fechaFin')
-            lugarEvento = request.POST.get('lugarEvento')
-
+            lugarEvento = request.POST.get('lugarEvento', "")
+            opciones_seleccionadas = request.POST.getlist('opciones', "")
+        
             # LLamar a la URL que hace el informe 
             try:
                 mensaje = "Se esta procesando el informe de eventos"
 
                 # pasar a la URL los parametros unos como argumentos y otros como cadena de mensaje 
-                cadenaURLParametros = f'?mensaje={mensaje}&fechaInicio={fechaInicio}&fechaFin={fechaFin}&lugarEvento={lugarEvento}'
+                cadenaURLParametros = f'?mensaje={mensaje}&fechaInicio={fechaInicio}&fechaFin={fechaFin}&lugarEvento={lugarEvento}&opciones_seleccionadas={opciones_seleccionadas}'
                 return redirect(reverse("DescargarInforme_prueba", args=["Informe_eventos", 2])+ f'{cadenaURLParametros}')   
             
             except Exception as e:
@@ -125,8 +126,6 @@ def procesar_informe_asistencia(request):
     try:
         if request.method == "POST":
             # Obtener los datos del formulario
-            idEvento = request.POST.get('idEvento')
-            lugarEvento = request.POST.get('lugarEvento')
             nombreEvento = request.POST.get('nombreEvento')
 
             # LLamar a la URL que hace el informe 
@@ -134,7 +133,7 @@ def procesar_informe_asistencia(request):
                 mensaje = "Se esta procesando el informe de asistencia "
 
                 # pasar a la URL los parametros unos como argumentos y otros como cadena de mensaje 
-                cadenaURLParametros = f'?mensaje={mensaje}&idEvento={idEvento}&lugarEvento={lugarEvento}&nombreEvento={nombreEvento}'
+                cadenaURLParametros = f'?mensaje={mensaje}&nombreEvento={nombreEvento}'
                 return redirect(reverse("DescargarInforme_prueba", args=["Informe_asistencia", 3])+ f'{cadenaURLParametros}')   
             
             except Exception as e:
@@ -177,7 +176,6 @@ def descarga_reportes(request,nombreArchivoReporte:str,numeroReporte:int ):
         fechaInicio = request.GET.get('fechaInicio')
         fechaFin = request.GET.get('fechaFin')
         nombreImplemento = request.GET.get('nombreImplemento') 
-        print(nombreImplemento)
         generarCanvas_Reporte_prestamo(lienzo, fechaInicio, fechaFin, nombreImplemento)  
 
     elif numeroReporte ==2:
@@ -185,15 +183,14 @@ def descarga_reportes(request,nombreArchivoReporte:str,numeroReporte:int ):
         fechaInicio = request.GET.get('fechaInicio')
         fechaFin = request.GET.get('fechaFin')
         lugarEvento = request.GET.get('lugarEvento')
+        opciones_seleccionadas = request.GET.get("opciones_seleccionadas")
         # print(f"\n\n{fechaInicio}\n")
-        generarCanvas_Reporte_Eventos(lienzo, fechaInicio, fechaFin, lugarEvento)
+        generarCanvas_Reporte_Eventos(lienzo, fechaInicio, fechaFin, lugarEvento, opciones_seleccionadas)
 
     elif numeroReporte ==3:
         # obtener lo que se paso como mensajes por la url 
-        idEvento = request.POST.get('idEvento')
-        lugarEvento = request.POST.get('lugarEvento')
         nombreEvento = request.POST.get('nombreEvento')
-        generarCanvas_Reporte_Asistencia(lienzo, idEvento, lugarEvento, nombreEvento)
+        generarCanvas_Reporte_Asistencia(lienzo, nombreEvento)
 
     else:
         buffer.close() # Cerrar buffer
@@ -468,7 +465,9 @@ def crearTablaReportLab(data, lienzo:canvas.Canvas, numeroColumnas:int, valorHig
 
 
 # Reporte Eventos 
-def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, lugarEvento):
+def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, lugarEvento, opciones_seleccionadas):
+    ## OJO opciones_seleccionadas ES UNA ARRAY 
+
     ## header
         #header-titulo
     lienzo.setLineWidth(.3)
@@ -489,7 +488,7 @@ def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, l
 
     
 # Reporte Asistencia
-def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento, lugarEvento, nombreEvento):
+def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, nombreEvento):
     ## header
         #header-titulo
     lienzo.setLineWidth(.3)
