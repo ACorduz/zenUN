@@ -10,6 +10,24 @@
     <link rel="stylesheet" href="{% static 'crearEvento.css' %}">
 </head>
 <body>
+
+<!-- Traer Libreria SweetAlertTwo-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Mensaje del backend-->
+  {% if mensaje %}
+    <div class="mensaje-exito">
+      <script>     
+        Swal.fire({
+          position: "top",
+          title: "Aviso Zenun",
+          text: '{{mensaje}}',
+          icon: 'warning',
+          confirmButtonText: 'Aceptar'
+        });
+      </script>
+    </div>
+    {% endif %}
+
     <div class="header">
         <button class="button-wrapper" onclick="window.location.href = '../principalAdminBienestar'">
             <img src="{% static 'icono.png' %}" alt="Botón 1">
@@ -25,54 +43,55 @@
         <div class="row">
             <div class="col-sm-5 col-md-6">
                 <h2>Datos del evento</h2>
-                <form action="">
+                <form action="{% url 'procesar_crear_evento' %}" method="POST" enctype="multipart/form-data" onsubmit="return validarFormulario();">
+                    {% csrf_token %}
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInput" name="nombreEvento" placeholder="Ej: Reunion de Semillero">
+                        <input type="text" class="form-control" id="floatingInput" name="nombreEvento" placeholder="Ej: Reunion de Semillero" required>
                         <label for="floatingInput">Nombre del evento</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInput" name="organizador" placeholder="Ej: Semillero Uqbar">
+                        <input type="text" class="form-control" id="floatingInput" name="organizador"  required placeholder="Ej: Semillero Uqbar" required>
                         <label for="floatingInput">Organizador</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                        <select name="categoria" class="form-select" id="floatingSelect" aria-label="Floating label select example" required>
                         <option selected>Seleccione la categoría del evento</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.idCategoriaEvento }}"> {{ categoria.nombreCategoriaEvento }}</option>
+                        {% endfor %}
                         </select>
                         <label for="floatingSelect">Categoría</label>
                     </div>
 
                     <div class="mb-3">
                         <label for="datetimeInput" class="form-label">Fecha y Hora:</label>
-                        <input type="datetime-local" class="form-control" id="datetimeInput" name="fechaHoraEvento">
+                        <input required type="datetime-local" class="form-control" id="datetimeInput" name="fechaHoraEvento" required>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="edificio">
+                        <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="edificio" required>
                         <option selected>Seleccione el edificio para el evento</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        {% for edificio in edificios %}
+                            <option value="{{ edificio.idEdificio }}"> {{ edificio.nombreEdificio }}</option>
+                        {% endfor %}
                         </select>
                         <label for="floatingSelect">Edificio</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInput" name="lugar" placeholder="Ej: Salón 305">
+                        <input type="text" class="form-control" id="floatingInput" name="lugar" placeholder="Ej: Salón 305" required>
                         <label for="floatingInput">Lugar</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="number" class="form-control" id="floatingInput" name="aforo" placeholder="Ej: 50">
+                        <input type="number" class="form-control" id="floatingInput" name="aforo" placeholder="Ej: 50" required>
                         <label for="floatingInput">Aforo</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <textarea class="form-control" name="descripcion" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px; width: 350px;"></textarea>
+                        <textarea class="form-control" name="descripcion" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px; width: 350px;" required></textarea>
                         <label for="floatingTextarea2">Descripción</label>
                     </div>
             </div>
@@ -81,15 +100,15 @@
                 <div class="mb-3">
                     <div id="previsualizacionArchivo" class="mt-3 mb-5" style="width: 500px; height: 500px;  overflow: hidden;"></div>
                     <label for="archivoInput" class="form-label">Subir Archivo:</label>
-                    <input type="file" class="form-control" id="archivoInput" name="archivo" onchange="previsualizarArchivo(this)">    
+                    <input type="file" class="form-control" id="archivoInput" accept="image/*" name="archivo" onchange="previsualizarArchivo(this)" required>    
                 </div>
             </div>
 
-            <div>
+            <div class="col-md-6 mb-3">
                 <button type="submit">Crear Evento</button>
                 <button type="button" onclick="window.location.href='../cancelarEvento'">Cancelar Evento</button>
             </div>
-
+                
                 </form>
         </div>
     </div>
@@ -125,7 +144,92 @@
         
         reader.readAsDataURL(archivo);
     }
+
+    function previsualizarArchivo(input) {
+        const file = input.files[0];
+        const maxSize = 2 * 1024 * 1024; // 2MB en bytes
+
+        if (file.size > maxSize) {
+            alert('El archivo es demasiado grande. El tamaño máximo permitido es 2MB.');
+            input.value = ''; // Limpia el archivo seleccionado
+            return;
+        }
+
+        const preview = document.getElementById('previsualizacionArchivo');
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.style.backgroundImage = `url(${e.target.result})`;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+    function validarFormulario() {
+        // Obtener referencias a los campos del formulario
+        var nombreEvento = document.getElementById('nombreEvento');
+        var organizador = document.getElementById('organizador');
+        var categoria = document.getElementById('categoria');
+        var fechaHoraEvento = document.getElementById('datetimeInput');
+        var edificio = document.getElementById('edificio');
+        var lugar = document.getElementById('lugar');
+        var aforo = document.getElementById('aforo');
+        var descripcion = document.getElementById('descripcion');
+        var archivo = document.getElementById('archivoInput');
+
+        // Validar cada campo individualmente
+        if (nombreEvento.value === '') {
+            alert('Por favor, ingrese el nombre del evento.');
+            return false;
+        }
+
+        if (organizador.value === '') {
+            alert('Por favor, ingrese el organizador del evento.');
+            return false;
+        }
+
+        if (categoria.value === '') {
+            alert('Por favor, seleccione la categoría del evento.');
+            return false;
+        }
+
+        if (fechaHoraEvento.value === '') {
+            alert('Por favor, seleccione la fecha y hora del evento.');
+            return false;
+        }
+
+        if (edificio.value === '') {
+            alert('Por favor, seleccione el edificio para el evento.');
+            return false;
+        }
+
+        if (lugar.value === '') {
+            alert('Por favor, ingrese el lugar del evento.');
+            return false;
+        }
+
+        if (aforo.value === '') {
+            alert('Por favor, ingrese el aforo del evento.');
+            return false;
+        }
+
+        if (descripcion.value === '') {
+            alert('Por favor, ingrese la descripción del evento.');
+            return false;
+        }
+
+        if (archivo.value === '') {
+            alert('Por favor, seleccione un archivo para subir.');
+            return false;
+        }
+
+        // Si todos los campos son válidos, enviar el formulario
+        return true;
+    }
 </script>
+
+
 
 </body>
 
