@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse
 
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.utils import timezone
+from datetime import datetime
 # se va a utilizar la libreria reportLab para hacer los reportes
 import os
 from io import BytesIO
@@ -507,8 +510,6 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento, lugarEvento
 #######################LOGICA PARA CREAR EVENTOS#######################################
 def mostrar_crear_evento(request):
     return render(request, 'crearEvento.html')
-
-    return render(request, 'asistirEvento.html')
 
 #Logica para cancelar la inscripción a un evento
 def cancelar_inscripcionEvento(request):
