@@ -572,8 +572,6 @@ def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, l
     
 # Reporte Asistencia
 def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento):
-    eventoSeleccionado = evento.objects.get(pk=idEvento)
-    inscritos = eventoSeleccionado.asistentes.all()
 
     ## header
         #header-titulo
@@ -585,6 +583,110 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento):
     lienzo.drawString(x=30, y=750,text='ZenUN')
     lienzo.setFont('Helvetica', 12)
     lienzo.drawString(30, 730, "Reporte ASISTENCIA")
+
+        # header-hora
+    hora_inicio_reserva = djangoTimeZone.now() + timedelta(hours=-5)
+    fecha_formateada = hora_inicio_reserva.strftime('%Y-%m-%d %H:%M:%S') # Formatear la fecha y hora
+
+    lienzo.setFont("Helvetica-Bold", 12)
+    lienzo.drawString(350, 750, f"Fecha Reporte: {fecha_formateada}")
+   
+
+    ## --------------ARRAY DE DATOS PARA LAS TABLAS ----------------
+    data = []   # Datos de la tabla se pasan mediante un array de arrays 
+    # SACAR DATOS BD 
+    BDDatos = []    
+    eventoSeleccionado = evento.objects.get(pk=idEvento)
+    inscritos = eventoSeleccionado.asistentes.all()
+    for persona in inscritos:
+        row = [
+            persona.apellidos,
+            persona.nombres,
+            persona.correoInstitucional,
+            persona.numeroDocumento,
+            ""
+        ]
+        BDDatos.append(row)
+
+    #Ordena la lista de inscritos por orden alfabético
+    BDDatos.sort(key = lambda x: (x[0].lower(),x[1].lower(),x[3],x[4])) #Primero intenta ordenas por el apellido, si coincide, orden por nombre y sucesivamente
+
+     ## --------------DATOS DEL EVENTO QUE SE GENERA ----------------
+   
+    nombreEvento = eventoSeleccionado.nombreEvento
+    organizador = eventoSeleccionado.organizador
+    fechaEvento = eventoSeleccionado.fechaHoraEvento
+    aforo = eventoSeleccionado.aforo
+    asistentesInscritos = len(BDDatos)
+
+    lienzo.setFont('Helvetica', 10)
+    lienzo.drawString(30, 700, "Nombre evento: "+ nombreEvento)
+    lienzo.drawString(30, 685, "Organizador: "+ organizador)
+    lienzo.drawString(30, 670, "Fecha evento: "+ fechaEvento.strftime('%Y-%m-%d %H:%M:%S'))
+    lienzo.drawString(30, 655, "Aforo: "+ str(aforo))
+    lienzo.drawString(30, 640, "Inscritos: "+ str(asistentesInscritos))
+    #----- CREACION ESTILOS---------
+    # Llamar a los Estilos
+    styles = getSampleStyleSheet() # nos da una lista de estilos a escoger de la biblioteca
+    
+    # Creacion estilo <-- header tabla
+    styleHeaderTable = ParagraphStyle('styleHeaderTable',  
+        parent= styles['Heading1'],
+        fontSize=10, 
+        alignment=1  # Center alignment
+    )
+
+    # Creacion estilo <-- contenido tabla   
+    styleN = ParagraphStyle('p',  
+        parent=styles["BodyText"],
+        fontSize=7, 
+        alignment=1  # Center alignment
+    )
+
+    # Títulos de las columnas (primera fila)
+    # Paragraph <-- le da estilo a un texto 
+    #                       texto           , estilo 
+    apellidos           = Paragraph('Apellidos', styleHeaderTable)
+    nombres             = Paragraph('Nombres', styleHeaderTable)
+    correoInstitucional = Paragraph('Correo Institucional', styleHeaderTable)
+    numeroDocumento     = Paragraph('Número Documento', styleHeaderTable) 
+    firma               = Paragraph('Firma', styleHeaderTable) 
+
+    # Pasar datos al (array data)
+    data.append([apellidos, nombres, correoInstitucional, numeroDocumento, firma])
+
+     # Variable HIGH para saber cuanto mover la tabla relativamente hacia arriba 
+    high = 700    
+
+    # Agregar (datos BD) al (array data)
+    for datoBd in BDDatos:
+        row = []
+        for item in datoBd:
+            # Poner estilo a ese dato
+            dato = Paragraph(str(item), styleN)
+            row.append(dato)
+
+        high -= 18
+        data.append(row)
+
+        # CAMBIAR PAGINA, si se pasa de un numero de datos o high especifico 
+        if high < 360:
+            # Poner tabla en el CANVAS
+            crearTablaReportLab(data, lienzo, 5, valorHigh= 700, PonerDesdeLimiteAbajo = True, alturaRow= 18, anchoCol= 3.7)
+
+            # Cambiar el high a 750, ya que alcanzo limite pagina 
+            high = 750
+            
+            # Limpiar datos del array de datos de la tabla 
+            data.clear() 
+
+            # Agregar los (nombres Columnas) a la tabla otra vez 
+            data.append([apellidos, nombres, correoInstitucional, numeroDocumento, firma])
+
+    # PARA LOS DATOS RESTANTES, si falto dibujar una parte de la tabla
+    crearTablaReportLab(data, lienzo, 5, valorHigh=600, PonerDesdeLimiteAbajo = False, alturaRow= 20, anchoCol= 3.7)
+
+    """
     lienzo.drawString(100,100, eventoSeleccionado.nombreEvento)
     
     for personas in inscritos:
@@ -594,6 +696,7 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento):
     # header-hora
     lienzo.setFont("Helvetica-Bold", 12)
     lienzo.drawString(480, 730, "fechaDeAhora")
+    """
     return(None)
 
 #######################LOGICA PARA CREAR EVENTOS#######################################
