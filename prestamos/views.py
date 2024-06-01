@@ -114,7 +114,7 @@ def generar_tareaSegundoPlano(request):
 
     hora_actual = timezone.now() #+ timedelta(hours=-5)
     # Agrega la tarea programada al planificador que se ejecuta 15 minutos despues de realizar la reserva
-    scheduler.add_job(verificar_tiempoReserva, 'date', run_date=hora_actual + timedelta(minutes=15), args=[request])
+    scheduler.add_job(verificar_tiempoReserva, 'date', run_date=hora_actual + timedelta(minutes=16), args=[request])
 
     # Inicia el planificador
     scheduler.start()

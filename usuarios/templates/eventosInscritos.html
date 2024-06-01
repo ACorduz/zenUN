@@ -4,11 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventos Inscritos</title>
+    <title>Lista de Eventos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{% static 'listaEventos.css' %}">
 </head>
 <body>
+    <!-- Traer Libreria SweetAlertTwo-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Mensaje del backend-->
+    {% if mensaje %}
+    <script>
+        Swal.fire({
+        position: "top",
+        title: "Aviso Zenun",
+        text: '{{mensaje}}',
+        icon: 'warning',
+        confirmButtonText: 'Aceptar'
+        });
+    </script>
+    {% endif %}
     <div class="header">
         <button class="button-wrapper" onclick="window.location.href = '/paginaPrincipalEstudiante/';">
             <img src="{% static 'icono.png' %}" alt="Botón 1">
@@ -19,7 +33,7 @@
     </div>
     <ul class="eventos-container">
         {% for evento in eventos %}
-            <a href="#" class="evento-link">
+            <a href="{% url 'detalleEventosInscritos' evento.idEvento %}" class="evento-link">
                 <li class="evento">
                     <div class="titulo">{{ evento.nombreEvento }}</div>
                     <div class="contenido">
