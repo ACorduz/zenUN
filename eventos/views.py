@@ -79,31 +79,37 @@ def procesar_crear_evento(request):
                     lugar = request.POST.get("lugar")
                     descripcion = request.POST.get("descripcion")
                     aforo = int(request.POST.get("aforo"))
-                    
-                    # Leer los datos binarios del archivo
-                    datos_binarios = archivo.read()
 
-                    evento_ = evento(
-                    fechaHoraCreacion=fechaHoraCreacion,
-                    numeroDocumento_AdministradorBienestar=administradorBienestarId,
-                    nombreEvento=nombreEvento,
-                    categoriaEvento_id=cat_Evento,
-                    organizador=organizador,
-                    fechaHoraEvento=fechaHoraEvento,
-                    edificio_id=edificio_,
-                    lugar=lugar,
-                    flyer=datos_binarios,
-                    descripcion=descripcion,
-                    aforo=aforo
-                    )
+                    # Verificar si hay un evento programado en el mismo edificio, lugar y fechaHora
+                    evento_existente = evento.objects.get(edificio_id=edificio_, lugar=lugar, fechaHoraEvento=fechaHoraEvento)
+                    if evento_existente:
+                        mensaje = 'Ya hay un evento programado en este lugar y fecha. Por favor, elige otro lugar o fecha.'
+                        return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
+                    else:
+                        # Leer los datos binarios del archivo
+                        datos_binarios = archivo.read()
 
-                    evento_.save()
+                        evento_ = evento(
+                        fechaHoraCreacion=fechaHoraCreacion,
+                        numeroDocumento_AdministradorBienestar=administradorBienestarId,
+                        nombreEvento=nombreEvento,
+                        categoriaEvento_id=cat_Evento,
+                        organizador=organizador,
+                        fechaHoraEvento=fechaHoraEvento,
+                        edificio_id=edificio_,
+                        lugar=lugar,
+                        flyer=datos_binarios,
+                        descripcion=descripcion,
+                        aforo=aforo
+                        )
 
-                    #Asignación del estado PROGRAMADO
-                    evento_.estadoEvento.add(evento_.idEvento, 1)
+                        evento_.save()
 
-                    mensaje = 'Evento creado exitosamente!'
-                    return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
+                        #Asignación del estado PROGRAMADO
+                        evento_.estadoEvento.add(evento_.idEvento, 1)
+
+                        mensaje = 'Evento creado exitosamente!'
+                        return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
 
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}"
