@@ -16,6 +16,9 @@ from reportlab.platypus import (SimpleDocTemplate, PageBreak, Image, Spacer,
 Paragraph, Table, TableStyle, )
 from reportlab.lib import colors
 
+from django.shortcuts import render
+from eventos.models import evento
+from usuarios.models import usuario
 import base64
 
 # llamar a los modelos de la BD
@@ -28,15 +31,19 @@ from django.db.models import Count
 from datetime import datetime, timedelta, timezone
 from django.utils import timezone as djangoTimeZone
 
+#Importaciones para enviar el correo
+from django.conf import settings
+from django.template.loader import get_template
+from django.core.mail import EmailMultiAlternatives
 
-
-
-# Create your views here.
 from prestamos.models import edificio
 from usuarios.models import usuario
 import base64
+from functools import wraps
 
+# Create your views here.
 #######################LOGICA PARA CREAR EVENTOS#######################################
+
 def mostrar_crear_evento(request):
     categorias = categoriaEvento.objects.all()
     edificios = edificio.objects.all()
@@ -106,18 +113,13 @@ def procesar_crear_evento(request):
     return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
 
 #######################LOGICA PARA LISTA DE EVENTOS#######################################
-
-
-
-#######################LOGICA PARA EL CASO DE USO ASISTIR EVENTO#######################################
 #Muestra la lista de todos los eventos a los que el estudiante se puede inscribir
 def mostrar_listaEventos(request):
-    eventos = evento.objects.filter(estadoEvento = "1")
+    eventos = evento.objects.filter(estadoEvento = "1").order_by('fechaHoraEvento')
     for evento_ in eventos:
         evento_.imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')  # Convertir la imagen a base64
     return render(request, 'listaEventos.html', {'eventos': eventos})
 
-#######################LOGICA PARA ASISTIR A EVENTO#######################################
 #muestra el resumen del evento que el estudiante de click y al cual el estudiante puede inscribirse
 def mostrar_asistirEvento(request, evento_id):
     evento_ = get_object_or_404(evento, idEvento=evento_id)
@@ -126,14 +128,91 @@ def mostrar_asistirEvento(request, evento_id):
         'evento_id': evento_id,
         'nombre_evento': evento_.nombreEvento,
         'organizador': evento_.organizador,
-        'categoria': evento_.categoriaEvento_id,
+        'categoria': evento_.categoriaEvento_id.nombreCategoriaEvento,
         'fecha_hora_evento': evento_.fechaHoraEvento,
         'lugar': evento_.lugar,
         'descripcion_evento': evento_.descripcion,
         'imagen_base64': imagen_base64
     }
     return render(request, 'asistirEvento.html', context)
-  
+
+def guardar_informacionInscripcion(request,evento_id):
+    numeroDocumentoUser = request.user.numeroDocumento
+    usuario_ = usuario.objects.get(numeroDocumento=numeroDocumentoUser)
+    evento_ = evento.objects.get(idEvento=evento_id)
+
+    ###Logica para la validación de no poder inscribirse a otro evento en el mismo horario.
+    fecha_evento = evento_.fechaHoraEvento
+    evento1 = evento.objects.filter(fechaHoraEvento = fecha_evento, asistentes= numeroDocumentoUser).exclude(idEvento=evento_id)
+
+    if evento1.exists(): 
+        print("No se puede inscribir a este evento por que se cruza con otros eventos en el mismos horario")
+
+        mensaje = f"No se puede inscribir a este evento por que se cruza con otro eventos en el mismo horario" # solo se le pasaria el mensaje en la URL 
+        return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
+    else:
+ 
+        #Logica para verificar que el usuario no este inscrito ya en este evento
+        if not evento_.asistentes.filter(numeroDocumento=numeroDocumentoUser).exists():
+            evento_.asistentes.add(usuario_)  # Establece los asistentes del evento como el usuario dado
+            evento_.save()  # Guarda el evento actualizado
+            print("El usuario fue agregado")
+            Proceso_enviarCorreo_inscripcionExitosa(numeroDocumentoUser,evento_id)
+            return render(request, 'inscripcionExitosa.html')
+        
+        else:
+            print("El usuario ya esta inscrito en este evento")
+            mensaje = f"El usuario ya esta inscrito en este evento"
+            return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
+    
+def Proceso_enviarCorreo_inscripcionExitosa(numeroDocumento,evento_id):
+    try: 
+        # obtener el correo del usuario
+        usuarioObject = usuario.objects.get(numeroDocumento = numeroDocumento)
+        correoUsuario = usuarioObject.correoInstitucional
+        # no se verifica si el correo ingresado existe pues para llamar a este metodo ya deberia haberse verificado esto    
+
+        #Datos del evento para enviar por correo
+        evento_ = get_object_or_404(evento, idEvento=evento_id)
+        imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')
+        nombreEvento = evento_.nombreEvento
+        nombreLugar = evento_.lugar
+        fechaEvento = evento_.fechaHoraEvento
+
+        #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
+        subject = "Tu inscripción fue un exito"
+        message = ""
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [correoUsuario]
+
+        #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+        context = {
+                    "nombreEstudiante": f"{usuarioObject.nombres.strip()} {usuarioObject.apellidos.strip()}",
+                    "numeroDocumentoEstudiante":numeroDocumento,
+                    "nombreEvento":nombreEvento,
+                    "nombreLugar":nombreLugar ,
+                    "fechaEvento":fechaEvento ,
+                    "imagen_base64":imagen_base64
+
+                }
+        #Renderizamos el template html
+        template = get_template("SendMessageEmailInscripcionEvento.html")
+        content = template.render(context)
+
+        email = EmailMultiAlternatives(
+                subject,
+                message,
+                email_from,
+                recipient_list
+            )
+
+        email.attach_alternative(content, "text/html")
+        email.send()
+        
+        return(True, "envio correo devolución exitoso")
+
+    except Exception as e:
+        return(False , f"no se pudo enviar correo devolución: {e}")
 
 #######################LOGICA PARA GENERAR INFORMES#######################################
 
