@@ -3,8 +3,6 @@ from django.urls import reverse
 from django.http import HttpResponse
 
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.utils import timezone
-from datetime import datetime
 # se va a utilizar la libreria reportLab para hacer los reportes
 import os
 from io import BytesIO
@@ -28,7 +26,8 @@ from usuarios.models import usuario
 from django.db.models import Count
 
 # llamar a las librerias para obtener la fecha
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+from django.utils import timezone
 from django.utils import timezone as djangoTimeZone
 
 #Importaciones para enviar el correo
@@ -68,7 +67,7 @@ def procesar_crear_evento(request):
                     mensaje = 'El archivo es demasiado grande. El tamaño máximo permitido es 2MB.'
                 else:
                     #crear el evento
-                    fechaHoraCreacion = timezone.now().replace(second=0, microsecond=0)
+                    fechaHoraCreacion = datetime.now().replace(second=0, microsecond=0)
                     administradorBienestarId =  usuario.objects.get(numeroDocumento=request.user.numeroDocumento)
                     nombreEvento = request.POST.get("nombreEvento")
                     categoriaEvento_ = int(request.POST.get("categoria"))

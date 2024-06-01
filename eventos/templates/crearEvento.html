@@ -43,21 +43,21 @@
         <div class="row">
             <div class="col-sm-5 col-md-6">
                 <h2>Datos del evento</h2>
-                <form action="{% url 'procesar_crear_evento' %}" method="POST" enctype="multipart/form-data" onsubmit="return validarFormulario();">
+                <form action="{% url 'procesar_crear_evento' %}" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInput" name="nombreEvento" placeholder="Ej: Reunion de Semillero" required>
-                        <label for="floatingInput">Nombre del evento</label>
+                        <input type="text" class="form-control" id="nombreEvento" name="nombreEvento" placeholder="Ej: Reunion de Semillero" required>
+                        <label for="nombreEvento">Nombre del evento</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInput" name="organizador"  required placeholder="Ej: Semillero Uqbar" required>
-                        <label for="floatingInput">Organizador</label>
+                        <input type="text" class="form-control" id="organizador" name="organizador" placeholder="Ej: Semillero Uqbar" required>
+                        <label for="organizador">Organizador</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <select name="categoria" class="form-select" id="floatingSelect" aria-label="Floating label select example" required>
-                        <option selected>Seleccione la categoría del evento</option>
+                        <select name="categoria" class="form-select" id="categoria" aria-label="Floating label select example" required>
+                        <option value="" selected disabled>Seleccione la categoría del evento</option>
                         {% for categoria in categorias %}
                             <option value="{{ categoria.idCategoriaEvento }}"> {{ categoria.nombreCategoriaEvento }}</option>
                         {% endfor %}
@@ -67,12 +67,12 @@
 
                     <div class="mb-3">
                         <label for="datetimeInput" class="form-label">Fecha y Hora:</label>
-                        <input required type="datetime-local" class="form-control" id="datetimeInput" name="fechaHoraEvento" required>
+                        <input type="datetime-local" class="form-control" id="datetimeInput" name="fechaHoraEvento" required>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <select class="form-select" id="floatingSelect" aria-label="Floating label select example" name="edificio" required>
-                        <option selected>Seleccione el edificio para el evento</option>
+                        <select class="form-select" id="edificio" aria-label="Floating label select example" name="edificio" required>
+                        <option value="" selected disabled>Seleccione el edificio para el evento</option>
                         {% for edificio in edificios %}
                             <option value="{{ edificio.idEdificio }}"> {{ edificio.nombreEdificio }}</option>
                         {% endfor %}
@@ -81,33 +81,34 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInput" name="lugar" placeholder="Ej: Salón 305" required>
-                        <label for="floatingInput">Lugar</label>
+                        <input type="text" class="form-control" id="lugar" name="lugar" placeholder="Ej: Salón 305" required>
+                        <label for="lugar">Lugar</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="number" class="form-control" id="floatingInput" name="aforo" placeholder="Ej: 50" required>
-                        <label for="floatingInput">Aforo</label>
+                        <input type="number" class="form-control" id="aforo" name="aforo" placeholder="Ej: 50" required>
+                        <label for="aforo">Aforo</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <textarea class="form-control" name="descripcion" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px; width: 350px;" required></textarea>
-                        <label for="floatingTextarea2">Descripción</label>
+                        <textarea class="form-control" name="descripcion" placeholder="Leave a comment here" id="descripcion" style="height: 100px; width: 350px;" required></textarea>
+                        <label for="descripcion">Descripción</label>
                     </div>
+                    
             </div>
 
-            <div class="col-sm-5 offset-sm-2 col-md-6 offset-md-0">
-                <div class="mb-3">
-                    <div id="previsualizacionArchivo" class="mt-3 mb-5" style="width: 500px; height: 500px;  overflow: hidden;"></div>
-                    <label for="archivoInput" class="form-label">Subir Archivo:</label>
-                    <input type="file" class="form-control" id="archivoInput" accept="image/*" name="archivo" onchange="previsualizarArchivo(this)" required>    
-                </div>
-            </div>
+                    <div class="col-sm-5 offset-sm-2 col-md-6 offset-md-0">
+                        <div class="mb-3">
+                            <div id="previsualizacionArchivo" class="mt-3 mb-5"></div>
+                            <label for="archivoInput" class="form-label">Subir Archivo:</label>
+                            <input type="file" class="form-control" id="archivoInput" accept="image/*" name="archivo" onchange="previsualizarArchivo(this)" required>    
+                        </div>
+                    </div>
 
-            <div class="col-md-6 mb-3">
-                <button type="submit">Crear Evento</button>
-                <button type="button" onclick="window.location.href='../cancelarEvento'">Cancelar Evento</button>
-            </div>
+                    <div class="col-md-6 mb-3">
+                        <button type="submit" onclick="validateForm()">Crear Evento</button>
+                        <button type="button" onclick="window.location.href='../cancelarEvento'">Cancelar Evento</button>
+                    </div>
                 
                 </form>
         </div>
@@ -134,103 +135,98 @@
 
 <script>
     function previsualizarArchivo(input) {
-        var archivo = input.files[0];
-        var reader = new FileReader();
-        
-        reader.onload = function(e) {
-            var previsualizacion = document.getElementById('previsualizacionArchivo');
-            previsualizacion.innerHTML = '<img src="' + e.target.result + '" class="img-thumbnail" alt="Previsualización del Archivo">';
-        }
-        
-        reader.readAsDataURL(archivo);
-    }
-
-    function previsualizarArchivo(input) {
         const file = input.files[0];
         const maxSize = 2 * 1024 * 1024; // 2MB en bytes
+        const allowedExtensions = ['jpg', 'jpeg', 'png']; // Extensiones permitidas
+        const allowedMimeTypes = ['image/jpeg', 'image/png']; // Tipos MIME permitidos
 
         if (file.size > maxSize) {
             alert('El archivo es demasiado grande. El tamaño máximo permitido es 2MB.');
+            Swal.fire({
+                title: 'Error',
+                text: 'El archivo es demasiado grande. El tamaño máximo permitido es 2MB.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
             input.value = ''; // Limpia el archivo seleccionado
+            const previsualizacion = document.getElementById('previsualizacionArchivo');
+            previsualizacion.innerHTML = "";
             return;
         }
 
-        const preview = document.getElementById('previsualizacionArchivo');
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(fileExtension) || !allowedMimeTypes.includes(file.type)) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Formato de archivo no permitido. Solo se permiten archivos JPG, JPEG, PNG y GIF.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+            input.value = ''; // Limpia el archivo seleccionado
+            const previsualizacion = document.getElementById('previsualizacionArchivo');
+            previsualizacion.innerHTML = "";
+            return;
+        }
+
         const reader = new FileReader();
-
         reader.onload = function(e) {
-            preview.style.backgroundImage = `url(${e.target.result})`;
+            const previsualizacion = document.getElementById('previsualizacionArchivo');
+            previsualizacion.innerHTML = '<img src="' + e.target.result + '" alt="Previsualización del Archivo">';
         }
 
-        if (file) {
-            reader.readAsDataURL(file);
-        }
+        reader.readAsDataURL(file);
     }
-    function validarFormulario() {
-        // Obtener referencias a los campos del formulario
-        var nombreEvento = document.getElementById('nombreEvento');
-        var organizador = document.getElementById('organizador');
-        var categoria = document.getElementById('categoria');
-        var fechaHoraEvento = document.getElementById('datetimeInput');
-        var edificio = document.getElementById('edificio');
-        var lugar = document.getElementById('lugar');
-        var aforo = document.getElementById('aforo');
-        var descripcion = document.getElementById('descripcion');
-        var archivo = document.getElementById('archivoInput');
 
-        // Validar cada campo individualmente
-        if (nombreEvento.value === '') {
-            alert('Por favor, ingrese el nombre del evento.');
-            return false;
-        }
+    // funcion para validar los campos del formulario 
+  function validateForm() {
+    var nombreEvento = document.getElementById('nombreEvento').value;
+    var organizador = document.getElementById('organizador').value;
+    var categoria = document.getElementById('categoria').value;
+    var fechaHoraEvento = document.getElementById('datetimeInput').value;
+    var edificio = document.getElementById('edificio').value;
+    var lugar = document.getElementById('lugar').value;
+    var aforo = document.getElementById('aforo').value;
+    var descripcion= document.getElementById('descripcion').value;
 
-        if (organizador.value === '') {
-            alert('Por favor, ingrese el organizador del evento.');
-            return false;
-        }
 
-        if (categoria.value === '') {
-            alert('Por favor, seleccione la categoría del evento.');
-            return false;
-        }
-
-        if (fechaHoraEvento.value === '') {
-            alert('Por favor, seleccione la fecha y hora del evento.');
-            return false;
-        }
-
-        if (edificio.value === '') {
-            alert('Por favor, seleccione el edificio para el evento.');
-            return false;
-        }
-
-        if (lugar.value === '') {
-            alert('Por favor, ingrese el lugar del evento.');
-            return false;
-        }
-
-        if (aforo.value === '') {
-            alert('Por favor, ingrese el aforo del evento.');
-            return false;
-        }
-
-        if (descripcion.value === '') {
-            alert('Por favor, ingrese la descripción del evento.');
-            return false;
-        }
-
-        if (archivo.value === '') {
-            alert('Por favor, seleccione un archivo para subir.');
-            return false;
-        }
-
-        // Si todos los campos son válidos, enviar el formulario
-        return true;
+    if (nombreEvento === ''){
+        mostrarAlertaError("Error:","Por favor, complete el campo del nombre del evento.");
+        event.preventDefault(); // Detener el envío del formulario
+    }else if(organizador === ''){
+        mostrarAlertaError("Error:","Por favor, complete el campo del organizador del evento.");
+        event.preventDefault(); // Detener el envío del formulario
+    }else if(categoria === ''){
+        mostrarAlertaError("Error:","Por favor, seleccione una opción de categoría del evento.");
+        event.preventDefault(); // Detener el envío del formulario
+    }else if(fechaHoraEvento === ''){
+        mostrarAlertaError("Error:","Por favor, seleccione la fecha de realización del evento.");
+        event.preventDefault(); // Detener el envío del formulario
+    }else if(edificio === ''){
+        mostrarAlertaError("Error:","Por favor, seleccione el edificio donde se va a realizar el evento.");
+        event.preventDefault(); // Detener el envío del formulario
+    }else if(lugar === ''){
+        mostrarAlertaError("Error:","Por favor, indique el lugar donde se va a realizar el evento.(ej: Salón 305)");
+        event.preventDefault(); // Detener el envío del formulario
+    }else if(aforo === ''){
+        mostrarAlertaError("Error:","Por favor, indique el aforo del evento.");
+        event.preventDefault(); // Detener el envío del formulario
+    }else if(descripcion === ''){
+        mostrarAlertaError("Error:","Por favor, indique una descrición sobre el evento que resulte de interés para los posibles asistentes.");
+        event.preventDefault(); // Detener el envío del formulario
     }
+}  
+  // funcion para crear una alerta con la libreria SweetAlert2
+  function mostrarAlertaError(titulo="",texto) {
+    // Mostrar alerta personalizada con SweetAlert2
+    Swal.fire({
+      title: titulo,
+      text: texto,
+      icon: 'error',
+      confirmButtonText: 'Aceptar'
+    });
+  }
+
 </script>
-
-
-
 </body>
 
 </html>
