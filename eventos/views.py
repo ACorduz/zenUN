@@ -609,7 +609,7 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento):
         BDDatos.append(row)
 
     #Ordena la lista de inscritos por orden alfabético
-    BDDatos.sort(key = lambda x: (x[0].lower(),x[1].lower(),x[3],x[4])) #Primero intenta ordenas por el apellido, si coincide, orden por nombre y sucesivamente
+    BDDatos.sort(key = lambda x: (x[0].lower(),x[1].lower(),x[3],x[4])) #Primero intenta ordenas por el apellido, si coincide, orden por nombre y así sucesivamente
 
      ## --------------DATOS DEL EVENTO QUE SE GENERA ----------------
    
@@ -625,6 +625,7 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento):
     lienzo.drawString(30, 670, "Fecha evento: "+ fechaEvento.strftime('%Y-%m-%d %H:%M:%S'))
     lienzo.drawString(30, 655, "Aforo: "+ str(aforo))
     lienzo.drawString(30, 640, "Inscritos: "+ str(asistentesInscritos))
+    
     #----- CREACION ESTILOS---------
     # Llamar a los Estilos
     styles = getSampleStyleSheet() # nos da una lista de estilos a escoger de la biblioteca
