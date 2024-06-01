@@ -3,8 +3,6 @@ from django.urls import reverse
 from django.http import HttpResponse
 
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.utils import timezone
-from datetime import datetime
 # se va a utilizar la libreria reportLab para hacer los reportes
 import os
 from io import BytesIO
@@ -28,7 +26,8 @@ from usuarios.models import usuario
 from django.db.models import Count
 
 # llamar a las librerias para obtener la fecha
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+from django.utils import timezone
 from django.utils import timezone as djangoTimeZone
 
 #Importaciones para enviar el correo
@@ -68,7 +67,7 @@ def procesar_crear_evento(request):
                     mensaje = 'El archivo es demasiado grande. El tamaño máximo permitido es 2MB.'
                 else:
                     #crear el evento
-                    fechaHoraCreacion = timezone.now().replace(second=0, microsecond=0)
+                    fechaHoraCreacion = datetime.now().replace(second=0, microsecond=0)
                     administradorBienestarId =  usuario.objects.get(numeroDocumento=request.user.numeroDocumento)
                     nombreEvento = request.POST.get("nombreEvento")
                     categoriaEvento_ = int(request.POST.get("categoria"))
@@ -80,31 +79,37 @@ def procesar_crear_evento(request):
                     lugar = request.POST.get("lugar")
                     descripcion = request.POST.get("descripcion")
                     aforo = int(request.POST.get("aforo"))
-                    
-                    # Leer los datos binarios del archivo
-                    datos_binarios = archivo.read()
 
-                    evento_ = evento(
-                    fechaHoraCreacion=fechaHoraCreacion,
-                    numeroDocumento_AdministradorBienestar=administradorBienestarId,
-                    nombreEvento=nombreEvento,
-                    categoriaEvento_id=cat_Evento,
-                    organizador=organizador,
-                    fechaHoraEvento=fechaHoraEvento,
-                    edificio_id=edificio_,
-                    lugar=lugar,
-                    flyer=datos_binarios,
-                    descripcion=descripcion,
-                    aforo=aforo
-                    )
+                    # Verificar si hay un evento programado en el mismo edificio, lugar y fechaHora
+                    evento_existente = evento.objects.get(edificio_id=edificio_, lugar=lugar, fechaHoraEvento=fechaHoraEvento)
+                    if evento_existente:
+                        mensaje = 'Ya hay un evento programado en este lugar y fecha. Por favor, elige otro lugar o fecha.'
+                        return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
+                    else:
+                        # Leer los datos binarios del archivo
+                        datos_binarios = archivo.read()
 
-                    evento_.save()
+                        evento_ = evento(
+                        fechaHoraCreacion=fechaHoraCreacion,
+                        numeroDocumento_AdministradorBienestar=administradorBienestarId,
+                        nombreEvento=nombreEvento,
+                        categoriaEvento_id=cat_Evento,
+                        organizador=organizador,
+                        fechaHoraEvento=fechaHoraEvento,
+                        edificio_id=edificio_,
+                        lugar=lugar,
+                        flyer=datos_binarios,
+                        descripcion=descripcion,
+                        aforo=aforo
+                        )
 
-                    #Asignación del estado PROGRAMADO
-                    evento_.estadoEvento.add(evento_.idEvento, 1)
+                        evento_.save()
 
-                    mensaje = 'Evento creado exitosamente!'
-                    return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
+                        #Asignación del estado PROGRAMADO
+                        evento_.estadoEvento.add(evento_.idEvento, 1)
+
+                        mensaje = 'Evento creado exitosamente!'
+                        return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
 
     except Exception as e:
             mensaje = f"Ocurrió un error: {str(e)}"
