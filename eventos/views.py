@@ -119,14 +119,19 @@ def mostrar_listaEventos(request):
 
 #######################LOGICA PARA ASISTIR A EVENTO#######################################
 #muestra el resumen del evento que el estudiante de click y al cual el estudiante puede inscribirse
-def mostrar_asistirEvento(request,evento_id):
-
-    # Pasar los datos al contexto para que puedan ser renderizados y mostrados en el html
+def mostrar_asistirEvento(request, evento_id):
+    evento_ = get_object_or_404(evento, idEvento=evento_id)
+    imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')
     context = {
-        'evento_id': evento_id
-        }
-
-    print(evento_id)
+        'evento_id': evento_id,
+        'nombre_evento': evento_.nombreEvento,
+        'organizador': evento_.organizador,
+        'categoria': evento_.categoriaEvento_id,
+        'fecha_hora_evento': evento_.fechaHoraEvento,
+        'lugar': evento_.lugar,
+        'descripcion_evento': evento_.descripcion,
+        'imagen_base64': imagen_base64
+    }
     return render(request, 'asistirEvento.html', context)
   
 

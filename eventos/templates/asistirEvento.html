@@ -1,12 +1,63 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resumen Evento</title>
+    <link rel="stylesheet" href="{% static 'asistirEvento.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <h1>Vista para ver el resumen del evento al que el estudiante se quiere inscribir</h1>
-    <p>Id del evento al que le dio click: <span id="evento">{{ evento_id }}</span></p>  
+    <div class="header">
+        <button class="button-wrapper" onclick="mostrarAlerta()">
+            <img src="{% static 'icono.png' %}" alt="Botón 1">
+            <span>zenUN</span>
+        </button>
+        <div class="header-title"><b>Asistir a evento</b></div>
+        <img src="{% static 'perfil.png' %}" alt="Botón 2">
+    </div>
+    <div class="informacion-imagen-container">
+        <div id="informacionUsuario">
+            <div id="contenedorDatos">
+                <h1>Resumen de Evento</h1>
+                <hr class="linea">
+                <p>Nombre del Evento: <span id="nombre">{{ nombre_evento }}</span></p>
+                <p>Organizador: <span id="organizador">{{ organizador }}</span></p>
+                <p>Categoría: <span id="categoria">{{ categoria }}</span></p>
+                <p>Fecha y Hora: <span id="fechayhora">{{ fecha_hora_evento }}</span></p>
+                <p>Lugar: <span id="lugar">{{ lugar }}</span></p>
+                <p>Descripción: <span id="descripcion">{{ descripcion_evento }}</span></p>
+                <input type="button" value="Inscribirse al evento">
+            </div>
+        </div>
+        <div id="contenedorImagen">
+            <img src="data:image/jpeg;base64,{{ imagen_base64 }}" alt="{{ evento.nombreEvento }}">
+        </div>
+        <script>
+            document.getElementById("submitButton").addEventListener("click", function() {
+            document.getElementById("myForm").submit();
+            });
+    
+    
+        function mostrarAlerta() {
+            Swal.fire({
+                title: '¡Atención!',
+                text: '¿Quieres volver a la lista de eventos sin completar tu inscripción?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/eventos/';
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // No se hace nada, se cierra el modal
+                }
+            });
+        };
+        </script>
+    </div>
 </body>
 </html>
