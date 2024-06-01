@@ -81,8 +81,8 @@ def procesar_crear_evento(request):
                     aforo = int(request.POST.get("aforo"))
 
                     # Verificar si hay un evento programado en el mismo edificio, lugar y fechaHora
-                    evento_existente = evento.objects.get(edificio_id=edificio_, lugar=lugar, fechaHoraEvento=fechaHoraEvento)
-                    if evento_existente:
+                    evento_existente = evento.objects.filter(edificio_id=edificio_, lugar=lugar, fechaHoraEvento=fechaHoraEvento)
+                    if evento_existente.exists():
                         mensaje = 'Ya hay un evento programado en este lugar y fecha. Por favor, elige otro lugar o fecha.'
                         return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
                     else:
