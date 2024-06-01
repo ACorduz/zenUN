@@ -16,6 +16,7 @@ import time
 import random
 import base64
 from eventos.models import evento
+from django.shortcuts import render, redirect, get_object_or_404
 
 ########################################Funcionalidad acceso según el ROL#########################
 def role_required(role_name):
@@ -305,16 +306,45 @@ def cerrar_sesion(request):
     return redirect(reverse('loginUsuario'))
 
 ##Metodo para mostrar la pestaña de los eventos a los que esta inscrito el estudiante
+@role_required('Estudiante')
 def mostrar_eventosInscritos(request):
-
     numeroDocumento = request.user.numeroDocumento
     eventos = evento.objects.filter(estadoEvento = "1" ,asistentes= numeroDocumento)
     for evento_ in eventos:
         evento_.imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')  # Convertir la imagen a base64
     return render(request, 'eventosInscritos.html', {'eventos': eventos})
 
+@role_required('Estudiante')
+def mostrar_detalleEventosInscritos(request, evento_id):
+    
+    evento_ = get_object_or_404(evento, idEvento=evento_id)
+    imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')
+    context = {
+        'evento_id': evento_id,
+        'nombre_evento': evento_.nombreEvento,
+        'organizador': evento_.organizador,
+        'categoria': evento_.categoriaEvento_id,
+        'fecha_hora_evento': evento_.fechaHoraEvento,
+        'lugar': evento_.lugar,
+        'descripcion_evento': evento_.descripcion,
+        'imagen_base64': imagen_base64
+    }
+    return render(request, 'cancelarInscripcionEvento.html', context)
+
+@role_required('Estudiante')
+def cancelar_InscripcionEstudiante(request,evento_id):
+
+    numeroDocumentoUser = request.user.numeroDocumento
+
+    usuario_ = usuario.objects.get(numeroDocumento=numeroDocumentoUser)
+    evento_ = evento.objects.get(idEvento=evento_id)
+
+    if evento_.asistentes.filter(numeroDocumento=numeroDocumentoUser).exists():
+        evento_.asistentes.remove(usuario_)  # Establece los asistentes del evento como el usuario dado
+        evento_.save()  # Guarda el evento actualizado
 
 
+    return render(request, 'cancelacionExitosa.html')
 ########################Funcionalidad de Recuperar Contraseña####################################
 
 #Este método se encarga de mostrar la vista donde el usuario ingresa que desea recuperar contraseña

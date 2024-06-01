@@ -15,7 +15,7 @@
             <img src="{% static 'icono.png' %}" alt="Botón 1">
             <span>zenUN</span>
         </button>
-        <div class="header-title"><b>Asistir a evento</b></div>
+        <div class="header-title"><b>Cancelar inscripción al evento</b></div>
         <img src="{% static 'perfil.png' %}" alt="Botón 2">
     </div>
     <div class="informacion-imagen-container">
@@ -29,10 +29,10 @@
                 <p>Fecha y Hora: <span id="fechayhora">{{ fecha_hora_evento }}</span></p>
                 <p>Lugar: <span id="lugar">{{ lugar }}</span></p>
                 <p>Descripción: <span id="descripcion">{{ descripcion_evento }}</span></p>
-                <form id="myForm" action="{% url 'inscripcionExitosa' evento_id %}" method="POST">
+                <form id="myForm" action="{% url 'cancelacionExitosa' evento_id %}" method="POST">
                     <!-- token de validacion -->
                     {% csrf_token %}
-                    <input type="button" id="submitButton" value="Inscribirse al evento">
+                    <input type="button" id="submitButton" value="Cancelar inscripción">
                 </form>
             </div>
         </div>
@@ -48,14 +48,14 @@
         function mostrarAlerta() {
             Swal.fire({
                 title: '¡Atención!',
-                text: '¿Quieres volver a la lista de eventos sin completar tu inscripción?',
+                text: '¿Quieres volver a la lista de eventos sin completar tu cancelación?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí',
                 cancelButtonText: 'No'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/eventos/';
+                    window.location.href = '/eventosInscritos/';
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
                     // No se hace nada, se cierra el modal
                 }

@@ -73,4 +73,10 @@ urlpatterns = [
     path('eventosInscritos/', 
          views.mostrar_eventosInscritos, 
          name='eventosInscritos'), #mostrar los eventos que tiene inscritos el estudiante
+     path('detalle_eventosInscritos/<int:evento_id>/', 
+         views.mostrar_detalleEventosInscritos, 
+         name='detalleEventosInscritos'), #mostrar el detalle del evento que quiere cancelar
+     path("cancelacionExitosa/<int:evento_id>/",
+         views.cancelar_InscripcionEstudiante,
+         name='cancelacionExitosa')
 ]
