@@ -17,6 +17,7 @@ from reportlab.lib import colors
 from django.shortcuts import render
 from eventos.models import evento
 from usuarios.models import usuario
+from usuarios.models import razonCambio
 import base64
 
 # llamar a los modelos de la BD
@@ -103,9 +104,14 @@ def procesar_crear_evento(request):
                         aforo=aforo
                         )
 
+                        #Trazabilidad eventos
+                        idRazonCambio = razonCambio.objects.get(pk=16) #El admin bienestar crea un evento
+                        evento_._change_reason = idRazonCambio
                         evento_.save()
 
                         #Asignación del estado PROGRAMADO
+                        idRazonCambio = razonCambio.objects.get(pk=17) #Se le asigna el estado de PROGRAMADO
+                        evento_._change_reason = idRazonCambio
                         evento_.estadoEvento.add(evento_.idEvento, 1)
 
                         mensaje = 'Evento creado exitosamente!'
@@ -159,8 +165,11 @@ def guardar_informacionInscripcion(request,evento_id):
  
         #Logica para verificar que el usuario no este inscrito ya en este evento
         if not evento_.asistentes.filter(numeroDocumento=numeroDocumentoUser).exists():
+            #Trazabilidad Eventos
+            idRazonCambio = razonCambio.objects.get(pk=20) #Estudiante se inscribe a un evento
+            evento_._change_reason = idRazonCambio
             evento_.asistentes.add(usuario_)  # Establece los asistentes del evento como el usuario dado
-            evento_.save()  # Guarda el evento actualizado
+            #evento_.save()  # Guarda el evento actualizado
             print("El usuario fue agregado")
             Proceso_enviarCorreo_inscripcionExitosa(numeroDocumentoUser,evento_id)
             return render(request, 'inscripcionExitosa.html')
@@ -833,7 +842,15 @@ def cancelar_evento(request, evento_id):
     evento_a_cancelar = get_object_or_404(evento, idEvento=evento_id)
     
     estado_cancelado = get_object_or_404(estadoEvento, nombreEstadoEvento='Cancelado')
+
+    idRazonCambio = razonCambio.objects.get(pk=19) #Se quita el estado de programado al evento
+    evento_a_cancelar._change_reason = idRazonCambio
+
     evento_a_cancelar.estadoEvento.clear()
+
+    idRazonCambio = razonCambio.objects.get(pk=18) #Se le asigna el estado de CANCELADO al evento   
+    evento_a_cancelar._change_reason = idRazonCambio
+
     evento_a_cancelar.estadoEvento.add(estado_cancelado)
     
     return redirect('mostrar_cancelar_evento')
