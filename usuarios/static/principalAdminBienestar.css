@@ -113,7 +113,6 @@ body::after {
 }
 
 #aprobarPrestamoButton{        
-    grid-row: span 2;
     background: url('../static/imgButtonAprobarPrestamo.jpg') no-repeat center center/cover;   
     
 }
@@ -121,8 +120,10 @@ body::after {
     background: url('../static/imgButtonDevolverPrestamo.png') no-repeat center center/cover;    
 }
 #crearEventoButton{
-    grid-column: 2/3;
     background: url('../static/imgButtonCrearEvento.png') no-repeat center center/cover;    
+}
+#cancelarEventoButton {
+    background: url('../static/imgButtonCancelarEvento.jpg') no-repeat center center/cover;
 }
 .footer{    
     font-size: small;
