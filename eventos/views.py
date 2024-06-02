@@ -25,7 +25,9 @@ from usuarios.models import usuario
 from django.db.models import Count
 
 # llamar a las librerias para obtener la fecha
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+from django.utils import timezone
+from datetime import timezone as datetimeTimeZone
 from django.utils import timezone as djangoTimeZone
 
 
@@ -313,8 +315,8 @@ def generarCanvas_Reporte_prestamo(lienzo:canvas.Canvas, fechaInicio, fechaFin, 
     # print(f"{fechaInicio}, {fechaFin}")
     # objeto_fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')   # Asi se crea un obj. datetime  pero sin zona horaria
     
-    objeto_fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').replace(tzinfo=timezone.utc)                                            # pero la BD los objetos fecha tienen zona horario
-    objeto_fechaFinal = (datetime.strptime(fechaFin, '%Y-%m-%d')  + timedelta(days=1) - timedelta(seconds=1)).replace(tzinfo=timezone.utc)  # para que quede en 23:59:59 de ese dia
+    objeto_fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').replace(tzinfo=datetimeTimeZone.utc)                                            # pero la BD los objetos fecha tienen zona horario
+    objeto_fechaFinal = (datetime.strptime(fechaFin, '%Y-%m-%d')  + timedelta(days=1) - timedelta(seconds=1)).replace(tzinfo=datetimeTimeZone.utc)  # para que quede en 23:59:59 de ese dia
 
     ## ------------------- PRIMERA TABLA------------------------------
     
