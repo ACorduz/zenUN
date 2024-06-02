@@ -12,6 +12,10 @@ urlpatterns = [
         views.mostrar_asistirEvento,
         name='asistirEvento'
     ),
+    path("inscripcionExitosa/<int:evento_id>/",
+         views.guardar_informacionInscripcion,
+         name='inscripcionExitosa'   
+    ),
     path('generarInformes/',
         views.mostrar_vista_informes,
         name='mostrar_vista_informes'
@@ -40,7 +44,10 @@ urlpatterns = [
          views.mostrar_cancelar_evento, 
          name='mostrar_cancelar_evento'
     ), #Vista para crear eventos
-    path('cancelarEvento/<int:evento_id>/', views.cancelar_evento, name='cancelar_evento'),
+    path('cancelarEvento/<int:evento_id>/', 
+         views.cancelar_evento, 
+         name='cancelar_evento'
+    ),
     path('crearEvento/procesar',
          views.procesar_crear_evento,
          name='procesar_crear_evento') #Ruta para procesar la creación de un evento

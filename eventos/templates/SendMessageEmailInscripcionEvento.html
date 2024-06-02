@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Inscripción al Evento</title>
+    <style>
+        /* CSS GRACIAS A CHAT GPT */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+        .message {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .link:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>TU INSCRIPCIÓN FUE UN EXITO</h2>
+        <p>
+            Hola: <strong>{{nombreEstudiante}}</strong> nos alegra que te hayas inscrito en el evento <strong>{{nombreEvento}}</strong>.
+        </p>
+        <p> Recuerda que el evento se llevara a cabo en <strong>{{nombreLugar}}</strong>
+            en la fecha: <strong>{{fechaEvento}}</strong>
+        </p>
+        <p>
+            Recuerda que puedes volver a inscribirte a otro evento, siempre y cuando estos no se cruzen en sus horarios.
+        </p>
+
+        <footer>
+            Saludos,<br>
+            El equipo de zenUN Los Capis
+        </footer>
+    </div>
+</body>
+</html>
