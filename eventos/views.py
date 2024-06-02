@@ -15,9 +15,10 @@ Paragraph, Table, TableStyle, )
 from reportlab.lib import colors
 
 from django.shortcuts import render
-from eventos.models import evento
+from eventos.models import evento,tipoInforme,trazabilidadInformes
 from usuarios.models import usuario
 from usuarios.models import razonCambio
+
 import base64
 
 # llamar a los modelos de la BD
@@ -28,6 +29,7 @@ from django.db.models import Count
 
 # llamar a las librerias para obtener la fecha
 from datetime import datetime, timedelta
+from datetime import timezone as datetimeTimeZone
 from django.utils import timezone
 from django.utils import timezone as djangoTimeZone
 
@@ -420,8 +422,8 @@ def generarCanvas_Reporte_prestamo(lienzo:canvas.Canvas, fechaInicio, fechaFin, 
     # print(f"{fechaInicio}, {fechaFin}")
     # objeto_fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')   # Asi se crea un obj. datetime  pero sin zona horaria
     
-    objeto_fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').replace(tzinfo=timezone.utc)                                            # pero la BD los objetos fecha tienen zona horario
-    objeto_fechaFinal = (datetime.strptime(fechaFin, '%Y-%m-%d')  + timedelta(days=1) - timedelta(seconds=1)).replace(tzinfo=timezone.utc)  # para que quede en 23:59:59 de ese dia
+    objeto_fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').replace(tzinfo=datetimeTimeZone.utc)                                            # pero la BD los objetos fecha tienen zona horario
+    objeto_fechaFinal = (datetime.strptime(fechaFin, '%Y-%m-%d')  + timedelta(days=1) - timedelta(seconds=1)).replace(tzinfo=datetimeTimeZone.utc)  # para que quede en 23:59:59 de ese dia
 
     ## ------------------- PRIMERA TABLA------------------------------
     
@@ -602,7 +604,13 @@ def generarCanvas_Reporte_prestamo(lienzo:canvas.Canvas, fechaInicio, fechaFin, 
     lienzo.drawString(x=30, y=750,text=f'3.  ¡TOTAL, SIN FILTROS!, ¿Cuántas veces fueron prestados los implemento VALOR?: ')
     lienzo.setFont('Helvetica-Bold', 15)
     lienzo.drawString(x=500, y=750,text=f'''{numeroTotalPrestamos} ''')
-
+    #Trazabilidad informe de préstamos, idInforme 3
+    tipo_informe = tipoInforme.objects.get(pk=3)
+    nuevo_informe = trazabilidadInformes(
+        fechaGeneracionInforme = fecha_formateada,
+        tipoInforme = tipo_informe
+    )
+    nuevo_informe.save()
     return None
 
 
@@ -662,7 +670,14 @@ def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, l
     lienzo.drawString(30, 730, "Reporte EVENTOS")
         # header-hora
     lienzo.setFont("Helvetica-Bold", 12)
-    lienzo.drawString(480, 730, "fechaDeAhora")    
+    lienzo.drawString(480, 730, "fechaDeAhora")   
+    #Trazabilidad informe de Eventos, idInforme 1 
+    tipo_informe = tipoInforme.objects.get(pk=1)
+    nuevo_informe = trazabilidadInformes(
+        fechaGeneracionInforme = timezone.now(),
+        tipoInforme = tipo_informe
+    )
+    nuevo_informe.save()
     return(None)
 
     
@@ -796,6 +811,13 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento):
     lienzo.setFont("Helvetica-Bold", 12)
     lienzo.drawString(480, 730, "fechaDeAhora")
     """
+    #Trazabilidad informe de Asistencia a eventos, idInforme 2
+    tipo_informe = tipoInforme.objects.get(pk=2)
+    nuevo_informe = trazabilidadInformes(
+        fechaGeneracionInforme = fecha_formateada,
+        tipoInforme = tipo_informe
+    )
+    nuevo_informe.save()
     return(None)
 
 #######################LOGICA PARA CREAR EVENTOS#######################################

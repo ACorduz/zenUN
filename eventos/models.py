@@ -31,3 +31,10 @@ class evento(models.Model):
     estadoEvento = models.ManyToManyField(estadoEvento)
     history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE),m2m_fields=[asistentes, estadoEvento],table_name = 'trazabilidadEventos',cascade_delete_history=True)           
 
+class tipoInforme(models.Model):
+    idTipoInforme = models.AutoField(primary_key=True)
+    tipo_informe = models.CharField(max_length=255)
+class trazabilidadInformes(models.Model):
+    idInforme = models.AutoField(primary_key=True)
+    fechaGeneracionInforme = models.DateTimeField()
+    tipoInforme = models.ForeignKey(tipoInforme, on_delete=models.CASCADE)
