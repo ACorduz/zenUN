@@ -180,6 +180,17 @@ button[type="submit"]:hover {
     background-color: #6b00b3; 
 }
 
+select {
+    font-family: 'MiFuente', sans-serif; 
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 10px; 
+    width: 93%; 
+    margin-top: 10px;
+    background-color: #ffffff; 
+    border: 1.6px solid #000000; 
+}
+
 .footer {
     display: flex;
     padding:10px;
