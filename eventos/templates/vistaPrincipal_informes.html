@@ -132,10 +132,23 @@
                     {% csrf_token %}
                     <h1>Generar informes de asistencia de eventos</h1>
                     <!-- Formulario de informe de eventos -->
+                    <!--
+                    <label for="idEvento"><strong>ID del evento:</strong></label> <br>
+                    <input type="text" id="idEvento" name="idEvento"><br><br>
+
+                    <label for="lugarEvento"><strong>Lugar de los eventos:</strong></label><br>
+                    <input type="text" id="lugarEvento" name="lugarEvento"><br><br>
 
                     <label for="nombreEvento"><strong>Nombre del evento:</strong></label> <br>
                     <input type="text" id="nombreEvento" name="nombreEvento"><br><br>
-
+                    -->
+                    <label for="nombreEvento"><strong>Nombre del evento:</strong></label> <br>
+                    <select id="selectEvento" name="selectEvento" required>
+                    {% for nombre_evento in eventos %}
+                        <option value="{{ nombre_evento.idEvento }}">{{ nombre_evento.nombreEvento }}</option>
+                    {% endfor %}                    
+                    </select>
+                    <br><br>
                     <button type="submit" onclick="validateForm_asistencia()" >Generar informe</button>
                 </form>
             `);
