@@ -70,6 +70,24 @@ body{
 #nombreEvento, #organizador, #categoria, #edificio, #lugar, #aforo, #descripcion, #datetimeInput{
     max-width: 350px; /* Puedes ajustar este valor según tu preferencia */
 }
+.button-style {
+    font-family: 'MiFuente', sans-serif;
+    font-size: 20px;
+    width: 30%;
+    padding: 5px;
+    border-radius: 30px;
+    border: none;
+    background-color: #6b00b3;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ajusté la opacidad del shadow a 0.2 */
+    margin-bottom: 5px;
+    margin-left: 70px;
+}
+
+.button-style:hover {
+    background-color: #2eeb2e;
+}
 
 /*Footer*/
 .footer{    
