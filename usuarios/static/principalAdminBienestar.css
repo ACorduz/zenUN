@@ -3,6 +3,24 @@
     src: url('../static/AveriaSerifLibre-Regular.ttf') format('truetype');
 }
 
+body {
+    font-family: 'MiFuente', sans-serif;
+    margin: 0;
+    padding: 0;    
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-image: url('../static/registro.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -10,9 +28,6 @@
     padding: 2px;
     background-color: #c0febf;
     position: relative;
-    top: 0;
-    left: 0;
-    right: 0;
     z-index: 1000;
     width: 100%;
     box-sizing: border-box;
@@ -21,7 +36,7 @@
 .header-title {
     font-family: 'MiFuente', sans-serif;
     font-size: 30px;
-    text-align: center;    
+    text-align: center;
 }
 
 .button-wrapper {
@@ -43,7 +58,7 @@
 .button-wrapper span {
     font-family: 'MiFuente', sans-serif;
     font-size: 30px;
-    color: black; 
+    color: black;
 }
 
 .header img[alt="Botón 2"] {
@@ -52,120 +67,102 @@
     cursor: pointer;
 }
 
-body {
-    font-family: 'MiFuente', sans-serif;
-    margin: 0;
-    padding: 0;    
-    justify-content: space-between;
-    align-items: center;
-    min-height: 100vh;
-    background-image: url('../static/registro.jpg');    
-    background-size: cover;
-    background-position: center;
+.content {
+    flex: 1;
 }
 
-body::after {
-    content: "";
-    background: inherit;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    filter: blur(2px);
-    z-index: -1;
-}
-
-.grid-container{
-    display: grid;    
+.grid-container {
+    display: grid;
     width: 80%;
-    margin:auto;
+    margin: auto;
     margin-top: 10vh;
     margin-bottom: 12vh;
-    height:60vh;
+    height: 60vh;
     grid-template-rows: 1fr 1fr;
-    grid-template-columns: 1fr 1fr;    
-    padding: 0px;    
+    grid-template-columns: 1fr 1fr;
+    padding: 0;
     gap: 10px;
 }
+
 /* Estilo para cada cuadricula de la matriz */
-.grid-container a{
-    text-decoration:none;    
+.grid-container a {
+    text-decoration: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
     cursor: pointer;
     padding: 0;
-    margin: 0;    
-    border: none;         
+    margin: 0;
+    border: none;
 }
-.texto{
-    display:flex;
+
+.texto {
+    display: flex;
     align-items: center;
     justify-content: center;
     background-color: gray;
     color: white;
-    width: 100%;    
+    width: 100%;
     padding-bottom: 10px;
     padding-top: 10px;
-    font-size: 20px;    
+    font-size: 20px;
 }
 
-#aprobarPrestamoButton{        
-    background: url('../static/imgButtonAprobarPrestamo.jpg') no-repeat center center/cover;   
-    
+#aprobarPrestamoButton {
+    background: url('../static/imgButtonAprobarPrestamo.jpg') no-repeat center center/cover;
 }
-#devolverPrestamoButton{
-    background: url('../static/imgButtonDevolverPrestamo.png') no-repeat center center/cover;    
+
+#devolverPrestamoButton {
+    background: url('../static/imgButtonDevolverPrestamo.png') no-repeat center center/cover;
 }
-#crearEventoButton{
-    background: url('../static/imgButtonCrearEvento.png') no-repeat center center/cover;    
+
+#crearEventoButton {
+    background: url('../static/imgButtonCrearEvento.png') no-repeat center center/cover;
 }
+
 #cancelarEventoButton {
     background: url('../static/imgButtonCancelarEvento.jpg') no-repeat center center/cover;
 }
-.footer{    
+
+.footer {
     font-size: small;
-    text-align: right;    
+    text-align: right;
     align-items: right;
     padding: 2px;
     background-color: #c0febf;
-    position: relative;    
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    width: 100%;
     box-sizing: border-box;
-    
 }
-.derechos{
+
+.derechos {
     border-right: 1.5px solid black;
     margin-right: 10px;
     padding-right: 4px;
 }
 
-/* Menu Cerrar sesión*/
-#btn-menu{
+/* Menu Cerrar sesión */
+#btn-menu {
     display: none;
 }
-#btn-menu:checked ~ .container-menu{
+
+#btn-menu:checked ~ .container-menu {
     opacity: 1;
     visibility: visible;
 }
-.container-menu{
+
+.container-menu {
     position: absolute;
     left: 0;
     top: 0;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     height: 100%;
     width: 100%;
     transition: all 500ms ease;
     opacity: 0;
     visibility: hidden;
 }
-.cont-menu{
+
+.cont-menu {
     visibility: hidden;
     width: 100%;
     height: 190px;
@@ -175,40 +172,46 @@ body::after {
     background-color: #c0febf;
     transition: all 500ms ease;
     transform: translateY(-100%);
-    
 }
-/*Animación despliegue hacía abajo*/
-#btn-menu:checked ~ .container-menu .cont-menu{
+
+/* Animación despliegue hacía abajo */
+#btn-menu:checked ~ .container-menu .cont-menu {
     visibility: visible;
-    transform: translateX(0%);    
+    transform: translateX(0%);
 }
-.container-menu nav{    
+
+.container-menu nav {
     position: relative;
     top: 110px
 }
-.container-menu nav a{    
+
+.container-menu nav a {
     display: flex;
     align-items: center;
     text-decoration: none;
-    padding-left: 10px;    
-    color: black;  
+    padding-left: 10px;
+    color: black;
     border-left: 5px solid transparent;
     transition: all 400ms ease;
 }
-.container-menu nav a:hover{    
+
+.container-menu nav a:hover {
     border-left: 5px solid black;
-    background: rgba(0, 0, 0, 0.192);    
+    background: rgba(0, 0, 0, 0.192);
 }
-.imgCerrarSesion{
+
+.imgCerrarSesion {
     width: 40px;
     height: 40px;
-    padding-right: 10px;    
+    padding-right: 10px;
 }
-.imgCambiarRol{
+
+.imgCambiarRol {
     width: 40px;
     height: 40px;
-    padding-right: 10px; 
+    padding-right: 10px;
 }
+
 .disabled-link {
     color: #ccc; /* Cambia el color del texto a gris */
     pointer-events: none; /* Evita que se puedan hacer clic en el enlace */
