@@ -268,14 +268,18 @@ def mostrar_informacionPrestamo_devolucionImplementos_administradorBienestar(req
                     mensaje = "Obtencion de datos exitosa"
                     implemento_prestado =  objetoImplemento.nombreImplemento
                     facultad_implemento = objetoEdificio.nombreEdificio
-                    nombre_estudiante = f"´{objetoEstudiante.nombres} {objetoEstudiante.apellidos}"
+                    nombre_estudiante = f"{objetoEstudiante.nombres} {objetoEstudiante.apellidos}"
                     correo_estudiante = objetoEstudiante.correoInstitucional
                     inicio_prestamo = objetoPrestamo.fechaHoraInicioPrestamo
                     fin_prestamo = objetoPrestamo.fechaHoraFinPrestamo
                     revision_datos="1" # para saber si el adm. Bienestar reviso los datos de la persona 
+                    
+                    # Formatear las fechas
+                    inicio_prestamo_formateado = inicio_prestamo.strftime('%Y-%m-%d %H:%M')
+                    fin_prestamo_formateado = fin_prestamo.strftime('%Y-%m-%d %H:%M')
 
                     # Pasar los datos a una cadena para que puedan ser pasados a la url
-                    cadenaURLParametros = f'?mensaje={mensaje}&implemento_prestado={implemento_prestado}&facultad_implemento={facultad_implemento}&nombre_estudiante={nombre_estudiante}&correo_estudiante={correo_estudiante}&inicio_prestamo={inicio_prestamo}&fin_prestamo={fin_prestamo}&revision_datos={revision_datos}'
+                    cadenaURLParametros = f'?mensaje={mensaje}&implemento_prestado={implemento_prestado}&facultad_implemento={facultad_implemento}&nombre_estudiante={nombre_estudiante}&correo_estudiante={correo_estudiante}&inicio_prestamo={inicio_prestamo_formateado}&fin_prestamo={fin_prestamo_formateado}&revision_datos={revision_datos}'
                     # mandar los datos a la vista devolucion de implementos
                     return redirect(reverse("devolucionImplementosConParametroNumeroDocumento", args=[NumeroDocumento]) + cadenaURLParametros)   
                 
