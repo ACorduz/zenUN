@@ -49,9 +49,10 @@ from functools import wraps
 def mostrar_crear_evento(request):
     categorias = categoriaEvento.objects.all()
     edificios = edificio.objects.all()
+    roles_count = request.user.roles.count()
     mensaje = request.GET.get('mensaje', '')
     datos_ingresados = request.session.pop('datos_ingresados', {})  # Obtener los datos ingresados por el usuario de la sesión
-    return render(request, 'crearEvento.html', {'categorias': categorias, 'edificios':edificios, 'mensaje':mensaje, 'datos': datos_ingresados})
+    return render(request, 'crearEvento.html', {'categorias': categorias, 'edificios':edificios, 'mensaje':mensaje, 'datos': datos_ingresados,'roles_count':roles_count})
 
 def procesar_crear_evento(request):
     try:
@@ -147,9 +148,10 @@ def procesar_crear_evento(request):
 #Muestra la lista de todos los eventos a los que el estudiante se puede inscribir
 def mostrar_listaEventos(request):
     eventos = evento.objects.filter(estadoEvento = "1").order_by('fechaHoraEvento')
+    roles_count = request.user.roles.count()
     for evento_ in eventos:
         evento_.imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')  # Convertir la imagen a base64
-    return render(request, 'listaEventos.html', {'eventos': eventos})
+    return render(request, 'listaEventos.html', {'eventos': eventos,'roles_count':roles_count})
 
 #muestra el resumen del evento que el estudiante de click y al cual el estudiante puede inscribirse
 def mostrar_asistirEvento(request, evento_id):
@@ -254,9 +256,11 @@ def Proceso_enviarCorreo_inscripcionExitosa(numeroDocumento,evento_id):
 def mostrar_vista_informes(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     eventos = evento.objects.all()
+    roles_count = request.user.roles.count()
     contexto = { # pasarle el contexto de lo que haya
                 'mensaje': mensaje,
                 'eventos': eventos,
+                'roles_count':roles_count
             }
     # retornar la URL
     return render(request, 'vistaPrincipal_informes.html', contexto)
@@ -862,7 +866,7 @@ def cancelar_inscripcionEvento(request):
 def mostrar_cancelar_evento(request):
     # Filtrar los eventos que tienen el estado "Programado"
     eventos = evento.objects.filter(estadoEvento__nombreEstadoEvento='Programado').select_related('categoriaEvento_id', 'edificio_id').prefetch_related('estadoEvento')
-    
+    roles_count = request.user.roles.count()
     eventos_info = []
     for e in eventos:
         estado = e.estadoEvento.first()  # Obtener el primer estado del evento
@@ -876,7 +880,7 @@ def mostrar_cancelar_evento(request):
                 'estado': estado.nombreEstadoEvento,
             })
     
-    return render(request, 'cancelarEvento.html', {'eventos_info': eventos_info})
+    return render(request, 'cancelarEvento.html', {'eventos_info': eventos_info,'roles_count':roles_count})
 
 def cancelar_evento(request, evento_id):
     evento_a_cancelar = get_object_or_404(evento, idEvento=evento_id)

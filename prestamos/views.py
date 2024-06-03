@@ -233,12 +233,14 @@ def guardar_informacionPrestamo(request,implemento_id):
 def mostrar_devolucionImplementos_administradorBienestar(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     revision_datos = request.GET.get('revision_datos', '0')  # Obtener un parametro que nos dice si la persona reviso los datos , si está presente, sino poner 0 es dececir no reviso
+    roles_count = request.user.roles.count()
 
     # pasarle el contexto de lo que haya
     contexto = {
                 'mensaje': mensaje,
                 'revision_datos':revision_datos,
-                'numeroDocumento': 000000000 # necesario cargarlo al contexto para que corra el html devolucionImplementos
+                'numeroDocumento': 000000000, # necesario cargarlo al contexto para que corra el html devolucionImplementos
+                'roles_count':roles_count
             }
     # retornar la URL
     return render(request, 'DevolucionImplementos.html', contexto)
@@ -445,7 +447,8 @@ def mostrar_tabla_disponibilidad_implementos(request, mensaje=None):
     )
     edificios = edificio.objects.all()
     correo_usuario = request.user.correoInstitucional
-    return render(request, 'disponibilidad.html', {'implementos': implementos_con_ultimos_prestamos, 'edificios': edificios, 'correo': correo_usuario, 'mensaje': mensaje})
+    roles_count = request.user.roles.count()
+    return render(request, 'disponibilidad.html', {'implementos': implementos_con_ultimos_prestamos, 'edificios': edificios, 'correo': correo_usuario, 'mensaje': mensaje,'roles_count':roles_count})
     
     # # Obtener la hora actual en UTC
     # hora_actual_utc = timezone.now()
@@ -490,8 +493,9 @@ def solicitar_prestamo(request, implemento_id):
 @role_required('Administrador Bienestar')
 def mostrar_tabla_aprobar(request):
     prestamos = prestamo.objects.all().filter(estadoPrestamo_id=1)
+    roles_count = request.user.roles.count()
     print(prestamos) # En la BD 1 = PROCESO
-    return render(request, 'Aprobar_prestamo_tabla.html', {'Prestamos': prestamos})
+    return render(request, 'Aprobar_prestamo_tabla.html', {'Prestamos': prestamos,'roles_count':roles_count})
 
 
 ################# Actualizamos la vista principal de aprobar prestamo individual################
