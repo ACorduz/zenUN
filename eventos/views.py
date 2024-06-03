@@ -50,7 +50,8 @@ def mostrar_crear_evento(request):
     categorias = categoriaEvento.objects.all()
     edificios = edificio.objects.all()
     mensaje = request.GET.get('mensaje', '')
-    return render(request, 'crearEvento.html', {'categorias': categorias, 'edificios':edificios, 'mensaje':mensaje})
+    datos_ingresados = request.session.pop('datos_ingresados', {})  # Obtener los datos ingresados por el usuario de la sesión
+    return render(request, 'crearEvento.html', {'categorias': categorias, 'edificios':edificios, 'mensaje':mensaje, 'datos': datos_ingresados})
 
 def procesar_crear_evento(request):
     try:
@@ -77,17 +78,32 @@ def procesar_crear_evento(request):
                     cat_Evento = categoriaEvento.objects.get(pk=categoriaEvento_)
                     organizador = request.POST.get("organizador")
                     fechaHoraEvento = request.POST.get("fechaHoraEvento")
+                    fechaHoraFinEvento = request.POST.get("fechaHoraFinEvento")
                     edificioId_ = int(request.POST.get("edificio"))
                     edificio_ = edificio.objects.get(pk=edificioId_)
                     lugar = request.POST.get("lugar")
                     descripcion = request.POST.get("descripcion")
                     aforo = int(request.POST.get("aforo"))
 
+                   
+                    # Almacenar los datos ingresados por el usuario en la sesión
+                    request.session['datos_ingresados'] = request.POST.dict()
+
+                    
+                     # Validar que la fechaHoraEventoFinal sea mayor que fechaHoraEvento
+                    if fechaHoraFinEvento <= fechaHoraEvento:
+                        mensaje = 'La fecha y hora de finalización debe ser mayor que la fecha y hora de inicio.'
+                        return redirect(reverse("mostrar_crear_evento") + f'?mensaje={mensaje}')
+                    
                     # Verificar si hay un evento programado en el mismo edificio, lugar y fechaHora
-                    evento_existente = evento.objects.filter(edificio_id=edificio_, lugar=lugar, fechaHoraEvento=fechaHoraEvento)
-                    if evento_existente.exists():
+                    eventos_existentes = evento.objects.filter(
+                        edificio_id=edificio_, lugar=lugar
+                    ).filter(
+                        fechaHoraEvento__lt=fechaHoraFinEvento,  # El evento existente comienza antes de que termine el nuevo evento
+                        fechaHoraEventoFinal__gt=fechaHoraEvento    # El evento existente termina después de que comience el nuevo evento
+                    )
+                    if eventos_existentes.exists():
                         mensaje = 'Ya hay un evento programado en este lugar y fecha. Por favor, elige otro lugar o fecha.'
-                        return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
                     else:
                         # Leer los datos binarios del archivo
                         datos_binarios = archivo.read()
@@ -99,6 +115,7 @@ def procesar_crear_evento(request):
                         categoriaEvento_id=cat_Evento,
                         organizador=organizador,
                         fechaHoraEvento=fechaHoraEvento,
+                        fechaHoraEventoFinal=fechaHoraFinEvento,
                         edificio_id=edificio_,
                         lugar=lugar,
                         flyer=datos_binarios,
@@ -117,6 +134,7 @@ def procesar_crear_evento(request):
                         evento_.estadoEvento.add(evento_.idEvento, 1)
 
                         mensaje = 'Evento creado exitosamente!'
+                        request.session.pop('datos_ingresados', None)
                         return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
 
     except Exception as e:

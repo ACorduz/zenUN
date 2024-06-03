@@ -3,6 +3,7 @@ from usuarios.models import usuario
 from prestamos.models import edificio
 from usuarios.models import razonCambio
 from simple_history.models import HistoricalRecords
+from datetime import datetime, timedelta
 
 class categoriaEvento(models.Model):
     idCategoriaEvento = models.AutoField(primary_key=True)
@@ -22,6 +23,7 @@ class evento(models.Model):
     categoriaEvento_id = models.ForeignKey(categoriaEvento, on_delete=models.CASCADE)
     organizador = models.CharField(max_length=255)
     fechaHoraEvento = models.DateTimeField()
+    fechaHoraEventoFinal = models.DateTimeField(default=datetime.now() + timedelta(hours=1))  # Nuevo campo con valor predeterminado
     edificio_id = models.ForeignKey(edificio, on_delete=models.CASCADE)
     lugar = models.CharField(max_length=255)
     flyer = models.BinaryField() #El tipo de dato puede cambiar

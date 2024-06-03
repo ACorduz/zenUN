@@ -67,7 +67,7 @@ body{
     object-fit: contain;
 }
 
-#nombreEvento, #organizador, #categoria, #edificio, #lugar, #aforo, #descripcion, #datetimeInput{
+#nombreEvento, #organizador, #categoria, #edificio, #lugar, #aforo, #descripcion, #datetimeInput, #datetimeInput1{
     max-width: 350px; /* Puedes ajustar este valor según tu preferencia */
 }
 .button-style {
