@@ -53,8 +53,8 @@
         <th>Código</th>
         <th>Edificio</th>
         <th>Disponibilidad</th>
-        <th>Hora de Reserva</th>
-        <th>Hora de Devolución</th>
+        <th>Fecha y hora de Reserva</th>
+        <th>Fecha y hora de Devolución</th>
         <th>Reservar</th>
     </tr>
     <!-- Iterar sobre los implementos y mostrarlos en la tabla -->
@@ -68,8 +68,8 @@
             <td></td>
             <td></td>
         {% else %}
-            <td>{{ implemento.ultima_fecha_inicio_prestamo|default_if_none:"" }}</td>
-            <td>{{ implemento.ultima_fecha_fin_prestamo|default_if_none:"" }}</td>    
+            <td>{{ implemento.ultima_fecha_inicio_prestamo |date:"d/m/Y H:i"|default_if_none:"" }}</td>
+            <td>{{ implemento.ultima_fecha_fin_prestamo |date:"d/m/Y H:i"|default_if_none:"" }}</td>    
         {% endif %}
         {% if implemento.estadoImplementoId.nombreEstadoImplemento != 'DISPONIBLE' %}
             <td><button id="reservarBtn" type="submit" disabled>Reservar</button></td>
