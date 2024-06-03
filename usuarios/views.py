@@ -248,8 +248,8 @@ def autenticar_credenciales_usuario(request):
                                 return redirect(reverse('paginaPrincipal_estudiante'))
                             elif request.user.roles.filter(nombreRol='Administrador Bienestar').exists():
                                 return redirect(reverse('paginaPrincipalAdministradorBienestar'))
-                            elif request.user.roles.filter(nombreRol='Administrador Master').exists():
-                                return redirect(reverse('paginaPrincipalAdministradorMaster'))
+                            elif request.user.roles.filter(nombreRol='Administrador Informes').exists():
+                                return redirect(reverse('principalAdminMaster'))
                     else: 
                         # si no está validado el usuario
                         mensaje = "Revise su correo para válidar la cuenta."
@@ -297,8 +297,9 @@ def mostrar_principalAdminBienestar(request):
 @role_required('Administrador Informes')
 def mostrar_principalAdminMaster(request):
     correo_usuario = request.user.correoInstitucional
+    roles_count = request.user.roles.count()
     mensaje = request.GET.get('mensaje', '')
-    return render(request, 'PrincipalAdminMaster.html', {'correo':correo_usuario, 'mensaje':mensaje})
+    return render(request, 'PrincipalAdminMaster.html', {'correo':correo_usuario, 'mensaje':mensaje,'roles_count':roles_count})
 
 #Cerrar Sesión
 def cerrar_sesion(request):
