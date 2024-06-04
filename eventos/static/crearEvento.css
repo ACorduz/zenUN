@@ -43,8 +43,9 @@
     color: black; 
 }
 .header img[alt="Botón 2"] {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
     cursor: pointer;
 }
 /*Header*/

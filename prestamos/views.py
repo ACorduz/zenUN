@@ -159,7 +159,7 @@ def mostrar_solicitarPrestamo(request,implemento_id):
         hora_inicio_reserva = timezone.now() + timedelta(hours=-5)
         hora_fin_reserva = hora_inicio_reserva + timedelta(minutes=15)
         hora_devolucion_implemento = hora_fin_reserva + timedelta(hours=2)
-
+        roles_count = request.user.roles.count()
         # Pasar los datos al contexto para que puedan ser renderizados y mostrados en el html
         context = {
             'implemento': implementoPrestamo,
@@ -169,7 +169,8 @@ def mostrar_solicitarPrestamo(request,implemento_id):
             'correo_estudiante': correo_estudiante,
             'inicio_reserva': hora_inicio_reserva,
             'fin_reserva': hora_fin_reserva,
-            'devolucion_implemento': hora_devolucion_implemento
+            'devolucion_implemento': hora_devolucion_implemento,
+            'roles_count':roles_count
         }
         
         return render(request, 'LoanApply.html', context)
@@ -519,6 +520,8 @@ def procesar_implemento_AdministradorBienestar(request, idImplemento, estudiante
 
     hora = timezone.now()+timedelta(hours=-5)
 
+    roles_count = request.user.roles.count()
+
     context = {
         "fecha_aprobacion": hora,
         "nombre_administrador": nombre_usuario,
@@ -528,6 +531,7 @@ def procesar_implemento_AdministradorBienestar(request, idImplemento, estudiante
         "nombre_estudiante": nombreEstudiante,
         "correo_estudiante": correoEstudiante,
         "documento_estudiante": estudianteNumeroDocumento,
+        'roles_count':roles_count
         }
     
     

@@ -51,8 +51,9 @@ p {
 }
 
 .header img[alt="Botón 2"] {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
     cursor: pointer;
 }
 
@@ -121,6 +122,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100%;
+    flex-grow: 1;
 }
 
 #formContainer {
@@ -205,6 +207,7 @@ select {
     justify-content: flex-end;
     margin-top: auto;
     box-sizing: border-box;
+    margin-top: auto
 } 
 .textfooter{
     display: flex;

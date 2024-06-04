@@ -8,6 +8,9 @@ body {
     margin: 0;
     padding: 0;    
     min-height: 100vh;
+    background-image: url('../static/registro.jpg');
+    background-size: cover;
+    background-position: center;
     display: flex;
     flex-direction: column;
 }
@@ -62,8 +65,9 @@ body {
 }
 
 .header img[alt="Botón 2"] {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
     cursor: pointer;
 }
 
@@ -125,7 +129,47 @@ body {
     background: url('../static/imgButtonCancelarEvento.jpg') no-repeat center center/cover;
 }
 
+/* Estilos para el footer */
 .footer {
+    display: flex;
+    padding: 20px;
+    background-color: #c0febf;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
+    /*height: 12%; */
+    height: 120px;
+    align-items: center;
+    justify-content: flex-end;
+    position: fixed; /* Cambia a posición fija */
+    box-sizing: border-box;
+}
+
+.textfooter {
+    font-family: 'MiFuente', sans-serif;
+    font-weight: bold;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    right: 50px;
+    text-align: end;
+}
+
+.textfooter p {
+    margin: 3px 0; /* Reducir el margen entre párrafos */
+    font-size: 14px; /* Reducir el tamaño de la fuente si es necesario */
+}
+
+.lineafooter {
+    position: relative;
+    border-left: 1px solid black;
+    height: 100px;
+    margin-left: 10px;
+    right: 50px;
+}
+/*.footer {
     font-size: small;
     text-align: right;
     align-items: right;
@@ -138,7 +182,7 @@ body {
     border-right: 1.5px solid black;
     margin-right: 10px;
     padding-right: 4px;
-}
+}*/
 
 /* Menu Cerrar sesión */
 #btn-menu {
