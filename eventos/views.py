@@ -159,7 +159,7 @@ def mostrar_listaEventos(request):
 def mostrar_asistirEvento(request, evento_id):
     evento_ = get_object_or_404(evento, idEvento=evento_id)
     imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')
-
+    roles_count = request.user.roles.count()
     context = {
         'evento_id': evento_id,
         'nombre_evento': evento_.nombreEvento,
@@ -169,6 +169,7 @@ def mostrar_asistirEvento(request, evento_id):
         'lugar': evento_.lugar,
         'descripcion_evento': evento_.descripcion,
         'imagen_base64': imagen_base64,
+        'roles_count':roles_count,
         'aforo': evento_.aforo
     }
     return render(request, 'asistirEvento.html', context)

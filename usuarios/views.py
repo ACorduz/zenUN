@@ -310,14 +310,15 @@ def cerrar_sesion(request):
 @role_required('Estudiante')
 def mostrar_eventosInscritos(request):
     numeroDocumento = request.user.numeroDocumento
+    roles_count = request.user.roles.count()
     eventos = evento.objects.filter(estadoEvento = "1" ,asistentes= numeroDocumento)
     for evento_ in eventos:
         evento_.imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')  # Convertir la imagen a base64
-    return render(request, 'eventosInscritos.html', {'eventos': eventos})
+    return render(request, 'eventosInscritos.html', {'eventos': eventos,'roles_count':roles_count})
 
 @role_required('Estudiante')
 def mostrar_detalleEventosInscritos(request, evento_id):
-    
+    roles_count = request.user.roles.count()
     evento_ = get_object_or_404(evento, idEvento=evento_id)
     imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')
     context = {
@@ -328,7 +329,8 @@ def mostrar_detalleEventosInscritos(request, evento_id):
         'fecha_hora_evento': evento_.fechaHoraEvento,
         'lugar': evento_.lugar,
         'descripcion_evento': evento_.descripcion,
-        'imagen_base64': imagen_base64
+        'imagen_base64': imagen_base64,
+        'roles_count':roles_count
     }
     return render(request, 'cancelarInscripcionEvento.html', context)
 

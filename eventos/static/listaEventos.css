@@ -50,8 +50,9 @@
 }
 
 .header img[alt="Botón 2"] {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
     cursor: pointer;
 }
 
@@ -193,7 +194,7 @@
     visibility: visible;
 }
 .container-menu{
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     background-color: rgba(0,0,0,0.5);
