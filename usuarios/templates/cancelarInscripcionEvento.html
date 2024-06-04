@@ -16,7 +16,9 @@
             <span>zenUN</span>
         </button>
         <div class="header-title"><b>Cancelar inscripción al evento</b></div>
-        <img src="{% static 'perfil.png' %}" alt="Botón 2">
+        <label for="btn-menu">
+            <img src="{% static 'menuIcon.png' %}" alt="Botón 2">
+        </label>
     </div>
     <div class="informacion-imagen-container">
         <div id="informacionUsuario">
@@ -39,12 +41,19 @@
         <div id="contenedorImagen">
             <img src="data:image/jpeg;base64,{{ imagen_base64 }}" alt="{{ evento.nombreEvento }}">
         </div>
-        <script>
-            document.getElementById("submitButton").addEventListener("click", function() {
+    </div>
+    
+    <!-- Modal de imagen -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="img01">
+    </div>
+    
+    <script>
+        document.getElementById("submitButton").addEventListener("click", function() {
             document.getElementById("myForm").submit();
-            });
-    
-    
+        });
+
         function mostrarAlerta() {
             Swal.fire({
                 title: '¡Atención!',
@@ -61,7 +70,45 @@
                 }
             });
         };
-        </script>
-    </div>
+
+        var modal = document.getElementById("imageModal");
+        var img = document.querySelector("#contenedorImagen img");
+        var modalImg = document.getElementById("img01");
+        var closeBtn = document.getElementsByClassName("close")[0];
+
+        img.onclick = function(){
+            modal.style.display = "block";
+            modalImg.src = this.src;
+        }
+
+        closeBtn.onclick = function() { 
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+        <!-- Menú Cerrar Sesión -->
+  <input type="checkbox" id = "btn-menu"> 
+  <div class="container-menu">
+      <div class="cont-menu">
+        <nav>
+            <a href="{% url 'eventosInscritos'%}"> <img src="{% static 'eventosInscritos.png' %}" alt="Menu" 
+             class="imgCerrarSesion">Eventos Inscritos
+            </a>
+            <!-- Nuevo enlace para Cambiar de Rol -->
+            <a href="{% url 'SeleccionarRol' %}" {% if roles_count == 1 %}class="disabled-link"{% endif %}>
+             <img src="{% static 'cambio.png' %}" alt="Cambiar de Rol" class="imgCambiarRol">
+             Cambiar de Rol
+            </a>
+            <!-- Agrega un mensaje de prueba para verificar si la lógica funciona -->
+            <a href="{% url 'cerrar_sesion'%}"><img src="{% static 'logoutIcon.png' %}" alt="Menu" class="imgCerrarSesion">Cerrar Sesión</a>
+            <!-- Etiqueta "a" para agregar más items al menú -->
+         </nav>           
+      </div>
+  </div>
 </body>
 </html>

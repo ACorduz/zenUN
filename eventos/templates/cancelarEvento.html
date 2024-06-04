@@ -41,7 +41,7 @@
     <tr>
         <td>{{ evento_info.nombre }}</td>
         <td>{{ evento_info.organizador }}</td>
-        <td>{{ evento_info.fecha_hora }}</td>
+        <td>{{ evento_info.fecha_hora|date:"d/m/Y H:i" }}</td>
         <td>{{ evento_info.lugar }}</td>
         {% if evento_info.estado != 'Programado' %}
             <td><button id="cancelarBtn" type="submit" disabled>Cancelar</button></td>
