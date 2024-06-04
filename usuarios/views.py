@@ -324,7 +324,7 @@ def mostrar_detalleEventosInscritos(request, evento_id):
         'evento_id': evento_id,
         'nombre_evento': evento_.nombreEvento,
         'organizador': evento_.organizador,
-        'categoria': evento_.categoriaEvento_id,
+        'categoria': evento_.categoriaEvento_id.nombreCategoriaEvento,
         'fecha_hora_evento': evento_.fechaHoraEvento,
         'lugar': evento_.lugar,
         'descripcion_evento': evento_.descripcion,
