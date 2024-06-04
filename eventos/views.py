@@ -43,6 +43,8 @@ from usuarios.models import usuario
 import base64
 from functools import wraps
 
+import ast
+
 # Create your views here.
 #######################LOGICA PARA CREAR EVENTOS#######################################
 
@@ -677,8 +679,9 @@ def crearTablaReportLab(data, lienzo:canvas.Canvas, numeroColumnas:int, valorHig
 
 
 # Reporte Eventos 
+# Reporte Eventos 
 def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, lugarEvento, opciones_seleccionadas):
-    ## OJO opciones_seleccionadas ES UNA ARRAY 
+    ## OJO opciones_seleccionadas ES UNA ARRAY
 
     ## header
         #header-titulo
@@ -689,20 +692,136 @@ def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, l
         # header-subtitulo
     lienzo.drawString(x=30, y=750,text='ZenUN')
     lienzo.setFont('Helvetica', 12)
+
     lienzo.drawString(30, 730, "Reporte EVENTOS")
         # header-hora
+    hora_ahora = djangoTimeZone.now() + timedelta(hours=-5)
+    fecha_formateada = hora_ahora.strftime('%Y-%m-%d %H:%M:%S') # Formatear la fecha y hora
+
     lienzo.setFont("Helvetica-Bold", 12)
-    lienzo.drawString(480, 730, "fechaDeAhora")   
-    #Trazabilidad informe de Eventos, idInforme 1 
+    lienzo.drawString(350, 730, f"Fecha del reporte: {fecha_formateada}")
+
+    ## ------------------ ARRAY DE DATOS PARA LAS TABLAS -----------------
+    data = []
+
+    ## ------------------ MODIFICAR OBJETOS FECHA ------------------------
+    objeto_fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').replace(tzinfo=datetimeTimeZone.utc)   
+    objeto_fechaFinal = (datetime.strptime(fechaFin, '%Y-%m-%d')  + timedelta(days=1) - timedelta(seconds=1)).replace(tzinfo=datetimeTimeZone.utc) 
+    
+    ## ------------------- PRIMERA TABLA----------------------------------
+
+    # Sacar datos de la base de datos
+    BDData = []
+    lista_eventos = evento.objects.select_related('categoriaEvento_id')
+    opciones_seleccionadas = ast.literal_eval(opciones_seleccionadas)
+
+    # Muramos si el lugar esta vacio
+    if (lugarEvento == ""):
+        for opciones in opciones_seleccionadas:
+            for nuevaTabla  in lista_eventos:
+                if (nuevaTabla.categoriaEvento_id.nombreCategoriaEvento == opciones) and (objeto_fechaInicio <= nuevaTabla.fechaHoraCreacion <= objeto_fechaFinal):
+                    row = [
+                        nuevaTabla.idEvento,
+                        nuevaTabla.nombreEvento,
+                        nuevaTabla.fechaHoraCreacion,
+                        nuevaTabla.categoriaEvento_id.nombreCategoriaEvento,
+                        nuevaTabla.organizador
+                    ]
+                    BDData.append(row)
+                else:
+                    pass
+    else:
+        for opciones in opciones_seleccionadas:
+            for nuevaTabla  in lista_eventos:
+                if (nuevaTabla.edificio_id.nombreEdificio.lower() == lugarEvento.lower()) and (nuevaTabla.categoriaEvento_id.nombreCategoriaEvento == opciones) and (objeto_fechaInicio <= nuevaTabla.fechaHoraCreacion <= objeto_fechaFinal):
+                    row = [
+                        nuevaTabla.idEvento,
+                        nuevaTabla.nombreEvento,
+                        nuevaTabla.fechaHoraCreacion,
+                        nuevaTabla.categoriaEvento_id.nombreCategoriaEvento,
+                        nuevaTabla.organizador
+                    ]
+                    BDData.append(row)
+                else:
+                    pass
+
+     #----- CREACION ESTILOS---------
+    # Llamar a los Estilos
+    styles = getSampleStyleSheet() # nos da una lista de estilos a escoger de la biblioteca
+    
+    # Creacion estilo <-- header tabla
+    styleHeaderTable = ParagraphStyle('styleHeaderTable',  
+        parent= styles['Heading1'],
+        fontSize=10, 
+        alignment=1  # Center alignment
+    )
+
+    # Creacion estilo <-- contenido tabla   
+    styleN = ParagraphStyle('p',  
+        parent=styles["BodyText"],
+        fontSize=7, 
+        alignment=1  # Center alignment
+    )
+
+    # Títulos de las columnas (primera fila)
+    idEvento = Paragraph('idEvento', styleHeaderTable)
+    nombreEvento = Paragraph('nombreEvento', styleHeaderTable)
+    fechaCreacion = Paragraph('fechaCreacion', styleHeaderTable)
+    categoriaEvento = Paragraph('categoriaEvento', styleHeaderTable)
+    organizador = Paragraph('organizador', styleHeaderTable)
+
+    data.append([idEvento, nombreEvento, fechaCreacion, categoriaEvento, organizador])
+    
+    high = 700
+
+    # ¿Cuantos prestamos se hicieron en la consulta?
+    TotalConsultaBD1 = len(BDData)
+
+
+    # Agregar (datos BD) al (array data)
+    for datoBd in BDData:
+        row = []
+        for item in datoBd:
+            # Poner estilo a ese dato
+            dato = Paragraph(str(item), styleN)
+            row.append(dato)
+
+        high -= 18
+        data.append(row)
+
+        # CAMBIAR PAGINA, si se pasa de un numero de datos o high especifico 
+        if high < 360:
+            # Poner tabla en el CANVAS
+            crearTablaReportLab(data, lienzo, 5, valorHigh= 700, PonerDesdeLimiteAbajo = True, alturaRow= 18, anchoCol= 3.7)
+
+            # Cambiar el high a 750, ya que alcanzo limite pagina 
+            high = 750
+            
+            # Limpiar datos del array de datos de la tabla 
+            data.clear() 
+
+            # Agregar los (nombres Columnas) a la tabla otra vez 
+            data.append([idEvento, nombreEvento, fechaCreacion, categoriaEvento, organizador])
+
+    # PARA LOS DATOS RESTANTES, si falto dibujar una parte de la tabla
+    crearTablaReportLab(data, lienzo, 5, valorHigh=600, PonerDesdeLimiteAbajo = False, alturaRow= 20, anchoCol= 3.7)
+
+    ##------------------ CUANTOS PRESTAMOS ----------------------------------
+    lienzo.setFont('Helvetica', 10)
+    lienzo.drawString(x=30, y=750,text=f'''1.5  ¡TOTAL EVENTOS IDENTIDICADOS CON FILTROS!: ''')
+    lienzo.setFont('Helvetica-Bold', 15)
+    lienzo.drawString(x=370, y=750,text=f'''{TotalConsultaBD1} ''')
+    lienzo.setFont('Helvetica', 10)
+    lienzo.drawString(x=30, y=735,text='---------------------------------------------------------------------------------------------------------------------------')
+
+    #Trazabilidad informe de Asistencia a eventos, idInforme 2
     tipo_informe = tipoInforme.objects.get(pk=1)
     nuevo_informe = trazabilidadInformes(
-        fechaGeneracionInforme = timezone.now(),
+        fechaGeneracionInforme = fecha_formateada,
         tipoInforme = tipo_informe
     )
     nuevo_informe.save()
     return(None)
-
-    
 
     
 # Reporte Asistencia
