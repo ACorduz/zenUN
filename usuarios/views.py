@@ -346,7 +346,8 @@ def cancelar_InscripcionEstudiante(request,evento_id):
         idRazonCambio = razonCambio.objects.get(pk=21) #Estudiante cancela su registro a un evento
         evento_._change_reason = idRazonCambio
         evento_.asistentes.remove(usuario_)  # Establece los asistentes del evento como el usuario dado
-        #evento_.save()  # Guarda el evento actualizado
+        evento_.aforo +=1
+        evento_.save()  # Guarda el evento actualizado
 
 
     return render(request, 'cancelacionExitosa.html')

@@ -74,7 +74,7 @@ def Proceso_enviarCorreo_cancelarPrestamo(numeroDocumento, nombreImplemento, fec
         # no se verifica si el correo ingresado existe pues para llamar a este metodo ya deberia haberse verificado esto    
 
         #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
-        subject = "Tu prestamo a sido cancelado"
+        subject = "Tu prestamo ha sido cancelado"
         message = ""
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [correoUsuario]

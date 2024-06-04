@@ -143,6 +143,12 @@ input[type="button"]:hover {
     background-color: #2eeb2e; 
 }
 
+input[type="button"]:disabled{
+    background-color: rgb(211, 203, 203);
+    color: hsl(0, 0%, 8%); 
+    cursor: default; 
+}
+
 .modal {
     display: none; 
     position: fixed; 
