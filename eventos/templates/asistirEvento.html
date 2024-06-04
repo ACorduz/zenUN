@@ -33,11 +33,12 @@
                 <p>Categoría: <span id="categoria">{{ categoria }}</span></p>
                 <p>Fecha y Hora: <span id="fechayhora">{{ fecha_hora_evento }}</span></p>
                 <p>Lugar: <span id="lugar">{{ lugar }}</span></p>
+                <p>Cupos disponibles: <span id="aforo">{{ aforo }}</span></p>
                 <p>Descripción: <span id="descripcion">{{ descripcion_evento }}</span></p>
                 <form id="myForm" action="{% url 'inscripcionExitosa' evento_id %}" method="POST">
                     <!-- token de validacion -->
                     {% csrf_token %}
-                    <input type="button" id="submitButton" value="Inscribirse al evento">
+                    <input type="button" id="submitButton" value="Inscribirse al evento" disabled>
                 </form>
             </div>
         </div>
@@ -109,6 +110,18 @@
             if (event.target == modal) {
                 modal.style.display = "none";
             }
+        }
+    </script>
+    <script>
+        // Obtén el valor del aforo
+        var aforo = parseInt(document.getElementById("aforo").innerText);
+
+        // Obtén el botón de submit
+        var submitButton = document.getElementById("submitButton");
+
+        // Verifica si el aforo es mayor que 0 y habilita el botón si es necesario
+        if (aforo > 0) {
+            submitButton.disabled = false;
         }
     </script>
 </body>
