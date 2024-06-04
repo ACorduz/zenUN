@@ -157,6 +157,7 @@ def mostrar_listaEventos(request):
 def mostrar_asistirEvento(request, evento_id):
     evento_ = get_object_or_404(evento, idEvento=evento_id)
     imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')
+
     context = {
         'evento_id': evento_id,
         'nombre_evento': evento_.nombreEvento,
@@ -165,7 +166,8 @@ def mostrar_asistirEvento(request, evento_id):
         'fecha_hora_evento': evento_.fechaHoraEvento,
         'lugar': evento_.lugar,
         'descripcion_evento': evento_.descripcion,
-        'imagen_base64': imagen_base64
+        'imagen_base64': imagen_base64,
+        'aforo': evento_.aforo
     }
     return render(request, 'asistirEvento.html', context)
 
@@ -177,29 +179,37 @@ def guardar_informacionInscripcion(request,evento_id):
     ###Logica para la validación de no poder inscribirse a otro evento en el mismo horario.
     fecha_evento = evento_.fechaHoraEvento
     evento1 = evento.objects.filter(fechaHoraEvento = fecha_evento, asistentes= numeroDocumentoUser).exclude(idEvento=evento_id)
+    if evento_.aforo == 0:
 
-    if evento1.exists(): 
-        print("No se puede inscribir a este evento por que se cruza con otros eventos en el mismos horario")
+        print("No se puede inscribir a este evento por que ya no hay cupos dispobibles")
 
-        mensaje = f"No se puede inscribir a este evento por que se cruza con otro eventos en el mismo horario" # solo se le pasaria el mensaje en la URL 
+        mensaje = f"No se puede inscribir a este evento por que ya no hay cupos dispobibles" # solo se le pasaria el mensaje en la URL 
         return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
+    
     else:
- 
-        #Logica para verificar que el usuario no este inscrito ya en este evento
-        if not evento_.asistentes.filter(numeroDocumento=numeroDocumentoUser).exists():
-            #Trazabilidad Eventos
-            idRazonCambio = razonCambio.objects.get(pk=20) #Estudiante se inscribe a un evento
-            evento_._change_reason = idRazonCambio
-            evento_.asistentes.add(usuario_)  # Establece los asistentes del evento como el usuario dado
-            #evento_.save()  # Guarda el evento actualizado
-            print("El usuario fue agregado")
-            Proceso_enviarCorreo_inscripcionExitosa(numeroDocumentoUser,evento_id)
-            return render(request, 'inscripcionExitosa.html')
-        
-        else:
-            print("El usuario ya esta inscrito en este evento")
-            mensaje = f"El usuario ya esta inscrito en este evento"
+        if evento1.exists(): 
+            print("No se puede inscribir a este evento por que se cruza con otros eventos en el mismos horario")
+
+            mensaje = f"No se puede inscribir a este evento por que se cruza con otro eventos en el mismo horario" # solo se le pasaria el mensaje en la URL 
             return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
+        else:
+    
+            #Logica para verificar que el usuario no este inscrito ya en este evento
+            if not evento_.asistentes.filter(numeroDocumento=numeroDocumentoUser).exists():
+                #Trazabilidad Eventos
+                idRazonCambio = razonCambio.objects.get(pk=20) #Estudiante se inscribe a un evento
+                evento_._change_reason = idRazonCambio
+                evento_.asistentes.add(usuario_)  # Establece los asistentes del evento como el usuario dado
+                evento_.aforo -=1
+                evento_.save()  # Guarda el evento actualizado
+                print("El usuario fue agregado")
+                Proceso_enviarCorreo_inscripcionExitosa(numeroDocumentoUser,evento_id)
+                return render(request, 'inscripcionExitosa.html')
+            
+            else:
+                print("El usuario ya esta inscrito en este evento")
+                mensaje = f"El usuario ya esta inscrito en este evento"
+                return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
     
 def Proceso_enviarCorreo_inscripcionExitosa(numeroDocumento,evento_id):
     try: 
