@@ -62,17 +62,17 @@
                 <label for="lugarEvento"><strong>Lugar de los eventos:</strong></label><br>
                 <input type="text" id="lugarEvento" name="lugarEvento"><br><br>
 
-                <label> <strong>Elige una o más categorias:</strong> </label><br>
-                <input type="checkbox" id="opcion1" name="opciones" value="opcion1">
+                <label><strong>Elige una o más categorias:</strong></label><br>
+                <input type="checkbox" id="opcion1" name="opciones" value="Bienestar">
                 <label for="opcion1">Bienestar</label><br>
-                <input type="checkbox" id="opcion2" name="opciones" value="opcion2">
+                <input type="checkbox" id="opcion2" name="opciones" value="Semillero">
                 <label for="opcion2">Semillero</label><br>
-                <input type="checkbox" id="opcion3" name="opciones" value="opcion3">
-                <label for="opcion3">Convocatoria</label><br>
-                <input type="checkbox" id="opcion4" name="opciones" value="opcion4">
+                <input type="checkbox" id="opcion3" name="opciones" value="Convocatoria Deportiva">
+                <label for="opcion3">Convocatoria Deportiva</label><br>
+                <input type="checkbox" id="opcion4" name="opciones" value="Torneo">
                 <label for="opcion4">Torneo</label><br><br>
 
-                <button type="submit">Generar informe</button>
+                <button type="submit" onclick="validateForm_eventos()"> Generar informe</button>
             </form>
         </div>
     </div>
@@ -103,13 +103,13 @@
                     <input type="text" id="lugarEvento" name="lugarEvento"><br><br>
 
                     <label><strong>Elige una o más categorias:</strong></label><br>
-                    <input type="checkbox" id="opcion1" name="opciones" value="opcion1">
+                    <input type="checkbox" id="opcion1" name="opciones" value="Bienestar">
                     <label for="opcion1">Bienestar</label><br>
-                    <input type="checkbox" id="opcion2" name="opciones" value="opcion2">
+                    <input type="checkbox" id="opcion2" name="opciones" value="Semillero">
                     <label for="opcion2">Semillero</label><br>
-                    <input type="checkbox" id="opcion3" name="opciones" value="opcion3">
-                    <label for="opcion3">Convocatoria</label><br>
-                    <input type="checkbox" id="opcion4" name="opciones" value="opcion4">
+                    <input type="checkbox" id="opcion3" name="opciones" value="Convocatoria Deportiva">
+                    <label for="opcion3">Convocatoria Deportiva</label><br>
+                    <input type="checkbox" id="opcion4" name="opciones" value="Torneo">
                     <label for="opcion4">Torneo</label><br><br>
 
                     <button type="submit">Generar informe</button>
@@ -167,6 +167,113 @@
                 </form>
             `);
         });
+
+    </script>
+    <script>
+        // METODOS PARA LOS MENSAJES DE ERROR
+        // funcion para validar los campos del formulario de prestamos 
+        function validateForm_prestamos() {
+            var fechaInicio= document.getElementById('fechaInicio').value;
+            var fechaFinal = document.getElementById('fechaFin').value;
+            var nombreImplemento = document.getElementById('nombreImplemento').value;
+
+            //si esta vacio algun campo OBLIGATORIO
+            if (fechaInicio === '' || fechaFinal === '') {
+                mostrarAlertaError("Error:","Porfavor, rellene todos los campos obligatorios de fechas.");
+                event.preventDefault(); // Detener el envío del formulario
+                return(0)
+            }else{
+                // si la fechas NO son LOGICAS 
+                const fechaIni = new Date(fechaInicio);
+                const fechaFin = new Date(fechaFinal);
+                if(fechaFin < fechaIni){
+                    mostrarAlertaError("Error fecha de FINAL NO puede ser MENOR a la INICIAL");
+                    event.preventDefault(); // Detener el envío del formulario
+                }
+                else if(fechaInicio == fechaFinal){
+                    mostrarAlertaError("Error fecha de FINAL NO puede ser IGUAL a la INICIAL, escoja un Rango");
+                    event.preventDefault(); // Detener el envío del formulario
+                }
+            }
+            
+        }
+
+        // Validacion de form eventos 
+        function validateForm_eventos() {
+            var fechaInicio = document.getElementById('fechaInicio').value;
+            var fechaFinal = document.getElementById('fechaFin').value;
+            var lugarEvento = document.getElementById('lugarEvento').value;
+            var opciones = document.getElementsByName('opciones')
+
+            var seleccionadas = [];
+            
+            // Recorrer el NodeList de opciones
+            for (var i = 0; i < opciones.length; i++) {
+                // Verificar si la opción está seleccionada
+                if (opciones[i].checked) {
+                    // Agregar el valor de la opción seleccionada al array de SELECCIONADAS
+                    seleccionadas.push(opciones[i].value);
+                }
+            }
+
+            // console.log("opciones pepe",  seleccionadas)
+            if (fechaInicio === '' || fechaFinal === '') {
+                mostrarAlertaError("Error:","Porfavor, rellene todos los campos obligatorios de fechas");
+                event.preventDefault(); // Detener el envío del formulario
+            }else{
+                // si la fechas NO son LOGICAS 
+                const fechaIni = new Date(fechaInicio);
+                const fechaFin = new Date(fechaFinal);
+                if(fechaFin < fechaIni){
+                    mostrarAlertaError("Error fecha de FINAL NO puede ser MENOR a la INICIAL");
+                    event.preventDefault(); // Detener el envío del formulario
+                }
+                else if(fechaInicio == fechaFinal){
+                    mostrarAlertaError("Error fecha de FINAL NO puede ser IGUAL a la INICIAL, escoja un Rango");
+                    event.preventDefault(); // Detener el envío del formulario
+                }else{
+                    if(seleccionadas.length == 0){
+                        mostrarAlertaError("Error:","Porfavor, SELECCIONE por lo menos una categoria ");
+                        event.preventDefault(); // Detener el envío del formulario
+                    }
+                }
+
+            }
+            
+        }
+
+        function validateForm_asistencia() {
+            var nombreEvento = document.getElementById('nombreEvento').value;
+
+            //si esta vacio algun campo OBLIGATORIO
+            if (nombreEvento === '' ) {
+                mostrarAlertaError("Error:","Porfavor, rellene el campo de nombre del evento");
+                event.preventDefault(); // Detener el envío del formulario
+            }
+        }
+
+        // funion para crear una alerta de ERROR con la libreria SweetAlert2
+        function mostrarAlertaError(titulo="",texto) {
+            // Mostrar alerta personalizada con SweetAlert2
+            Swal.fire({
+            title: titulo,
+            text: texto,
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+            });
+        }
+
+        // funion para crear una alerta de AVISO con la libreria SweetAlert2
+        function mostrarAlertaAviso(titulo="",texto) {
+            // Mostrar alerta personalizada con SweetAlert2
+            Swal.fire({
+            title: titulo,
+            text: texto,
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+            });
+        }
+
     </script>
 </body>
 
