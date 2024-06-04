@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -65,14 +66,14 @@
                     <label><strong>Lugar de los eventos no es obligatorio</strong> <br> NOTA: si se deja vacio consulta general</label> <br>
                     <br>
 
-                    <label> <strong>Elige una o más categorias:</strong> </label><br>
-                    <input type="checkbox" id="opcion1" name="opciones" value="opcion1">
+                    <label><strong>Elige una o más categorias:</strong></label><br>
+                    <input type="checkbox" id="opcion1" name="opciones" value="Bienestar">
                     <label for="opcion1">Bienestar</label><br>
-                    <input type="checkbox" id="opcion2" name="opciones" value="opcion2">
+                    <input type="checkbox" id="opcion2" name="opciones" value="Semillero">
                     <label for="opcion2">Semillero</label><br>
-                    <input type="checkbox" id="opcion3" name="opciones" value="opcion3">
-                    <label for="opcion3">Convocatoria</label><br>
-                    <input type="checkbox" id="opcion4" name="opciones" value="opcion4">
+                    <input type="checkbox" id="opcion3" name="opciones" value="Convocatoria Deportiva">
+                    <label for="opcion3">Convocatoria Deportiva</label><br>
+                    <input type="checkbox" id="opcion4" name="opciones" value="Torneo">
                     <label for="opcion4">Torneo</label><br><br>
 
                     <button type="submit" onclick="validateForm_eventos()"> Generar informe</button>
@@ -106,6 +107,7 @@
             </nav>            
         </div>
     </div>
+    
     <script>
         $('#btn1').click(function () {
             $('#formContainer').html(`
@@ -127,15 +129,14 @@
 
                     
                     <label><strong>Elige una o más categorias:</strong></label><br>
-                    <input type="checkbox" id="opcion1" name="opciones" value="opcion1">
+                    <input type="checkbox" id="opcion1" name="opciones" value="Bienestar">
                     <label for="opcion1">Bienestar</label><br>
-                    <input type="checkbox" id="opcion2" name="opciones" value="opcion2">
+                    <input type="checkbox" id="opcion2" name="opciones" value="Semillero">
                     <label for="opcion2">Semillero</label><br>
-                    <input type="checkbox" id="opcion3" name="opciones" value="opcion3">
-                    <label for="opcion3">Convocatoria</label><br>
-                    <input type="checkbox" id="opcion4" name="opciones" value="opcion4">
+                    <input type="checkbox" id="opcion3" name="opciones" value="Convocatoria Deportiva">
+                    <label for="opcion3">Convocatoria Deportiva</label><br>
+                    <input type="checkbox" id="opcion4" name="opciones" value="Torneo">
                     <label for="opcion4">Torneo</label><br><br>
-                    
 
                     <button type="submit" onclick="validateForm_eventos()" >Generar informe</button>
                 </form>
