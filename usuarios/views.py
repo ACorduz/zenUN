@@ -31,7 +31,7 @@ def role_required(role_name):
                 return view_func(request, *args, **kwargs)
             else:
                 # Redirigir a una página de acceso denegado si no tiene el rol necesario
-                return redirect(reverse('access_denied'))  # Asegúrate de definir esta URL en tu proyecto
+                return redirect(reverse('accesoDenegado'))  # Asegúrate de definir esta URL en tu proyecto
         return _wrapped_view
     return decorator
 
@@ -589,6 +589,11 @@ def procesar_registro_administrador_bienestar(request):
                 idRazonCambio = razonCambio.objects.get(pk=5) #Razón cambio 5: Asignación rol admin
                 administradorBienestar._change_reason = idRazonCambio
                 administradorBienestar.roles.add(administradorBienestar.numeroDocumento, 2)
+
+                #Asignar el rol de Estudiante
+                idRazonCambio = razonCambio.objects.get(pk=7) #Razón cambio 7: Asignación rol estudiante
+                administradorBienestar._change_reason = idRazonCambio
+                administradorBienestar.roles.add(administradorBienestar.numeroDocumento, 1)
                 
                 ##Envio de correo con el código de verificación
                 #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar

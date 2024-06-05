@@ -19,6 +19,8 @@ from eventos.models import evento,tipoInforme,trazabilidadInformes
 from usuarios.models import usuario
 from usuarios.models import razonCambio
 
+from usuarios.views import role_required
+
 import base64
 
 # llamar a los modelos de la BD
@@ -47,7 +49,7 @@ import ast
 
 # Create your views here.
 #######################LOGICA PARA CREAR EVENTOS#######################################
-
+@role_required('Administrador Bienestar')
 def mostrar_crear_evento(request):
     categorias = categoriaEvento.objects.all()
     edificios = edificio.objects.all()
@@ -148,6 +150,7 @@ def procesar_crear_evento(request):
 
 #######################LOGICA PARA LISTA DE EVENTOS#######################################
 #Muestra la lista de todos los eventos a los que el estudiante se puede inscribir
+@role_required('Estudiante')
 def mostrar_listaEventos(request):
     eventos = evento.objects.filter(estadoEvento = "1").order_by('fechaHoraEvento')
     roles_count = request.user.roles.count()
@@ -156,6 +159,7 @@ def mostrar_listaEventos(request):
     return render(request, 'listaEventos.html', {'eventos': eventos,'roles_count':roles_count})
 
 #muestra el resumen del evento que el estudiante de click y al cual el estudiante puede inscribirse
+@role_required('Estudiante')
 def mostrar_asistirEvento(request, evento_id):
     evento_ = get_object_or_404(evento, idEvento=evento_id)
     imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')
@@ -265,7 +269,8 @@ def Proceso_enviarCorreo_inscripcionExitosa(numeroDocumento,evento_id):
 
 #######################LOGICA PARA GENERAR INFORMES#######################################
 
-# Función para mostrar la vista principal de la sección de informes 
+# Función para mostrar la vista principal de la sección de informes
+@role_required('Administrador Informes') 
 def mostrar_vista_informes(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     eventos = evento.objects.all()
@@ -974,6 +979,7 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento):
 
 #######################LOGICA PARA CREAR EVENTOS#######################################
 #Logica para cancelar la inscripción a un evento
+@role_required('Estudiante')
 def cancelar_inscripcionEvento(request):
     return render(request, 'asistirEvento.html')
 
@@ -992,7 +998,7 @@ def cancelar_inscripcionEvento(request):
 #             'estado': estado.nombreEstadoEvento if estado else '',  # Obtener el nombre del estado o cadena vacía si no hay estado
 #         })
 #     return render(request, 'cancelarEvento.html', {'eventos_info': eventos_info})
-
+@role_required('Administrador Bienestar')
 def mostrar_cancelar_evento(request):
     # Filtrar los eventos que tienen el estado "Programado"
     eventos = evento.objects.filter(estadoEvento__nombreEstadoEvento='Programado').select_related('categoriaEvento_id', 'edificio_id').prefetch_related('estadoEvento')

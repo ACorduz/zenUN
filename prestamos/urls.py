@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
         path('solicitarPrestamo/<int:implemento_id>/', 
-            login_required(views.mostrar_solicitarPrestamo), 
+            views.mostrar_solicitarPrestamo, 
             name='solicitarPrestamo'
         ), #Vista solicitarPrestamo
         path('reservaExitosa/<int:implemento_id>/', 
@@ -31,17 +31,17 @@ urlpatterns = [
         ), #En la vista  devolucionImplementos( con paramentro CORREO en la URL)  procesar devolucion implemento
         ##vista Disponibilidad Implementos
         path('tablaDisponibilidadImplementos/', 
-             login_required(views.mostrar_tabla_disponibilidad_implementos), 
+             views.mostrar_tabla_disponibilidad_implementos, 
              name='tablaDisponibilidadImplementos'),
         path("aprobarPrestamoTabla/",
-            login_required(views.mostrar_tabla_aprobar),
+            views.mostrar_tabla_aprobar,
             name="Mostrar_aprobarPrestamo_tabla"
         ),# Vista de la tabla de prestamos por aprobar por parte del administrador de bienestar
         path("procesarImplemento/<int:idImplemento>/<int:estudianteNumeroDocumento>/",
              views.procesar_implemento_AdministradorBienestar,
              name="procesarImplemento"),
         path("aprobarPrestamo/<int:idImplemento>/<int:estudianteNumeroDocumento>/<int:documento_usuario>/",
-             login_required(views.procesar_aprobar_prestamo),
+             views.procesar_aprobar_prestamo,
              name="procesarPrestamo"),
         path("llamarTareaAsincronica",
              views.generar_tareaSegundoPlano,
