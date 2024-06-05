@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
         path('solicitarPrestamo/<int:implemento_id>/', 
-            views.mostrar_solicitarPrestamo, 
+            login_required(views.mostrar_solicitarPrestamo), 
             name='solicitarPrestamo'
         ), #Vista solicitarPrestamo
         path('reservaExitosa/<int:implemento_id>/', 
@@ -41,7 +41,7 @@ urlpatterns = [
              views.procesar_implemento_AdministradorBienestar,
              name="procesarImplemento"),
         path("aprobarPrestamo/<int:idImplemento>/<int:estudianteNumeroDocumento>/<int:documento_usuario>/",
-             views.procesar_aprobar_prestamo,
+             login_required(views.procesar_aprobar_prestamo),
              name="procesarPrestamo"),
         path("llamarTareaAsincronica",
              views.generar_tareaSegundoPlano,

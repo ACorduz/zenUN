@@ -17,7 +17,7 @@ urlpatterns = [
             views.autenticar_credenciales_usuario, 
             name='autenticar_credenciales_usuario'), #Ruta para el formulario Login
     path('paginaPrincipalEstudiante/', 
-            login_required(views.mostrar_mainPage_estudiante), 
+            views.mostrar_mainPage_estudiante, 
             name='paginaPrincipal_estudiante'), #vista Principal estudiante
     path('cerrar-sesion/', 
             views.cerrar_sesion, 
@@ -65,7 +65,7 @@ urlpatterns = [
         views.mostrar_principalAdminBienestar,
         name = "paginaPrincipalAdministradorBienestar"),
     path("procesarSeleccionRol/",
-         views.procesar_seleccionar_rol,
+         login_required(views.procesar_seleccionar_rol),
          name='ProcesarSeleccionRol'),
     path('principalAdminInformes/',
          views.mostrar_principalAdminMaster,

@@ -499,8 +499,9 @@ def solicitar_prestamo(request, implemento_id):
 def mostrar_tabla_aprobar(request):
     prestamos = prestamo.objects.all().filter(estadoPrestamo_id=1)
     roles_count = request.user.roles.count()
+    documentoAdministrador = request.user.numeroDocumento
     print(prestamos) # En la BD 1 = PROCESO
-    return render(request, 'Aprobar_prestamo_tabla.html', {'Prestamos': prestamos,'roles_count':roles_count})
+    return render(request, 'Aprobar_prestamo_tabla.html', {'Prestamos': prestamos,'roles_count':roles_count, 'documentoAdministrador': documentoAdministrador})
 
 
 ################# Actualizamos la vista principal de aprobar prestamo individual################
