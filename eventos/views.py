@@ -43,6 +43,9 @@ from usuarios.models import usuario
 import base64
 from functools import wraps
 
+#Tarea en segundo plano
+from apscheduler.schedulers.background import BackgroundScheduler
+
 import ast
 
 # Create your views here.
@@ -137,6 +140,8 @@ def procesar_crear_evento(request):
                         evento_.estadoEvento.add(evento_.idEvento, 1)
 
                         mensaje = 'Evento creado exitosamente!'
+                        #Llamar la función para que finalice el Evento
+                        generar_tareaSegundoPlanoFinalizarEvento(request,evento_)
                         request.session.pop('datos_ingresados', None)
                         return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
 
@@ -146,6 +151,47 @@ def procesar_crear_evento(request):
 
     return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
 
+def generar_tareaSegundoPlanoFinalizarEvento(request,evento_):
+    #Funcion para llamar la tarea en una fecha especifica
+    fechaCreacion = evento_.fechaHoraEvento
+    try:
+        # Asegúrate de que la fecha sea un objeto datetime
+        if isinstance(fechaCreacion, str):
+            fechaCreacion = datetime.fromisoformat(fechaCreacion)
+        
+        # Crea una instancia del planificador
+        scheduler = BackgroundScheduler()
+        
+        # Agrega la tarea programada al planificador para que se ejecute en la fecha específica
+        scheduler.add_job(finalizarEvento, 'date', run_date=fechaCreacion, args=[request,evento_])
+        
+        # Inicia el planificador
+        scheduler.start()
+        
+        print("Tarea en segundo plano programada para:", fechaCreacion)
+    
+    except Exception as e:
+
+        print("Error al programar la tarea en segundo plano:", str(e))
+
+def finalizarEvento(request,evento_):
+    print("Funciona melo lo de finalizar evento")
+
+    print(evento_.idEvento)
+    evento_a_finalizar = get_object_or_404(evento, idEvento=evento_.idEvento)
+    
+    estado_finalizado = get_object_or_404(estadoEvento, nombreEstadoEvento='Finalizado')
+    evento_a_finalizar.estadoEvento.clear()
+
+    idRazonCambio = razonCambio.objects.get(pk=23) #Se le asigna el estado de FONALIZADO al evento   
+    evento_a_finalizar._change_reason = idRazonCambio
+
+    evento_a_finalizar.estadoEvento.add(estado_finalizado)
+
+    print("se finalizo bien el evento")
+
+
+    
 #######################LOGICA PARA LISTA DE EVENTOS#######################################
 #Muestra la lista de todos los eventos a los que el estudiante se puede inscribir
 def mostrar_listaEventos(request):
@@ -204,6 +250,10 @@ def guardar_informacionInscripcion(request,evento_id):
                 evento_._change_reason = idRazonCambio
                 evento_.asistentes.add(usuario_)  # Establece los asistentes del evento como el usuario dado
                 evento_.aforo -=1
+
+                #Trazabilidad del Aforo
+                idRazonCambio2 = razonCambio.objects.get(pk=22) #El aforo se reduce en 1   
+                evento_._change_reason = idRazonCambio2
                 evento_.save()  # Guarda el evento actualizado
                 print("El usuario fue agregado")
                 Proceso_enviarCorreo_inscripcionExitosa(numeroDocumentoUser,evento_id)
@@ -1026,5 +1076,52 @@ def cancelar_evento(request, evento_id):
     evento_a_cancelar._change_reason = idRazonCambio
 
     evento_a_cancelar.estadoEvento.add(estado_cancelado)
-    
+
+    Proceso_enviarCorreo_cancelacionEvento(evento_id)
+
     return redirect('mostrar_cancelar_evento')
+
+def Proceso_enviarCorreo_cancelacionEvento(evento_id):
+    try: 
+
+        #Datos del evento para enviar por correo
+        evento_ = get_object_or_404(evento, idEvento=evento_id)
+        #Los correos de los asistentes
+        recipient_list = []
+        asistentes = evento_.asistentes.all()
+        for asistente in asistentes:
+            recipient_list.append(asistente.correoInstitucional)
+
+        nombreEvento = evento_.nombreEvento
+        fechaEvento = evento_.fechaHoraEvento
+
+        #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
+        subject = "Evento Cancelado"
+        message = ""
+        email_from = settings.EMAIL_HOST_USER
+        
+
+        #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+        context = {
+                    "nombreEvento":nombreEvento,
+                    "fechaEvento":fechaEvento ,
+                }
+        #Renderizamos el template html
+        template = get_template("SendMessageEmailCancelacionEvento.html")
+        content = template.render(context)
+
+        email = EmailMultiAlternatives(
+                subject,
+                message,
+                email_from,
+                recipient_list
+            )
+
+        email.attach_alternative(content, "text/html")
+        email.send()
+        
+        print("envio correo cancelación exitoso")
+        return(True, "envio correo cancelación exitoso")
+
+    except Exception as e:
+        return(False , f"no se pudo enviar correo cancelación: {e}")
