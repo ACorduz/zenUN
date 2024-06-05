@@ -23,12 +23,15 @@ def role_required(role_name):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
-            # Verificar si el usuario tiene el rol necesario
-            if request.user.is_authenticated and request.user.roles.filter(nombreRol=role_name).exists():
+            if not request.user.is_authenticated:
+                # Redirigir al login si no está autenticado
+                return redirect(settings.LOGIN_URL)
+            
+            if request.user.roles.filter(nombreRol=role_name).exists():
                 return view_func(request, *args, **kwargs)
             else:
-                # Si el usuario no tiene el rol necesario, redirigir a una página de acceso denegado
-                return redirect(reverse('accesoDenegado'))  # Puedes definir una URL para una página de acceso denegado
+                # Redirigir a una página de acceso denegado si no tiene el rol necesario
+                return redirect(reverse('accesoDenegado'))  # Asegúrate de definir esta URL en tu proyecto
         return _wrapped_view
     return decorator
 
@@ -487,7 +490,9 @@ def mostrar_vistaVerificarCorreoAdminBienestar(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     return render(request, 'VerificacionCorreoRegistroAdministradorBienestar.html', {'mensaje': mensaje})
 
+
 #Funcionalidad para verificar si un usuario ya está registrado como estudiante
+@role_required('Administrador Informes')
 def procesar_verificar_correo_Admin_Bienestar(request):
     try:
         if request.method == "POST":
@@ -528,14 +533,16 @@ def procesar_verificar_correo_Admin_Bienestar(request):
         return redirect(reverse('verificacionCorreoAdminBienestar') + f'?mensaje={mensaje}')
     
 
-@role_required('Administrador Informes')
+
 #Método para mostrar la vista de registro admnistrador bienestar
+@role_required('Administrador Informes')
 def mostrar_registro_administrativo(request):
     tipos_documentos = tipoDocumento.objects.all()
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     return render(request, 'RegistroAdministradorBienestar.html', {'tipos_documentos':tipos_documentos, 'mensaje': mensaje})
 
 #Este método se encarga de procesar el formulario de registro cuando se envía
+@role_required('Administrador Informes')
 def procesar_registro_administrador_bienestar(request):
     try:
         if request.method == "POST":
@@ -586,6 +593,11 @@ def procesar_registro_administrador_bienestar(request):
                 idRazonCambio = razonCambio.objects.get(pk=5) #Razón cambio 5: Asignación rol admin
                 administradorBienestar._change_reason = idRazonCambio
                 administradorBienestar.roles.add(administradorBienestar.numeroDocumento, 2)
+
+                #Asignar el rol de Estudiante
+                idRazonCambio = razonCambio.objects.get(pk=7) #Razón cambio 7: Asignación rol estudiante
+                administradorBienestar._change_reason = idRazonCambio
+                administradorBienestar.roles.add(administradorBienestar.numeroDocumento, 1)
                 
                 ##Envio de correo con el código de verificación
                 #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
@@ -629,6 +641,7 @@ def procesar_registro_administrador_bienestar(request):
     return redirect(reverse('registroAdministradorBienestar') + f'?mensaje={mensaje}')
 
 #Este método se encarga de asignar el rol de administrador de bienestar al usuario que ya está registrado como estudiante
+@role_required('Administrador Informes')
 def procesar_asignacion_rol_administrador_bienestar(request):
     try:
         if request.method == "POST":

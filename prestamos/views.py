@@ -120,6 +120,7 @@ def generar_tareaSegundoPlano(request):
     scheduler.start()
     return render(request, 'PrincipalAdminMaster.html')
 
+@role_required('Estudiante')
 #Este método solo se encarga de mostrar la vista de solicitar Prestamo
 def mostrar_solicitarPrestamo(request,implemento_id):
 
@@ -230,7 +231,7 @@ def guardar_informacionPrestamo(request,implemento_id):
 
 
 ################# Funcionalidad Devolucion Prestamo AdministradorBienestar ################
-
+@role_required('Administrador Bienestar')
 def mostrar_devolucionImplementos_administradorBienestar(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     revision_datos = request.GET.get('revision_datos', '0')  # Obtener un parametro que nos dice si la persona reviso los datos , si está presente, sino poner 0 es dececir no reviso
@@ -247,6 +248,7 @@ def mostrar_devolucionImplementos_administradorBienestar(request):
     return render(request, 'DevolucionImplementos.html', contexto)
 
 # Metodo para procesar la información del prestamo pasando los datos a la URL 
+@role_required('Administrador Bienestar')
 def mostrar_informacionPrestamo_devolucionImplementos_administradorBienestar(request):
     try:
         if request.method == "POST":
@@ -254,6 +256,7 @@ def mostrar_informacionPrestamo_devolucionImplementos_administradorBienestar(req
             # Obtener los datos del formulario
             NumeroDocumento = request.POST.get('documentNumber')
             #print(type(NumeroDocumento))
+            
             try:
                 # ver si existe el prestamo
                 if prestamo.objects.filter(estudianteNumeroDocumento=NumeroDocumento, estadoPrestamo_id="2"): # En la BD 2 = ACTIVO
@@ -297,6 +300,7 @@ def mostrar_informacionPrestamo_devolucionImplementos_administradorBienestar(req
             return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
 
 # Metodo para mostrar la vista devolucionImplementos.html pero cogiendo los datos de la URL 
+@role_required('Administrador Bienestar')
 def mostrar_devolucionImplementosConParametroNumeroDocumento_administradorBienestar(request, numeroDocumento): 
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
     implemento_prestado = request.GET.get('implemento_prestado', '')  # Obtener el implementoPrestado de la URL, si está presente
@@ -455,38 +459,8 @@ def mostrar_tabla_disponibilidad_implementos(request, mensaje=None):
     roles_count = request.user.roles.count()
     return render(request, 'disponibilidad.html', {'implementos': implementos_con_ultimos_prestamos, 'edificios': edificios, 'correo': correo_usuario, 'mensaje': mensaje,'roles_count':roles_count})
     
-    # # Obtener la hora actual en UTC
-    # hora_actual_utc = timezone.now()
-
-    # # Ajustar la hora actual a la zona horaria de Bogotá (UTC-5)
-    # diferencia_horaria = timedelta(hours=-5)
-    # hora_actual_bogota = hora_actual_utc + diferencia_horaria
-
-    # # Verificar y actualizar los préstamos en reserva
-    # for implemento_obj in implementos:
-    #     implemento_obj.prestamos = prestamo.objects.filter(idImplemento=implemento_obj)
-    #     for prestamo_obj in implemento_obj.prestamos:
-    #         #print("Prestamo:", prestamo_obj)
-    #         #print("Estado del préstamo:", prestamo_obj.estadoPrestamo.nombreEstado)
-    #         #print("Fecha y hora de finalización del préstamo:", prestamo_obj.fechaHoraFinPrestamo)
-            
-    #         # Verificar si el préstamo está en proceso y tiene una fecha de finalización
-    #         if prestamo_obj.estadoPrestamo.nombreEstado == 'PROCESO' and prestamo_obj.fechaHoraFinPrestamo:
-    #             print("Hora actual en Bogotá:", hora_actual_bogota.time())
-    #             #print("Hora máxima de reserva:", prestamo_obj.fechaHoraFinPrestamo.time())
-    #             if hora_actual_bogota.time() > prestamo_obj.fechaHoraFinPrestamo.time():
-    #                 print("La hora actual es mayor que la hora máxima de reserva.")
-    #                 prestamo_obj.estadoPrestamo = estadoPrestamo.objects.get(nombreEstado='FINALIZADO')
-    #                 prestamo_obj.fechaHoraInicioPrestamo = None
-    #                 prestamo_obj.fechaHoraFinPrestamo = None
-    #                 prestamo_obj.save()
-
-    #                 # Actualizar el estado del implemento a DISPONIBLE
-    #                 implemento_obj.estadoImplementoId = estadoImplemento.objects.get(nombreEstadoImplemento='DISPONIBLE')
-    #                 implemento_obj.save()
     
-    
-
+@role_required('Estudiante')
 def solicitar_prestamo(request, implemento_id):
     # Obtener el implemento usando su ID
     implemento_obj = implemento.objects.get(pk=implemento_id)
@@ -499,11 +473,13 @@ def solicitar_prestamo(request, implemento_id):
 def mostrar_tabla_aprobar(request):
     prestamos = prestamo.objects.all().filter(estadoPrestamo_id=1)
     roles_count = request.user.roles.count()
+    documentoAdministrador = request.user.numeroDocumento
     print(prestamos) # En la BD 1 = PROCESO
-    return render(request, 'Aprobar_prestamo_tabla.html', {'Prestamos': prestamos,'roles_count':roles_count})
+    return render(request, 'Aprobar_prestamo_tabla.html', {'Prestamos': prestamos,'roles_count':roles_count, 'documentoAdministrador': documentoAdministrador})
 
 
 ################# Actualizamos la vista principal de aprobar prestamo individual################
+@role_required('Administrador Bienestar')
 def procesar_implemento_AdministradorBienestar(request, idImplemento, estudianteNumeroDocumento):
     usuario_actual = request.user
     nombre_usuario = usuario_actual.nombres
