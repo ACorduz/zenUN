@@ -1,15 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pagina Principal Estudiante </title>
+  <title>Pagina Principal Estudiante</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="{% static 'MainPageStudent.css' %}">
 </head>
-
 <body>
   <!-- Traer Libreria SweetAlertTwo-->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -26,76 +24,76 @@
   </script>
   {% endif %}
 
-  <div class="header">
-
-    <button class="button-wrapper" onclick="window.location.href = '/zenUN/usuarios/templates/MainPageStudent.html';">
-      <img src="{% static 'icono.png' %}" alt="Botón 1">
-      <span>zenUN</span>
-    </button>
-    <div class="header-title">
-      <h1>Pagina Principal Estudiantes</h1>
-    </div>
-    <label for="btn-menu">
-      <img src="{% static 'menuIcon.png' %} " alt="Botón 2">
-    </label>
-
-  </div>
-
-  <div class="container-content">
-    <div class="container-forms">
-      <a href="{% url 'tablaDisponibilidadImplementos' %}" style="text-decoration: none;">
-      <div class="container-form1">
-
-        <button class="disponibilidad">
-          <img src="{% static 'implementos.png' %}" alt="disp">
-        </button>
-        <div class="fondogris1">
-          <p>Disponibilidad de Implementos</p>
-        </div>
-
-      </div></a>
-      <a href="{% url 'eventos' %}" style="text-decoration: none;">
-      <div class="container-form2">
-
-        <button class="eventos">
-          <img src="{% static 'eventos.png' %}" alt="eventos">
-        </button>
-        <div class="fondogris2">
-          <p>Eventos</p>
-        </div>
-        
-      </div></a>
-
-    </div>
-  </div>
-  <footer class="footer">
-    <div class="textfooter">
-      <p>© Copyright 2024</p>
-      <p>Algunos derechos reservados.</p>
-      <p>Contáctenos</p>
-      <p>Acerca de este sitio web</p>
-      <p>Actualización: 09/05/2024</p>
-    </div>
-    <div class="lineafooter">
-    </div>
-  </footer>
-  <!-- Menú Cerrar Sesión -->
-  <input type="checkbox" id = "btn-menu"> 
-  <div class="container-menu">
-      <div class="cont-menu">
-          <nav>
-             <!-- Nuevo enlace para Cambiar de Rol -->
-             <a href="{% url 'SeleccionarRol' %}" {% if roles_count == 1 %}class="disabled-link"{% endif %}>
-              <img src="{% static 'cambio.png' %}" alt="Cambiar de Rol" class="imgCambiarRol">
-              Cambiar de Rol
-            </a>
-            <!-- Agrega un mensaje de prueba para verificar si la lógica funciona -->
-              <a href="{% url 'cerrar_sesion'%}"><img src="{% static 'logoutIcon.png' %}" alt="Menu" class="imgCerrarSesion">Cerrar Sesión</a>
-              <a href="{% url 'eventosInscritos'%}"><img src="{% static 'eventosInscritos.png' %}" alt="Menu" class="imgCerrarSesion">Eventos Inscritos</a>
-              <!-- Etiqueta "a" para agregar más items al menú -->
-          </nav>            
+  <div class="page-container">
+    <div class="header">
+      <button class="button-wrapper" onclick="window.location.href = '/paginaPrincipalEstudiante/';">
+        <img src="{% static 'icono.png' %}" alt="Botón 1">
+        <span>zenUN</span>
+      </button>
+      <div class="header-title">
+        <h1>Página Principal Estudiantes</h1>
       </div>
+      <label for="btn-menu">
+        <img src="{% static 'menuIcon.png' %}" alt="Botón 2">
+      </label>
+    </div>
+
+    <div class="container-content">
+      <div class="container-forms">
+        <a href="{% url 'tablaDisponibilidadImplementos' %}" style="text-decoration: none;">
+          <div class="container-form1">
+            <button class="disponibilidad">
+              <img src="{% static 'implementos.png' %}" alt="disp">
+            </button>
+            <div class="fondogris1">
+              <p>Disponibilidad de Implementos</p>
+            </div>
+          </div>
+        </a>
+        <a href="{% url 'eventos' %}" style="text-decoration: none;">
+          <div class="container-form2">
+            <button class="eventos">
+              <img src="{% static 'eventos.png' %}" alt="eventos">
+            </button>
+            <div class="fondogris2">
+              <p>Eventos</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="textfooter">
+        <p>© Copyright 2024</p>
+        <p>Algunos derechos reservados.</p>
+        <p>Contáctenos</p>
+        <p>Acerca de este sitio web</p>
+        <p>Actualización: 09/05/2024</p>
+      </div>
+      <div class="lineafooter"></div>
+    </footer>
+  </div>
+
+  <!-- Menú Cerrar Sesión -->
+  <input type="checkbox" id="btn-menu">
+  <div class="container-menu">
+    <div class="cont-menu">
+      <nav>
+        <a href="{% url 'eventosInscritos'%}">
+          <img src="{% static 'eventosInscritos.png' %}" alt="Menu" class="imgCerrarSesion">Eventos Inscritos
+        </a>
+        <!-- Nuevo enlace para Cambiar de Rol -->
+        <a href="{% url 'SeleccionarRol' %}" {% if roles_count == 1 %}class="disabled-link"{% endif %}>
+          <img src="{% static 'cambio.png' %}" alt="Cambiar de Rol" class="imgCambiarRol"> Cambiar de Rol
+        </a>
+        <!-- Agrega un mensaje de prueba para verificar si la lógica funciona -->
+        <a href="{% url 'cerrar_sesion'%}">
+          <img src="{% static 'logoutIcon.png' %}" alt="Menu" class="imgCerrarSesion">Cerrar Sesión
+        </a>
+        <!-- Etiqueta "a" para agregar más items al menú -->
+      </nav>
+    </div>
   </div>
 </body>
-
 </html>

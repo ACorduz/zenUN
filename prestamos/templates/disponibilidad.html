@@ -31,7 +31,9 @@
         <span>zenUN</span>
     </button>
     <div class="header-title">Disponibilidad Implementos</div>
-    <img src="{% static 'perfil.png' %}" alt="Botón 2">
+    <label for="btn-menu">
+        <img src="{% static 'menuIcon.png' %} " alt="Botón 2">
+      </label>
 </div>
 <br>
 <!-- Formulario de búsqueda y filtro -->
@@ -53,8 +55,8 @@
         <th>Código</th>
         <th>Edificio</th>
         <th>Disponibilidad</th>
-        <th>Hora de Reserva</th>
-        <th>Hora de Devolución</th>
+        <th>Fecha y hora de Reserva</th>
+        <th>Fecha y hora de Devolución</th>
         <th>Reservar</th>
     </tr>
     <!-- Iterar sobre los implementos y mostrarlos en la tabla -->
@@ -68,8 +70,8 @@
             <td></td>
             <td></td>
         {% else %}
-            <td>{{ implemento.ultima_fecha_inicio_prestamo|default_if_none:"" }}</td>
-            <td>{{ implemento.ultima_fecha_fin_prestamo|default_if_none:"" }}</td>    
+            <td>{{ implemento.ultima_fecha_inicio_prestamo |date:"d/m/Y H:i"|default_if_none:"" }}</td>
+            <td>{{ implemento.ultima_fecha_fin_prestamo |date:"d/m/Y H:i"|default_if_none:"" }}</td>    
         {% endif %}
         {% if implemento.estadoImplementoId.nombreEstadoImplemento != 'DISPONIBLE' %}
             <td><button id="reservarBtn" type="submit" disabled>Reservar</button></td>
@@ -96,6 +98,24 @@
     </div>
     <div class="lineafooter"></div>
 </div>
+  <!-- Menú Cerrar Sesión -->
+  <input type="checkbox" id = "btn-menu"> 
+  <div class="container-menu">
+      <div class="cont-menu">
+          <nav>
+             <a href="{% url 'eventosInscritos'%}"><img src="{% static 'eventosInscritos.png' %}" alt="Menu" class="imgCerrarSesion">Eventos Inscritos</a>
+             <!-- Nuevo enlace para Cambiar de Rol -->
+             <a href="{% url 'SeleccionarRol' %}" {% if roles_count == 1 %}class="disabled-link"{% endif %}>
+              <img src="{% static 'cambio.png' %}" alt="Cambiar de Rol" class="imgCambiarRol">
+              Cambiar de Rol
+            </a>
+            <!-- Agrega un mensaje de prueba para verificar si la lógica funciona -->
+              <a href="{% url 'cerrar_sesion'%}"><img src="{% static 'logoutIcon.png' %}" alt="Menu" class="imgCerrarSesion">Cerrar Sesión</a>
+             
+              <!-- Etiqueta "a" para agregar más items al menú -->
+          </nav>            
+      </div>
+  </div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>

@@ -16,8 +16,10 @@
                 <img src="{% static 'icono.png' %}" alt="Botón 1">
                 <span>zenUN</span>
             </button>
-            <div class="header-title">Aprobar prestamo</div>
-            <img src="{% static 'perfil.png' %}" alt="Botón 2">
+            <div class="header-title">Aprobar préstamo</div>
+            <label for="btn-menu">
+                <img src="{% static 'menuIcon.png' %}" alt="Botón 2">
+            </label>
         </div>
         <br>
 
@@ -38,18 +40,21 @@
                 </tr>
                 
                 {% for prestamos in Prestamos %}
-                <tr>
-                    <td> {{ prestamos.idPrestamo }}</td>
-                    <td> {{ prestamos.estudianteNumeroDocumento.numeroDocumento }}</td>
-                    <td> {{ prestamos.fechaHoraCreacion }}</td>
-                    <td> {{ prestamos.idImplemento.idImplemento}}</td>
-                    <td>
-                        <form action="{% url 'procesarImplemento' prestamos.idImplemento.idImplemento prestamos.estudianteNumeroDocumento.numeroDocumento   %}">
-                            {% csrf_token%}
-                            <button id="aprobar" type="submit">Revisar</button>
-                        </form>
-                    </td>
-                </tr>
+                    {% if prestamos.estudianteNumeroDocumento.numeroDocumento != documentoAdministrador %}
+                    <tr>
+                        <td> {{ prestamos.idPrestamo }}</td>
+                        <td> {{ prestamos.estudianteNumeroDocumento.numeroDocumento }}</td>
+                        <td> {{ prestamos.fechaHoraCreacion }}</td>
+                        <td> {{ prestamos.idImplemento.idImplemento}}</td>
+                        <td>
+                            <form action="{% url 'procesarImplemento' prestamos.idImplemento.idImplemento prestamos.estudianteNumeroDocumento.numeroDocumento   %}">
+                                {% csrf_token%}
+                                <button id="aprobar" type="submit">Revisar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endif %}
+
                 {% endfor %}
             </table> 
         </div>
@@ -63,6 +68,21 @@
                 <p>Actualización: <strong>09/05/2024</strong></p>
             </div>
             <div class="lineafooter"></div>
+        </div>
+        <!-- Menú Cerrar Sesión -->
+        <input type="checkbox" id = "btn-menu"> 
+        <div class="container-menu">
+            <div class="cont-menu">
+                <nav>
+                    <!-- Nuevo enlace para Cambiar de Rol -->
+                    <a href="{% url 'SeleccionarRol' %}" {% if roles_count == 1 %}class="disabled-link"{% endif %}>
+                        <img src="{% static 'cambio.png' %}" alt="Cambiar de Rol" class="imgCambiarRol">
+                        Cambiar de Rol
+                    </a>
+                    <a href="{% url 'cerrar_sesion' %}"><img src="{% static 'logoutIcon.png' %}" alt="Menu" class="imgCerrarSesion">Cerrar Sesión</a>
+                    <!-- Etiqueta "a" para agregar más items al menú -->
+                </nav>            
+            </div>
         </div>
     </body>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

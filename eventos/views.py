@@ -15,8 +15,12 @@ Paragraph, Table, TableStyle, )
 from reportlab.lib import colors
 
 from django.shortcuts import render
-from eventos.models import evento
+from eventos.models import evento,tipoInforme,trazabilidadInformes
 from usuarios.models import usuario
+from usuarios.models import razonCambio
+
+from usuarios.views import role_required
+
 import base64
 
 # llamar a los modelos de la BD
@@ -27,6 +31,7 @@ from django.db.models import Count
 
 # llamar a las librerias para obtener la fecha
 from datetime import datetime, timedelta
+from datetime import timezone as datetimeTimeZone
 from django.utils import timezone
 from datetime import timezone as datetimeTimeZone
 from django.utils import timezone as djangoTimeZone
@@ -41,14 +46,21 @@ from usuarios.models import usuario
 import base64
 from functools import wraps
 
+#Tarea en segundo plano
+from apscheduler.schedulers.background import BackgroundScheduler
+
+import ast
+
 # Create your views here.
 #######################LOGICA PARA CREAR EVENTOS#######################################
-
+@role_required('Administrador Bienestar')
 def mostrar_crear_evento(request):
     categorias = categoriaEvento.objects.all()
     edificios = edificio.objects.all()
+    roles_count = request.user.roles.count()
     mensaje = request.GET.get('mensaje', '')
-    return render(request, 'crearEvento.html', {'categorias': categorias, 'edificios':edificios, 'mensaje':mensaje})
+    datos_ingresados = request.session.pop('datos_ingresados', {})  # Obtener los datos ingresados por el usuario de la sesión
+    return render(request, 'crearEvento.html', {'categorias': categorias, 'edificios':edificios, 'mensaje':mensaje, 'datos': datos_ingresados,'roles_count':roles_count})
 
 def procesar_crear_evento(request):
     try:
@@ -75,17 +87,32 @@ def procesar_crear_evento(request):
                     cat_Evento = categoriaEvento.objects.get(pk=categoriaEvento_)
                     organizador = request.POST.get("organizador")
                     fechaHoraEvento = request.POST.get("fechaHoraEvento")
+                    fechaHoraFinEvento = request.POST.get("fechaHoraFinEvento")
                     edificioId_ = int(request.POST.get("edificio"))
                     edificio_ = edificio.objects.get(pk=edificioId_)
                     lugar = request.POST.get("lugar")
                     descripcion = request.POST.get("descripcion")
                     aforo = int(request.POST.get("aforo"))
 
+                   
+                    # Almacenar los datos ingresados por el usuario en la sesión
+                    request.session['datos_ingresados'] = request.POST.dict()
+
+                    
+                     # Validar que la fechaHoraEventoFinal sea mayor que fechaHoraEvento
+                    if fechaHoraFinEvento <= fechaHoraEvento:
+                        mensaje = 'La fecha y hora de finalización debe ser mayor que la fecha y hora de inicio.'
+                        return redirect(reverse("mostrar_crear_evento") + f'?mensaje={mensaje}')
+                    
                     # Verificar si hay un evento programado en el mismo edificio, lugar y fechaHora
-                    evento_existente = evento.objects.filter(edificio_id=edificio_, lugar=lugar, fechaHoraEvento=fechaHoraEvento)
-                    if evento_existente.exists():
+                    eventos_existentes = evento.objects.filter(
+                        edificio_id=edificio_, lugar=lugar
+                    ).filter(
+                        fechaHoraEvento__lt=fechaHoraFinEvento,  # El evento existente comienza antes de que termine el nuevo evento
+                        fechaHoraEventoFinal__gt=fechaHoraEvento    # El evento existente termina después de que comience el nuevo evento
+                    )
+                    if eventos_existentes.exists():
                         mensaje = 'Ya hay un evento programado en este lugar y fecha. Por favor, elige otro lugar o fecha.'
-                        return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
                     else:
                         # Leer los datos binarios del archivo
                         datos_binarios = archivo.read()
@@ -97,6 +124,7 @@ def procesar_crear_evento(request):
                         categoriaEvento_id=cat_Evento,
                         organizador=organizador,
                         fechaHoraEvento=fechaHoraEvento,
+                        fechaHoraEventoFinal=fechaHoraFinEvento,
                         edificio_id=edificio_,
                         lugar=lugar,
                         flyer=datos_binarios,
@@ -104,12 +132,20 @@ def procesar_crear_evento(request):
                         aforo=aforo
                         )
 
+                        #Trazabilidad eventos
+                        idRazonCambio = razonCambio.objects.get(pk=16) #El admin bienestar crea un evento
+                        evento_._change_reason = idRazonCambio
                         evento_.save()
 
                         #Asignación del estado PROGRAMADO
+                        idRazonCambio = razonCambio.objects.get(pk=17) #Se le asigna el estado de PROGRAMADO
+                        evento_._change_reason = idRazonCambio
                         evento_.estadoEvento.add(evento_.idEvento, 1)
 
                         mensaje = 'Evento creado exitosamente!'
+                        #Llamar la función para que finalice el Evento
+                        generar_tareaSegundoPlanoFinalizarEvento(request,evento_)
+                        request.session.pop('datos_ingresados', None)
                         return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
 
     except Exception as e:
@@ -118,18 +154,63 @@ def procesar_crear_evento(request):
 
     return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
 
+def generar_tareaSegundoPlanoFinalizarEvento(request,evento_):
+    #Funcion para llamar la tarea en una fecha especifica
+    fechaCreacion = evento_.fechaHoraEvento
+    try:
+        # Asegúrate de que la fecha sea un objeto datetime
+        if isinstance(fechaCreacion, str):
+            fechaCreacion = datetime.fromisoformat(fechaCreacion)
+        
+        # Crea una instancia del planificador
+        scheduler = BackgroundScheduler()
+        
+        # Agrega la tarea programada al planificador para que se ejecute en la fecha específica
+        scheduler.add_job(finalizarEvento, 'date', run_date=fechaCreacion, args=[request,evento_])
+        
+        # Inicia el planificador
+        scheduler.start()
+        
+        print("Tarea en segundo plano programada para:", fechaCreacion)
+    
+    except Exception as e:
+
+        print("Error al programar la tarea en segundo plano:", str(e))
+
+def finalizarEvento(request,evento_):
+    print("Funciona melo lo de finalizar evento")
+
+    print(evento_.idEvento)
+    evento_a_finalizar = get_object_or_404(evento, idEvento=evento_.idEvento)
+    
+    estado_finalizado = get_object_or_404(estadoEvento, nombreEstadoEvento='Finalizado')
+    evento_a_finalizar.estadoEvento.clear()
+
+    idRazonCambio = razonCambio.objects.get(pk=23) #Se le asigna el estado de FONALIZADO al evento   
+    evento_a_finalizar._change_reason = idRazonCambio
+
+    evento_a_finalizar.estadoEvento.add(estado_finalizado)
+
+    print("se finalizo bien el evento")
+
+
+    
 #######################LOGICA PARA LISTA DE EVENTOS#######################################
 #Muestra la lista de todos los eventos a los que el estudiante se puede inscribir
+@role_required('Estudiante')
 def mostrar_listaEventos(request):
     eventos = evento.objects.filter(estadoEvento = "1").order_by('fechaHoraEvento')
+    roles_count = request.user.roles.count()
     for evento_ in eventos:
         evento_.imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')  # Convertir la imagen a base64
-    return render(request, 'listaEventos.html', {'eventos': eventos})
+    return render(request, 'listaEventos.html', {'eventos': eventos,'roles_count':roles_count})
 
 #muestra el resumen del evento que el estudiante de click y al cual el estudiante puede inscribirse
+@role_required('Estudiante')
 def mostrar_asistirEvento(request, evento_id):
     evento_ = get_object_or_404(evento, idEvento=evento_id)
     imagen_base64 = base64.b64encode(evento_.flyer).decode('utf-8')
+    roles_count = request.user.roles.count()
     context = {
         'evento_id': evento_id,
         'nombre_evento': evento_.nombreEvento,
@@ -138,7 +219,9 @@ def mostrar_asistirEvento(request, evento_id):
         'fecha_hora_evento': evento_.fechaHoraEvento,
         'lugar': evento_.lugar,
         'descripcion_evento': evento_.descripcion,
-        'imagen_base64': imagen_base64
+        'imagen_base64': imagen_base64,
+        'roles_count':roles_count,
+        'aforo': evento_.aforo
     }
     return render(request, 'asistirEvento.html', context)
 
@@ -150,26 +233,41 @@ def guardar_informacionInscripcion(request,evento_id):
     ###Logica para la validación de no poder inscribirse a otro evento en el mismo horario.
     fecha_evento = evento_.fechaHoraEvento
     evento1 = evento.objects.filter(fechaHoraEvento = fecha_evento, asistentes= numeroDocumentoUser).exclude(idEvento=evento_id)
+    if evento_.aforo == 0:
 
-    if evento1.exists(): 
-        print("No se puede inscribir a este evento por que se cruza con otros eventos en el mismos horario")
+        print("No se puede inscribir a este evento por que ya no hay cupos dispobibles")
 
-        mensaje = f"No se puede inscribir a este evento por que se cruza con otro eventos en el mismo horario" # solo se le pasaria el mensaje en la URL 
+        mensaje = f"No se puede inscribir a este evento por que ya no hay cupos dispobibles" # solo se le pasaria el mensaje en la URL 
         return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
+    
     else:
- 
-        #Logica para verificar que el usuario no este inscrito ya en este evento
-        if not evento_.asistentes.filter(numeroDocumento=numeroDocumentoUser).exists():
-            evento_.asistentes.add(usuario_)  # Establece los asistentes del evento como el usuario dado
-            evento_.save()  # Guarda el evento actualizado
-            print("El usuario fue agregado")
-            Proceso_enviarCorreo_inscripcionExitosa(numeroDocumentoUser,evento_id)
-            return render(request, 'inscripcionExitosa.html')
-        
-        else:
-            print("El usuario ya esta inscrito en este evento")
-            mensaje = f"El usuario ya esta inscrito en este evento"
+        if evento1.exists(): 
+            print("No se puede inscribir a este evento por que se cruza con otros eventos en el mismos horario")
+
+            mensaje = f"No se puede inscribir a este evento por que se cruza con otro eventos en el mismo horario" # solo se le pasaria el mensaje en la URL 
             return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
+        else:
+    
+            #Logica para verificar que el usuario no este inscrito ya en este evento
+            if not evento_.asistentes.filter(numeroDocumento=numeroDocumentoUser).exists():
+                #Trazabilidad Eventos
+                idRazonCambio = razonCambio.objects.get(pk=20) #Estudiante se inscribe a un evento
+                evento_._change_reason = idRazonCambio
+                evento_.asistentes.add(usuario_)  # Establece los asistentes del evento como el usuario dado
+                evento_.aforo -=1
+
+                #Trazabilidad del Aforo
+                idRazonCambio2 = razonCambio.objects.get(pk=22) #El aforo se reduce en 1   
+                evento_._change_reason = idRazonCambio2
+                evento_.save()  # Guarda el evento actualizado
+                print("El usuario fue agregado")
+                Proceso_enviarCorreo_inscripcionExitosa(numeroDocumentoUser,evento_id)
+                return render(request, 'inscripcionExitosa.html')
+            
+            else:
+                print("El usuario ya esta inscrito en este evento")
+                mensaje = f"El usuario ya esta inscrito en este evento"
+                return redirect(reverse('paginaPrincipal_estudiante') + f'?mensaje={mensaje}')
     
 def Proceso_enviarCorreo_inscripcionExitosa(numeroDocumento,evento_id):
     try: 
@@ -222,11 +320,16 @@ def Proceso_enviarCorreo_inscripcionExitosa(numeroDocumento,evento_id):
 
 #######################LOGICA PARA GENERAR INFORMES#######################################
 
-# Función para mostrar la vista principal de la sección de informes 
+# Función para mostrar la vista principal de la sección de informes
+@role_required('Administrador Informes') 
 def mostrar_vista_informes(request):
     mensaje = request.GET.get('mensaje', '')  # Obtener el mensaje de la URL, si está presente
+    eventos = evento.objects.all()
+    roles_count = request.user.roles.count()
     contexto = { # pasarle el contexto de lo que haya
                 'mensaje': mensaje,
+                'eventos': eventos,
+                'roles_count':roles_count
             }
     # retornar la URL
     return render(request, 'vistaPrincipal_informes.html', contexto)
@@ -291,14 +394,18 @@ def procesar_informe_asistencia(request):
     try:
         if request.method == "POST":
             # Obtener los datos del formulario
-            nombreEvento = request.POST.get('nombreEvento')
+            idEvento = int(request.POST.get('selectEvento'))
+            print(idEvento)
+            #lugarEvento = request.POST.get('lugarEvento')
+            #nombreEvento = request.POST.get('nombreEvento')
 
             # LLamar a la URL que hace el informe 
             try:
                 mensaje = "Se esta procesando el informe de asistencia "
 
                 # pasar a la URL los parametros unos como argumentos y otros como cadena de mensaje 
-                cadenaURLParametros = f'?mensaje={mensaje}&nombreEvento={nombreEvento}'
+                cadenaURLParametros = f'?mensaje={mensaje}&idEvento={idEvento}'
+                #&lugarEvento={lugarEvento}&nombreEvento={nombreEvento}
                 return redirect(reverse("DescargarInforme_prueba", args=["Informe_asistencia", 3])+ f'{cadenaURLParametros}')   
             
             except Exception as e:
@@ -354,8 +461,11 @@ def descarga_reportes(request,nombreArchivoReporte:str,numeroReporte:int ):
 
     elif numeroReporte ==3:
         # obtener lo que se paso como mensajes por la url 
-        nombreEvento = request.POST.get('nombreEvento')
-        generarCanvas_Reporte_Asistencia(lienzo, nombreEvento)
+        idEvento = request.GET.get('idEvento')
+        print(idEvento)
+        #lugarEvento = request.POST.get('lugarEvento')
+        #nombreEvento = request.POST.get('nombreEvento')
+        generarCanvas_Reporte_Asistencia(lienzo, idEvento)
 
     else:
         buffer.close() # Cerrar buffer
@@ -585,7 +695,13 @@ def generarCanvas_Reporte_prestamo(lienzo:canvas.Canvas, fechaInicio, fechaFin, 
     lienzo.drawString(x=30, y=750,text=f'3.  ¡TOTAL, SIN FILTROS!, ¿Cuántas veces fueron prestados los implemento VALOR?: ')
     lienzo.setFont('Helvetica-Bold', 15)
     lienzo.drawString(x=500, y=750,text=f'''{numeroTotalPrestamos} ''')
-
+    #Trazabilidad informe de préstamos, idInforme 3
+    tipo_informe = tipoInforme.objects.get(pk=3)
+    nuevo_informe = trazabilidadInformes(
+        fechaGeneracionInforme = fecha_formateada,
+        tipoInforme = tipo_informe
+    )
+    nuevo_informe.save()
     return None
 
 
@@ -630,8 +746,9 @@ def crearTablaReportLab(data, lienzo:canvas.Canvas, numeroColumnas:int, valorHig
 
 
 # Reporte Eventos 
+# Reporte Eventos 
 def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, lugarEvento, opciones_seleccionadas):
-    ## OJO opciones_seleccionadas ES UNA ARRAY 
+    ## OJO opciones_seleccionadas ES UNA ARRAY
 
     ## header
         #header-titulo
@@ -642,18 +759,141 @@ def generarCanvas_Reporte_Eventos(lienzo:canvas.Canvas, fechaInicio, fechaFin, l
         # header-subtitulo
     lienzo.drawString(x=30, y=750,text='ZenUN')
     lienzo.setFont('Helvetica', 12)
+
     lienzo.drawString(30, 730, "Reporte EVENTOS")
         # header-hora
-    lienzo.setFont("Helvetica-Bold", 12)
-    lienzo.drawString(480, 730, "fechaDeAhora")
+    hora_ahora = djangoTimeZone.now() + timedelta(hours=-5)
+    fecha_formateada = hora_ahora.strftime('%Y-%m-%d %H:%M:%S') # Formatear la fecha y hora
 
+    lienzo.setFont("Helvetica-Bold", 12)
+    lienzo.drawString(350, 730, f"Fecha del reporte: {fecha_formateada}")
+
+    ## ------------------ ARRAY DE DATOS PARA LAS TABLAS -----------------
+    data = []
+
+    ## ------------------ MODIFICAR OBJETOS FECHA ------------------------
+    objeto_fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').replace(tzinfo=datetimeTimeZone.utc)   
+    objeto_fechaFinal = (datetime.strptime(fechaFin, '%Y-%m-%d')  + timedelta(days=1) - timedelta(seconds=1)).replace(tzinfo=datetimeTimeZone.utc) 
+    
+    ## ------------------- PRIMERA TABLA----------------------------------
+
+    # Sacar datos de la base de datos
+    BDData = []
+    lista_eventos = evento.objects.select_related('categoriaEvento_id')
+    opciones_seleccionadas = ast.literal_eval(opciones_seleccionadas)
+
+    # Muramos si el lugar esta vacio
+    if (lugarEvento == ""):
+        for opciones in opciones_seleccionadas:
+            for nuevaTabla  in lista_eventos:
+                if (nuevaTabla.categoriaEvento_id.nombreCategoriaEvento == opciones) and (objeto_fechaInicio <= nuevaTabla.fechaHoraCreacion <= objeto_fechaFinal):
+                    row = [
+                        nuevaTabla.idEvento,
+                        nuevaTabla.nombreEvento,
+                        nuevaTabla.fechaHoraCreacion,
+                        nuevaTabla.categoriaEvento_id.nombreCategoriaEvento,
+                        nuevaTabla.organizador
+                    ]
+                    BDData.append(row)
+                else:
+                    pass
+    else:
+        for opciones in opciones_seleccionadas:
+            for nuevaTabla  in lista_eventos:
+                if (nuevaTabla.edificio_id.nombreEdificio.lower() == lugarEvento.lower()) and (nuevaTabla.categoriaEvento_id.nombreCategoriaEvento == opciones) and (objeto_fechaInicio <= nuevaTabla.fechaHoraCreacion <= objeto_fechaFinal):
+                    row = [
+                        nuevaTabla.idEvento,
+                        nuevaTabla.nombreEvento,
+                        nuevaTabla.fechaHoraCreacion,
+                        nuevaTabla.categoriaEvento_id.nombreCategoriaEvento,
+                        nuevaTabla.organizador
+                    ]
+                    BDData.append(row)
+                else:
+                    pass
+
+     #----- CREACION ESTILOS---------
+    # Llamar a los Estilos
+    styles = getSampleStyleSheet() # nos da una lista de estilos a escoger de la biblioteca
+    
+    # Creacion estilo <-- header tabla
+    styleHeaderTable = ParagraphStyle('styleHeaderTable',  
+        parent= styles['Heading1'],
+        fontSize=10, 
+        alignment=1  # Center alignment
+    )
+
+    # Creacion estilo <-- contenido tabla   
+    styleN = ParagraphStyle('p',  
+        parent=styles["BodyText"],
+        fontSize=7, 
+        alignment=1  # Center alignment
+    )
+
+    # Títulos de las columnas (primera fila)
+    idEvento = Paragraph('idEvento', styleHeaderTable)
+    nombreEvento = Paragraph('nombreEvento', styleHeaderTable)
+    fechaCreacion = Paragraph('fechaCreacion', styleHeaderTable)
+    categoriaEvento = Paragraph('categoriaEvento', styleHeaderTable)
+    organizador = Paragraph('organizador', styleHeaderTable)
+
+    data.append([idEvento, nombreEvento, fechaCreacion, categoriaEvento, organizador])
+    
+    high = 700
+
+    # ¿Cuantos prestamos se hicieron en la consulta?
+    TotalConsultaBD1 = len(BDData)
+
+
+    # Agregar (datos BD) al (array data)
+    for datoBd in BDData:
+        row = []
+        for item in datoBd:
+            # Poner estilo a ese dato
+            dato = Paragraph(str(item), styleN)
+            row.append(dato)
+
+        high -= 18
+        data.append(row)
+
+        # CAMBIAR PAGINA, si se pasa de un numero de datos o high especifico 
+        if high < 360:
+            # Poner tabla en el CANVAS
+            crearTablaReportLab(data, lienzo, 5, valorHigh= 700, PonerDesdeLimiteAbajo = True, alturaRow= 18, anchoCol= 3.7)
+
+            # Cambiar el high a 750, ya que alcanzo limite pagina 
+            high = 750
+            
+            # Limpiar datos del array de datos de la tabla 
+            data.clear() 
+
+            # Agregar los (nombres Columnas) a la tabla otra vez 
+            data.append([idEvento, nombreEvento, fechaCreacion, categoriaEvento, organizador])
+
+    # PARA LOS DATOS RESTANTES, si falto dibujar una parte de la tabla
+    crearTablaReportLab(data, lienzo, 5, valorHigh=600, PonerDesdeLimiteAbajo = False, alturaRow= 20, anchoCol= 3.7)
+
+    ##------------------ CUANTOS PRESTAMOS ----------------------------------
+    lienzo.setFont('Helvetica', 10)
+    lienzo.drawString(x=30, y=750,text=f'''1.5  ¡TOTAL EVENTOS IDENTIDICADOS CON FILTROS!: ''')
+    lienzo.setFont('Helvetica-Bold', 15)
+    lienzo.drawString(x=370, y=750,text=f'''{TotalConsultaBD1} ''')
+    lienzo.setFont('Helvetica', 10)
+    lienzo.drawString(x=30, y=735,text='---------------------------------------------------------------------------------------------------------------------------')
+
+    #Trazabilidad informe de Asistencia a eventos, idInforme 2
+    tipo_informe = tipoInforme.objects.get(pk=1)
+    nuevo_informe = trazabilidadInformes(
+        fechaGeneracionInforme = fecha_formateada,
+        tipoInforme = tipo_informe
+    )
+    nuevo_informe.save()
     return(None)
 
     
-
-    
 # Reporte Asistencia
-def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, nombreEvento):
+def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, idEvento):
+
     ## header
         #header-titulo
     lienzo.setLineWidth(.3)
@@ -664,13 +904,133 @@ def generarCanvas_Reporte_Asistencia(lienzo:canvas.Canvas, nombreEvento):
     lienzo.drawString(x=30, y=750,text='ZenUN')
     lienzo.setFont('Helvetica', 12)
     lienzo.drawString(30, 730, "Reporte ASISTENCIA")
+
         # header-hora
+    hora_inicio_reserva = djangoTimeZone.now() + timedelta(hours=-5)
+    fecha_formateada = hora_inicio_reserva.strftime('%Y-%m-%d %H:%M:%S') # Formatear la fecha y hora
+
+    lienzo.setFont("Helvetica-Bold", 12)
+    lienzo.drawString(350, 750, f"Fecha Reporte: {fecha_formateada}")
+   
+
+    ## --------------ARRAY DE DATOS PARA LAS TABLAS ----------------
+    data = []   # Datos de la tabla se pasan mediante un array de arrays 
+    # SACAR DATOS BD 
+    BDDatos = []    
+    eventoSeleccionado = evento.objects.get(pk=idEvento)
+    inscritos = eventoSeleccionado.asistentes.all()
+    for persona in inscritos:
+        row = [
+            persona.apellidos,
+            persona.nombres,
+            persona.correoInstitucional,
+            persona.numeroDocumento,
+            ""
+        ]
+        BDDatos.append(row)
+
+    #Ordena la lista de inscritos por orden alfabético
+    BDDatos.sort(key = lambda x: (x[0].lower(),x[1].lower(),x[3],x[4])) #Primero intenta ordenas por el apellido, si coincide, orden por nombre y así sucesivamente
+
+     ## --------------DATOS DEL EVENTO QUE SE GENERA ----------------
+   
+    nombreEvento = eventoSeleccionado.nombreEvento
+    organizador = eventoSeleccionado.organizador
+    fechaEvento = eventoSeleccionado.fechaHoraEvento
+    aforo = eventoSeleccionado.aforo
+    asistentesInscritos = len(BDDatos)
+
+    lienzo.setFont('Helvetica', 10)
+    lienzo.drawString(30, 700, "Nombre evento: "+ nombreEvento)
+    lienzo.drawString(30, 685, "Organizador: "+ organizador)
+    lienzo.drawString(30, 670, "Fecha evento: "+ fechaEvento.strftime('%Y-%m-%d %H:%M:%S'))
+    lienzo.drawString(30, 655, "Aforo: "+ str(aforo))
+    lienzo.drawString(30, 640, "Inscritos: "+ str(asistentesInscritos))
+    
+    #----- CREACION ESTILOS---------
+    # Llamar a los Estilos
+    styles = getSampleStyleSheet() # nos da una lista de estilos a escoger de la biblioteca
+    
+    # Creacion estilo <-- header tabla
+    styleHeaderTable = ParagraphStyle('styleHeaderTable',  
+        parent= styles['Heading1'],
+        fontSize=10, 
+        alignment=1  # Center alignment
+    )
+
+    # Creacion estilo <-- contenido tabla   
+    styleN = ParagraphStyle('p',  
+        parent=styles["BodyText"],
+        fontSize=7, 
+        alignment=1  # Center alignment
+    )
+
+    # Títulos de las columnas (primera fila)
+    # Paragraph <-- le da estilo a un texto 
+    #                       texto           , estilo 
+    apellidos           = Paragraph('Apellidos', styleHeaderTable)
+    nombres             = Paragraph('Nombres', styleHeaderTable)
+    correoInstitucional = Paragraph('Correo Institucional', styleHeaderTable)
+    numeroDocumento     = Paragraph('Número Documento', styleHeaderTable) 
+    firma               = Paragraph('Firma', styleHeaderTable) 
+
+    # Pasar datos al (array data)
+    data.append([apellidos, nombres, correoInstitucional, numeroDocumento, firma])
+
+     # Variable HIGH para saber cuanto mover la tabla relativamente hacia arriba 
+    high = 700    
+
+    # Agregar (datos BD) al (array data)
+    for datoBd in BDDatos:
+        row = []
+        for item in datoBd:
+            # Poner estilo a ese dato
+            dato = Paragraph(str(item), styleN)
+            row.append(dato)
+
+        high -= 18
+        data.append(row)
+
+        # CAMBIAR PAGINA, si se pasa de un numero de datos o high especifico 
+        if high < 360:
+            # Poner tabla en el CANVAS
+            crearTablaReportLab(data, lienzo, 5, valorHigh= 700, PonerDesdeLimiteAbajo = True, alturaRow= 18, anchoCol= 3.7)
+
+            # Cambiar el high a 750, ya que alcanzo limite pagina 
+            high = 750
+            
+            # Limpiar datos del array de datos de la tabla 
+            data.clear() 
+
+            # Agregar los (nombres Columnas) a la tabla otra vez 
+            data.append([apellidos, nombres, correoInstitucional, numeroDocumento, firma])
+
+    # PARA LOS DATOS RESTANTES, si falto dibujar una parte de la tabla
+    crearTablaReportLab(data, lienzo, 5, valorHigh=600, PonerDesdeLimiteAbajo = False, alturaRow= 20, anchoCol= 3.7)
+
+    """
+    lienzo.drawString(100,100, eventoSeleccionado.nombreEvento)
+    
+    for personas in inscritos:
+        lienzo.drawString(100,150, personas.correoInstitucional)
+        print(personas.correoInstitucional)
+        
+    # header-hora
     lienzo.setFont("Helvetica-Bold", 12)
     lienzo.drawString(480, 730, "fechaDeAhora")
+    """
+    #Trazabilidad informe de Asistencia a eventos, idInforme 2
+    tipo_informe = tipoInforme.objects.get(pk=2)
+    nuevo_informe = trazabilidadInformes(
+        fechaGeneracionInforme = fecha_formateada,
+        tipoInforme = tipo_informe
+    )
+    nuevo_informe.save()
     return(None)
 
 #######################LOGICA PARA CREAR EVENTOS#######################################
 #Logica para cancelar la inscripción a un evento
+@role_required('Estudiante')
 def cancelar_inscripcionEvento(request):
     return render(request, 'asistirEvento.html')
 
@@ -689,11 +1049,11 @@ def cancelar_inscripcionEvento(request):
 #             'estado': estado.nombreEstadoEvento if estado else '',  # Obtener el nombre del estado o cadena vacía si no hay estado
 #         })
 #     return render(request, 'cancelarEvento.html', {'eventos_info': eventos_info})
-
+@role_required('Administrador Bienestar')
 def mostrar_cancelar_evento(request):
     # Filtrar los eventos que tienen el estado "Programado"
     eventos = evento.objects.filter(estadoEvento__nombreEstadoEvento='Programado').select_related('categoriaEvento_id', 'edificio_id').prefetch_related('estadoEvento')
-    
+    roles_count = request.user.roles.count()
     eventos_info = []
     for e in eventos:
         estado = e.estadoEvento.first()  # Obtener el primer estado del evento
@@ -707,13 +1067,68 @@ def mostrar_cancelar_evento(request):
                 'estado': estado.nombreEstadoEvento,
             })
     
-    return render(request, 'cancelarEvento.html', {'eventos_info': eventos_info})
+    return render(request, 'cancelarEvento.html', {'eventos_info': eventos_info,'roles_count':roles_count})
 
 def cancelar_evento(request, evento_id):
     evento_a_cancelar = get_object_or_404(evento, idEvento=evento_id)
     
     estado_cancelado = get_object_or_404(estadoEvento, nombreEstadoEvento='Cancelado')
+
+    idRazonCambio = razonCambio.objects.get(pk=19) #Se quita el estado de programado al evento
+    evento_a_cancelar._change_reason = idRazonCambio
+
     evento_a_cancelar.estadoEvento.clear()
+
+    idRazonCambio = razonCambio.objects.get(pk=18) #Se le asigna el estado de CANCELADO al evento   
+    evento_a_cancelar._change_reason = idRazonCambio
+
     evento_a_cancelar.estadoEvento.add(estado_cancelado)
-    
+
+    Proceso_enviarCorreo_cancelacionEvento(evento_id)
+
     return redirect('mostrar_cancelar_evento')
+
+def Proceso_enviarCorreo_cancelacionEvento(evento_id):
+    try: 
+
+        #Datos del evento para enviar por correo
+        evento_ = get_object_or_404(evento, idEvento=evento_id)
+        #Los correos de los asistentes
+        recipient_list = []
+        asistentes = evento_.asistentes.all()
+        for asistente in asistentes:
+            recipient_list.append(asistente.correoInstitucional)
+
+        nombreEvento = evento_.nombreEvento
+        fechaEvento = evento_.fechaHoraEvento
+
+        #El correo necesita un asunto, mensaje que se quiere enviar, quien lo envia, y los correos a los que se quiere enviar
+        subject = "Evento Cancelado"
+        message = ""
+        email_from = settings.EMAIL_HOST_USER
+        
+
+        #Generamos un html para que el correo que se envia sea más vistoso y no solo texto plano
+        context = {
+                    "nombreEvento":nombreEvento,
+                    "fechaEvento":fechaEvento ,
+                }
+        #Renderizamos el template html
+        template = get_template("SendMessageEmailCancelacionEvento.html")
+        content = template.render(context)
+
+        email = EmailMultiAlternatives(
+                subject,
+                message,
+                email_from,
+                recipient_list
+            )
+
+        email.attach_alternative(content, "text/html")
+        email.send()
+        
+        print("envio correo cancelación exitoso")
+        return(True, "envio correo cancelación exitoso")
+
+    except Exception as e:
+        return(False , f"no se pudo enviar correo cancelación: {e}")

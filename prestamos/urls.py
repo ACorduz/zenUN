@@ -31,10 +31,10 @@ urlpatterns = [
         ), #En la vista  devolucionImplementos( con paramentro CORREO en la URL)  procesar devolucion implemento
         ##vista Disponibilidad Implementos
         path('tablaDisponibilidadImplementos/', 
-             login_required(views.mostrar_tabla_disponibilidad_implementos), 
+             views.mostrar_tabla_disponibilidad_implementos, 
              name='tablaDisponibilidadImplementos'),
         path("aprobarPrestamoTabla/",
-            login_required(views.mostrar_tabla_aprobar),
+            views.mostrar_tabla_aprobar,
             name="Mostrar_aprobarPrestamo_tabla"
         ),# Vista de la tabla de prestamos por aprobar por parte del administrador de bienestar
         path("procesarImplemento/<int:idImplemento>/<int:estudianteNumeroDocumento>/",

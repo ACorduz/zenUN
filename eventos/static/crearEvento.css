@@ -43,8 +43,9 @@
     color: black; 
 }
 .header img[alt="Botón 2"] {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
     cursor: pointer;
 }
 /*Header*/
@@ -67,8 +68,26 @@ body{
     object-fit: contain;
 }
 
-#nombreEvento, #organizador, #categoria, #edificio, #lugar, #aforo, #descripcion, #datetimeInput{
+#nombreEvento, #organizador, #categoria, #edificio, #lugar, #aforo, #descripcion, #datetimeInput, #datetimeInput1{
     max-width: 350px; /* Puedes ajustar este valor según tu preferencia */
+}
+.button-style {
+    font-family: 'MiFuente', sans-serif;
+    font-size: 20px;
+    width: 30%;
+    padding: 5px;
+    border-radius: 30px;
+    border: none;
+    background-color: #6b00b3;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ajusté la opacidad del shadow a 0.2 */
+    margin-bottom: 5px;
+    margin-left: 70px;
+}
+
+.button-style:hover {
+    background-color: #2eeb2e;
 }
 
 /*Footer*/
@@ -93,3 +112,74 @@ body{
     padding-right: 4px;
 }
 /*Footer*/
+
+/* Menu Cerrar sesión*/
+#btn-menu{
+    display: none;
+}
+#btn-menu:checked ~ .container-menu{
+    opacity: 1;
+    visibility: visible;
+}
+.container-menu{
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: rgba(0,0,0,0.5);
+    height: 100%;
+    width: 100%;
+    transition: all 500ms ease;
+    opacity: 0;
+    visibility: hidden;
+}
+.cont-menu{
+    visibility: hidden;
+    width: 100%;
+    height: 190px;
+    position: absolute;
+    right: 0;
+    max-width: 250px;
+    background-color: #c0febf;
+    transition: all 500ms ease;
+    transform: translateY(-100%);
+    
+}
+/*Animación despliegue hacía abajo*/
+#btn-menu:checked ~ .container-menu .cont-menu{
+    visibility: visible;
+    transform: translateX(0%);    
+}
+.container-menu nav{    
+    position: relative;
+    top: 110px
+}
+.container-menu nav a{    
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    padding-left: 10px;    
+    color: black;  
+    border-left: 5px solid transparent;
+    transition: all 400ms ease;
+}
+.container-menu nav a:hover{    
+    border-left: 5px solid black;
+    background: rgba(0, 0, 0, 0.192);    
+}
+.imgCerrarSesion{
+    width: 40px;
+    height: 40px;
+    padding-right: 10px;    
+}
+.imgCambiarRol{
+    width: 40px;
+    height: 40px;
+    padding-right: 10px; 
+}
+.disabled-link {
+    color: #ccc; /* Cambia el color del texto a gris */
+    pointer-events: none; /* Evita que se puedan hacer clic en el enlace */
+    cursor: not-allowed; /* Cambia el cursor a "no permitido" */
+    text-decoration: none; /* Quita cualquier decoración de texto */
+    opacity: 0.5;
+}
