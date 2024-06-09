@@ -335,6 +335,7 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request, nu
             # obtener el comentario del html
             comentarioBack= request.POST.get('comentario')
 
+    
             # Obtener el objeto del prestamo  
             objetoPrestamo = prestamo.objects.get(estudianteNumeroDocumento=numeroDocumento, estadoPrestamo_id="2") 
 
@@ -344,6 +345,15 @@ def procesar_devolucion_devolucionImplementos_administradorBienestar(request, nu
             # Obtener el implemento 
             objetoImplemento = implemento.objects.get(idImplemento= f"{ImplementoIdBack}")
 
+            # VERIFICACION Adm bienestar no pueda devolverse su propio PRESTAMO
+
+            numeroDocumento_adm = request.user.numeroDocumento       # obtener el numero de documento de la cookie
+            numeroDocumento_est = int(numeroDocumento)
+            # print(f"ADM {numeroDocumento_adm}, {type(numeroDocumento_adm)}; USUARIO {numeroDocumento_est}, {type(numeroDocumento_est)}")
+            if (numeroDocumento_adm == numeroDocumento_est):
+                mensaje = f'Error, el adm. de bienestar no puede devolverse un prestamo que creo el mismo.' 
+                return redirect(reverse('devolucionImplementos') + f'?mensaje={mensaje}')
+            
 
             # Crear le comentario del implemento y meterlo en la BD
             comentario = comentarioImplemento(
