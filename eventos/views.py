@@ -153,31 +153,49 @@ def procesar_crear_evento(request):
 
     return redirect(reverse("mostrar_crear_evento")+ f'?mensaje={mensaje}')
 
-def generar_tareaSegundoPlanoFinalizarEvento(request,evento_):
-    #Funcion para llamar la tarea en una fecha especifica
-    fechaCreacion = evento_.fechaHoraEvento
+def generar_tareaSegundoPlanoFinalizarEvento(request, evento_):
+    # Función para llamar la tarea en una fecha específica
+    fecha_InicioEvento = evento_.fechaHoraEvento
+    fechaActual = timezone.now()
     try:
         # Asegúrate de que la fecha sea un objeto datetime
-        if isinstance(fechaCreacion, str):
-            fechaCreacion = datetime.fromisoformat(fechaCreacion)
+        if isinstance(fecha_InicioEvento, str):
+            fecha_InicioEvento = datetime.fromisoformat(fecha_InicioEvento)
         
+        # Convertir ambos datetimes a timezone-aware
+        if fecha_InicioEvento.tzinfo is None:
+            fecha_InicioEvento = timezone.make_aware(fecha_InicioEvento, timezone.get_current_timezone())
+        
+        #Por el tema de zonas horarias toca cuadrar esto manual
+
+        fechasBien = fecha_InicioEvento + timedelta(hours=5)
+        # Calcula la diferencia de tiemp
+        diferencia =fechasBien - fechaActual
+
+        print(diferencia)
+        print(fechaActual)
+        print(fecha_InicioEvento)
+
+        segundos_totales = diferencia.seconds
+        
+        run_date_ = fechaActual + timedelta(seconds=segundos_totales)
         # Crea una instancia del planificador
         scheduler = BackgroundScheduler()
         
         # Agrega la tarea programada al planificador para que se ejecute en la fecha específica
-        scheduler.add_job(finalizarEvento, 'date', run_date=fechaCreacion, args=[request,evento_])
+        scheduler.add_job(finalizarEvento, 'date', run_date=run_date_, args=[request, evento_])
         
         # Inicia el planificador
         scheduler.start()
         
-        print("Tarea en segundo plano programada para:", fechaCreacion)
+        print("Tarea en segundo plano programada para:", run_date_)
     
     except Exception as e:
 
         print("Error al programar la tarea en segundo plano:", str(e))
 
 def finalizarEvento(request,evento_):
-    print("Funciona melo lo de finalizar evento")
+    print("Entro a la función de finalizar evento exitosamente")
 
     print(evento_.idEvento)
     evento_a_finalizar = get_object_or_404(evento, idEvento=evento_.idEvento)
