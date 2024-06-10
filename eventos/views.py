@@ -250,7 +250,7 @@ def guardar_informacionInscripcion(request,evento_id):
 
     ###Logica para la validación de no poder inscribirse a otro evento en el mismo horario.
     fecha_evento = evento_.fechaHoraEvento
-    evento1 = evento.objects.filter(fechaHoraEvento = fecha_evento, asistentes= numeroDocumentoUser).exclude(idEvento=evento_id)
+    evento1 = evento.objects.filter(fechaHoraEvento = fecha_evento, asistentes= numeroDocumentoUser, estadoEvento="1").exclude(idEvento=evento_id)
     if evento_.aforo == 0:
 
         print("No se puede inscribir a este evento por que ya no hay cupos dispobibles")
