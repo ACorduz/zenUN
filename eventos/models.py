@@ -31,7 +31,7 @@ class evento(models.Model):
     aforo = models.SmallIntegerField()
     asistentes = models.ManyToManyField(usuario)
     estadoEvento = models.ManyToManyField(estadoEvento)
-    history = HistoricalRecords(history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE),m2m_fields=[asistentes, estadoEvento],table_name = 'trazabilidadEventos',cascade_delete_history=True)           
+    history = HistoricalRecords(excluded_fields=['flyer'],history_change_reason_field=models.ForeignKey(razonCambio, null=True, on_delete=models.CASCADE),m2m_fields=[asistentes, estadoEvento],table_name = 'trazabilidadEventos',cascade_delete_history=True)           
 
 class tipoInforme(models.Model):
     idTipoInforme = models.AutoField(primary_key=True)
