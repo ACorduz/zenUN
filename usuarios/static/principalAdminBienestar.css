@@ -128,6 +128,9 @@ body {
 #cancelarEventoButton {
     background: url('../static/imgButtonCancelarEvento.jpg') no-repeat center center/cover;
 }
+#registroAdminButton {
+    background: url('../static/viejounal.jpg') no-repeat center center/cover;
+}
 
 /* Estilos para el footer */
 .footer {

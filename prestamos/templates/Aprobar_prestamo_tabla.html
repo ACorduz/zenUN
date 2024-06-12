@@ -40,18 +40,21 @@
                 </tr>
                 
                 {% for prestamos in Prestamos %}
-                <tr>
-                    <td> {{ prestamos.idPrestamo }}</td>
-                    <td> {{ prestamos.estudianteNumeroDocumento.numeroDocumento }}</td>
-                    <td> {{ prestamos.fechaHoraCreacion }}</td>
-                    <td> {{ prestamos.idImplemento.idImplemento}}</td>
-                    <td>
-                        <form action="{% url 'procesarImplemento' prestamos.idImplemento.idImplemento prestamos.estudianteNumeroDocumento.numeroDocumento   %}">
-                            {% csrf_token%}
-                            <button id="aprobar" type="submit">Revisar</button>
-                        </form>
-                    </td>
-                </tr>
+                    {% if prestamos.estudianteNumeroDocumento.numeroDocumento != documentoAdministrador %}
+                    <tr>
+                        <td> {{ prestamos.idPrestamo }}</td>
+                        <td> {{ prestamos.estudianteNumeroDocumento.numeroDocumento }}</td>
+                        <td> {{ prestamos.fechaHoraCreacion }}</td>
+                        <td> {{ prestamos.idImplemento.idImplemento}}</td>
+                        <td>
+                            <form action="{% url 'procesarImplemento' prestamos.idImplemento.idImplemento prestamos.estudianteNumeroDocumento.numeroDocumento   %}">
+                                {% csrf_token%}
+                                <button id="aprobar" type="submit">Revisar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endif %}
+
                 {% endfor %}
             </table> 
         </div>
